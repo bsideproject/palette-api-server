@@ -1,8 +1,19 @@
 spring:
   main:
     banner-mode: off
-  datasource:
-    driverClassName: org.h2.Driver
-    jdbcUrl: jdbc:h2:mem:~/palette;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
-    password:
+  profiles:
+    default: local
+    group:
+      local: local
+
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health, info
+      path-mapping:
+        health : healthcheck
+
+server:
+  port: 8082
