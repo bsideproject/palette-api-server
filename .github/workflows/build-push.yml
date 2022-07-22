@@ -77,7 +77,6 @@ jobs:
             echo "docker images remove success"
             docker-compose up --build -d
             echo "docker-compose start success"
-#            ./copy.sh
           fi
 
       - name: action-slack
