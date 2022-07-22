@@ -76,9 +76,10 @@ jobs:
           else
             docker rmi ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}
             echo "docker images remove success"
+            docker-compose up --build -d
+            echo "docker-compose start success"
+            ./copy.sh
           fi
-          docker-compose up --build -d
-          ./copy.sh
 
       - name: action-slack
         uses: 8398a7/action-slack@v3
