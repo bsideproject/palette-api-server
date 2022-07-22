@@ -69,7 +69,12 @@ jobs:
         run: |
           cd /home/server/api-server
           docker-compose down
-          docker rmi -f $(docker images -a -q)
+          if [ -z docker images | grep ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}" ]; then
+            docker rmi ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}
+            echo "docker images remove success"
+          else
+            echo "not search docker images"
+          fi
           docker-compose up --build -d
           ./copy.sh
 
