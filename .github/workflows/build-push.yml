@@ -1,5 +1,3 @@
-#재푸시
-
 # build-push.yml
 name: 'build-push'
 
@@ -73,12 +71,13 @@ jobs:
           docker-compose down
           if [ -z $(docker images -qf reference='${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}') ]; then
             echo "not search docker images"
+            exit 1
           else
-            docker rmi ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}
+            docker rmi -f ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}
             echo "docker images remove success"
             docker-compose up --build -d
             echo "docker-compose start success"
-            ./copy.sh
+#            ./copy.sh
           fi
 
       - name: action-slack
