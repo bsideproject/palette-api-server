@@ -4,8 +4,8 @@ name: 'build-push'
 on:
   push:
     branches: [ "develop" ]
-  pull_request:
-    branches: [ "develop" ]
+#  pull_request:
+#    branches: [ "develop" ]
 
 jobs:
   build:
@@ -70,10 +70,10 @@ jobs:
           cd /home/server/api-server
           docker-compose down
           if [ -z $(docker images -qf reference='${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}') ]; then
+            echo "not search docker images"
+          else
             docker rmi ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}
             echo "docker images remove success"
-          else
-            echo "not search docker images"
           fi
           docker-compose up --build -d
           ./copy.sh
