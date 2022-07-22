@@ -69,7 +69,7 @@ jobs:
         run: |
           cd /home/server/api-server
           docker-compose down
-          if [ -z $(docker images -q ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}} ]; then
+          if [ -z $(docker images -q ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}) ]; then
             docker rmi ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}
             echo "docker images remove success"
           else
