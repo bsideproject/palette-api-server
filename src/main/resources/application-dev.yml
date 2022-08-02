@@ -18,5 +18,3 @@ aws:
     profile-separator: '-'
     name: app-palette
     fail-fast: false
-
-kwc: ${mysql.url}
