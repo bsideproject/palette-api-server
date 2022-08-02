@@ -1,0 +1,35 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+    import: 'aws-parameterstore:'
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/palette_auth
+    username: dbuser
+    password: dbuser1234
+  jpa:
+    show-sql: true
+    hibernate.ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    properties:
+      hibernate:
+        format_sql: true
+
+# Logging
+logging:
+  level:
+    org.springframework.web: DEBUG
+    io:
+      awspring:
+        cloud:
+          paramstore:
+            io.awspring.cloud.paramstore.AwsParamStorePropertySource: debug
+
+aws:
+  paramstore:
+    enabled: true
+    prefix: /config
+    profile-separator: '-'
+    name: app-palette
+    fail-fast: true
