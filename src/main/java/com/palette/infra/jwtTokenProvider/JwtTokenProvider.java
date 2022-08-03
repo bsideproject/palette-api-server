@@ -1,5 +1,7 @@
 package com.palette.infra.jwtTokenProvider;
 
+import com.palette.exception.TokenExpirationException;
+import com.palette.exception.TokenNotValidException;
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;
 
@@ -50,9 +52,9 @@ public class JwtTokenProvider {
                     .setSigningKey(getSecretKey(jwtTokenType))
                     .parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
-            throw new RuntimeException();
+            throw new TokenExpirationException();
         } catch (NullPointerException | JwtException | IllegalArgumentException e) {
-            throw new RuntimeException();
+            throw new TokenNotValidException();
         }
     }
 
