@@ -1,4 +1,4 @@
-package com.palette.domain;
+package com.palette;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

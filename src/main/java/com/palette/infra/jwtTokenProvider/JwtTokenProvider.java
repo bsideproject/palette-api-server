@@ -1,4 +1,4 @@
-package com.palette.infrastructure.jwtTokenProvider;
+package com.palette.infra.jwtTokenProvider;
 
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;

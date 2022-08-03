@@ -1,7 +1,7 @@
-package com.palette.domain.token;
+package com.palette.token.domain;
 
 
-import com.palette.domain.BaseEntity;
+import com.palette.BaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

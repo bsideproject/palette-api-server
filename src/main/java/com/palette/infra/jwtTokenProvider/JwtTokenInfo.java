@@ -1,4 +1,4 @@
-package com.palette.infrastructure.jwtTokenProvider;
+package com.palette.infra.jwtTokenProvider;
 
 public interface JwtTokenInfo {
     String getSecretKey();

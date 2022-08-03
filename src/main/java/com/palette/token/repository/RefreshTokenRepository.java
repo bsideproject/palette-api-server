@@ -1,5 +1,6 @@
-package com.palette.domain.token;
+package com.palette.token.repository;
 
+import com.palette.token.domain.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
