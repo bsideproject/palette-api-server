@@ -50,7 +50,7 @@ public class UserController {
         String refreshToken = userService.createRefreshToken(email);
         return ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)
                 .sameSite("Lax")
-                .secure(true)
+//                .secure(true)
                 .httpOnly(true)
                 .path("/")
                 .maxAge(jwtRefreshTokenInfo.getValidityInSeconds().intValue())
@@ -60,7 +60,7 @@ public class UserController {
     private void expireRefreshTokenCookie(HttpServletResponse response) {
         ResponseCookie responseCookie = ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, "")
                 .sameSite("Lax")
-                .secure(true)
+//                .secure(true)
                 .httpOnly(true)
                 .path("/")
                 .maxAge(0)
