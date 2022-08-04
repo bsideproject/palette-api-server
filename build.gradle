@@ -1,17 +1,17 @@
 buildscript {
-	ext {
-		docsVersion = "0.16.0"
-		querydslVersion = "5.0.0"
-		jwtVersion = "0.9.1"
-	}
+    ext {
+        docsVersion = "0.16.0"
+        querydslVersion = "5.0.0"
+        jwtVersion = "0.9.1"
+    }
 }
 
 plugins {
-	id 'org.springframework.boot' version '2.6.9'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'java'
-	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10" //querydsl
-	id 'org.asciidoctor.jvm.convert' version '3.3.2'  // Spring REST Docs
+    id 'org.springframework.boot' version '2.6.9'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10" //querydsl
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'  // Spring REST Docs
 }
 
 group = 'com.palette'
@@ -19,108 +19,112 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
 ext {
-	set('springCloudVersion', "2021.0.2")
+    set('springCloudVersion', "2021.0.2")
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:2.3.3"
-	}
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
+    imports {
+        mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:2.3.3"
+    }
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-	querydsl.extendsFrom compileClasspath
-	asciidoctorExtensions    // Spring REST Docs
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
+    asciidoctorExtensions    // Spring REST Docs
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    //DGS
+    implementation(platform("com.netflix.graphql.dgs:graphql-dgs-platform-dependencies:latest.release"))
+    implementation "com.netflix.graphql.dgs:graphql-dgs-spring-boot-starter"
 
-	//p6spy
-	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-	implementation "com.querydsl:querydsl-jpa:${querydslVersion}"
-	implementation "com.querydsl:querydsl-apt:${querydslVersion}"
+    //p6spy
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
 
-	// jwt
-	implementation "io.jsonwebtoken:jjwt:${jwtVersion}"
+    implementation "com.querydsl:querydsl-jpa:${querydslVersion}"
+    implementation "com.querydsl:querydsl-apt:${querydslVersion}"
 
-	// spring actuator
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    // jwt
+    implementation "io.jsonwebtoken:jjwt:${jwtVersion}"
 
-	// Spring REST Docs
-	asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
-	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    // spring actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-	// AWS Pamametor store
-	implementation group: 'io.awspring.cloud', name: 'spring-cloud-starter-aws-parameter-store-config'
+    // Spring REST Docs
+    asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 
-	// h2 & mysql
-	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'mysql:mysql-connector-java'
+    // AWS Pamametor store
+    implementation group: 'io.awspring.cloud', name: 'spring-cloud-starter-aws-parameter-store-config'
 
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // h2 & mysql
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'mysql:mysql-connector-java'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 //*.plain.jar exclude
 jar {
-	enabled = false
+    enabled = false
 }
 
 // Spring REST Docs
 task copyDocument(type: Copy) {
-	dependsOn bootJar
-	from file("build/docs/asciidoc/index.html")
-	into file("src/main/resources/static/docs")
+    dependsOn bootJar
+    from file("build/docs/asciidoc/index.html")
+    into file("src/main/resources/static/docs")
 }
 
 bootJar {
-	archivesBaseName = 'palette'
-	archiveFileName = 'palette.jar'
-	dependsOn asciidoctor                        // Spring REST Docs
-	copy {
-		from "${asciidoctor.outputDir}"         // Spring REST Docs
-		into 'src/main/resources/static/docs'   // Spring REST Docs
-	}
-	finalizedBy 'copyDocument'
+    archivesBaseName = 'palette'
+    archiveFileName = 'palette.jar'
+    dependsOn asciidoctor                        // Spring REST Docs
+    copy {
+        from "${asciidoctor.outputDir}"         // Spring REST Docs
+        into 'src/main/resources/static/docs'   // Spring REST Docs
+    }
+    finalizedBy 'copyDocument'
 }
 
 //Spring REST Docs
 ext {
-	snippetsDir = file('build/generated-snippets')
+    snippetsDir = file('build/generated-snippets')
 }
 
 asciidoctor {
-	configurations 'asciidoctorExtensions'
-	inputs.dir snippetsDir
-	dependsOn test
+    configurations 'asciidoctorExtensions'
+    inputs.dir snippetsDir
+    dependsOn test
 
-	sources {
-		include("**/*.adoc", "**/backoffice/*.adoc")
-	}
+    sources {
+        include("**/*.adoc", "**/backoffice/*.adoc")
+    }
 
-	baseDirFollowsSourceFile()
+    baseDirFollowsSourceFile()
 }
 
 asciidoctor.doFirst {
-	delete file('src/main/resources/static/docs')
+    delete file('src/main/resources/static/docs')
 }
 //Spring REST Docs
 
@@ -128,24 +132,24 @@ asciidoctor.doFirst {
 def querydslDir = "$buildDir/generated/querydsl"
 
 querydsl {
-	jpa = true
-	querydslSourcesDir = querydslDir
+    jpa = true
+    querydslSourcesDir = querydslDir
 }
 sourceSets {
-	main.java.srcDir querydslDir
+    main.java.srcDir querydslDir
 }
 compileQuerydsl {
-	options.annotationProcessorPath = configurations.querydsl
+    options.annotationProcessorPath = configurations.querydsl
 }
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-	querydsl.extendsFrom compileClasspath
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
 }
 //querydsl
 
 tasks.named('test') {
-	outputs.dir snippetsDir    // Spring REST Docs
-	useJUnitPlatform()
+    outputs.dir snippetsDir    // Spring REST Docs
+    useJUnitPlatform()
 }
