@@ -3,6 +3,8 @@ spring:
     activate:
       on-profile: local
     import: 'aws-parameterstore:'
+  main:
+    banner-mode: off
 
   # ===============================
   # = jpa
@@ -15,6 +17,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        default_batch_fetch_size: 1000
 
   # ===============================
   # = database
@@ -37,15 +40,10 @@ logging:
       file-name-pattern: '${LOG_FILE}.%d{yyyy-MM-dd}.%i.log'
       max-history: 30
   file:
-    name: ./logs/api.log
+    name: ./server/logs/api.log
   level:
     root: INFO
     org.springframework.web: INFO
-    io:
-      awspring:
-        cloud:
-          paramstore:
-            io.awspring.cloud.paramstore.AwsParamStorePropertySource: debug
 
 aws:
   paramstore:
