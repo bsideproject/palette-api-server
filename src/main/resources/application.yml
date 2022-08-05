@@ -2,8 +2,9 @@ spring:
   main:
     banner-mode: off
   profiles:
-    default: dev
+    default: local
     group:
+      local: local
       dev: dev
 
 management:
