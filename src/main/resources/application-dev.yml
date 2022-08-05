@@ -5,11 +5,51 @@ spring:
     import: 'aws-parameterstore:'
   main:
     banner-mode: off
+
+  # ===============================
+  # = jpa
+  # ===============================
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 1000
+
+  # ===============================
+  # = database
+  # ===============================
   datasource:
-    driverClassName: org.h2.Driver
-    jdbcUrl: jdbc:h2:mem:~/palette;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
-    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mysql8:3306/palette
+    username: palette
+    password: 1q2w3e4r1!
+
+  # ===============================
+  # = logging
+  # ===============================
+logging:
+  pattern:
+    file: '%highlight(%-5level) %X{X-HIT-TRANSACTION-ID} %d{yyyy-MM-dd HH:mm:ss} [%-5p] [%F]%M\(%L\): %m%n'
+    console: '%highlight(%-5level) %X{X-HIT-TRANSACTION-ID} %d{yyyy-MM-dd HH:mm:ss} [%-5p] [%F]%M\(%L\): %m%n'
+  logback:
+    rollingpolicy:
+      file-name-pattern: '${LOG_FILE}.%d{yyyy-MM-dd}.%i.log'
+      max-history: 30
+  file:
+    name: ./logs/api.log
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    io:
+      awspring:
+        cloud:
+          paramstore:
+            io.awspring.cloud.paramstore.AwsParamStorePropertySource: debug
 
 aws:
   paramstore:
