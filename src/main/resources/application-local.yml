@@ -3,23 +3,44 @@ spring:
     activate:
       on-profile: local
     import: 'aws-parameterstore:'
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/palette_auth
-    username: dbuser
-    password: dbuser1234
+
+  # ===============================
+  # = jpa
+  # ===============================
   jpa:
     show-sql: true
-    hibernate.ddl-auto: update
+    hibernate:
+      ddl-auto: update
     database-platform: org.hibernate.dialect.MySQL8Dialect
     properties:
       hibernate:
         format_sql: true
 
-# Logging
+  # ===============================
+  # = database
+  # ===============================
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/palette_auth
+    username: dbuser
+    password: dbuser1234
+
+  # ===============================
+  # = logging
+  # ===============================
 logging:
+  pattern:
+    file: '%highlight(%-5level) %X{X-HIT-TRANSACTION-ID} %d{yyyy-MM-dd HH:mm:ss} [%-5p] [%F]%M\(%L\): %m%n'
+    console: '%highlight(%-5level) %X{X-HIT-TRANSACTION-ID} %d{yyyy-MM-dd HH:mm:ss} [%-5p] [%F]%M\(%L\): %m%n'
+  logback:
+    rollingpolicy:
+      file-name-pattern: '${LOG_FILE}.%d{yyyy-MM-dd}.%i.log'
+      max-history: 30
+  file:
+    name: ./logs/api.log
   level:
-    org.springframework.web: DEBUG
+    root: INFO
+    org.springframework.web: INFO
     io:
       awspring:
         cloud:
