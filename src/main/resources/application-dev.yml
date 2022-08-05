@@ -13,7 +13,6 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: none
-    open-in-view: false
     database-platform: org.hibernate.dialect.MySQL8Dialect
     properties:
       hibernate:
@@ -25,7 +24,7 @@ spring:
   # ===============================
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://mysql8:3306/palette
+    url: jdbc:mysql://61.97.190.252:3306/palette
     username: palette
     password: 1q2w3e4r1!
 
@@ -41,15 +40,10 @@ logging:
       file-name-pattern: '${LOG_FILE}.%d{yyyy-MM-dd}.%i.log'
       max-history: 30
   file:
-    name: ./logs/api.log
+    name: ./server/logs/api.log
   level:
     root: INFO
     org.springframework.web: INFO
-    io:
-      awspring:
-        cloud:
-          paramstore:
-            io.awspring.cloud.paramstore.AwsParamStorePropertySource: debug
 
 aws:
   paramstore:
