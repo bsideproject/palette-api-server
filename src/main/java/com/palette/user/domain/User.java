@@ -1,5 +1,6 @@
 package com.palette.user.domain;
 
+import com.palette.BaseEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,12 +11,8 @@ import java.util.Collection;
 @Getter
 @NoArgsConstructor
 @Entity
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
+public class User extends BaseEntity {
+    @Column(nullable = false, unique = true)
     private String email;
 
     @ElementCollection(targetClass = SocialType.class)
