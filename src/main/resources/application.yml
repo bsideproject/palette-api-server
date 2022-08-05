@@ -2,7 +2,7 @@ spring:
   main:
     banner-mode: off
   profiles:
-    default: dev
+    default: local
     group:
       local: local
       dev: dev
@@ -14,7 +14,7 @@ management:
       exposure:
         include: health, info
       path-mapping:
-        health : healthcheck
+        health: healthcheck
 
 server:
   port: 8082
