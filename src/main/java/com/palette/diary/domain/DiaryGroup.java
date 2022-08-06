@@ -2,12 +2,11 @@ package com.palette.diary.domain;
 
 import com.palette.BaseEntity;
 import com.palette.user.domain.User;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -22,13 +21,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @Table(name = "diary_group")
+@AttributeOverrides({
+    @AttributeOverride(name = "id", column = @Column(name = "group_id")),
+})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DiaryGroup extends BaseEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "seq_no")
-    private Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

@@ -1,11 +1,10 @@
 package com.palette.diary.domain;
 
 import com.palette.BaseEntity;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,14 +21,12 @@ import org.hibernate.annotations.Where;
 @AllArgsConstructor
 @Table(name = "diary")
 @Where(clause = "isDel = 0")
+@AttributeOverrides({
+    @AttributeOverride(name = "id", column = @Column(name = "diary_id")),
+})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE diary SET isDel = 1 WHERE id = ?")
 public class Diary extends BaseEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "diary_id")
-    private Long id;
 
     @Column(length = 12)
     private String title;
@@ -42,7 +39,7 @@ public class Diary extends BaseEntity {
 
     @Builder.Default
     @ColumnDefault("0")
-    @Column(name = "del_status")
-    private Integer isDel = 0;
+    @Column(name = "id_deleted")
+    private Integer isDeleted = 0;
 
 }
