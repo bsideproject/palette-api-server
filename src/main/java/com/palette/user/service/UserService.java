@@ -62,7 +62,6 @@ public class UserService {
     }
 
     public TokenResponse renewAccessToken(String email, String refreshToken) {
-        validateAccessToken(refreshToken);
         return TokenResponse.of(jwtTokenProvider.createAccessToken(email));
     }
 
