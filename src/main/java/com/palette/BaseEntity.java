@@ -14,7 +14,7 @@ import java.util.Date;
 @Getter
 public abstract class BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false)
