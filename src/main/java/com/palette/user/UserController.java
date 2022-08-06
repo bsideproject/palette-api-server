@@ -47,6 +47,16 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/token")
+    public ResponseEntity<TokenResponse> token(
+            @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME, required = true) String refreshToken,
+            HttpServletResponse response) {
+        userService.validateRefreshToken(refreshToken);
+        String email = userService.getEmailFromToken(refreshToken, JwtTokenType.REFRESH_TOKEN);
+        TokenResponse tokenResponse = userService.renewAccessToken(email, refreshToken);
+        return ResponseEntity.ok(tokenResponse);
+    }
+
     private ResponseCookie createRefreshTokenCookie(String email) {
         String refreshToken = userService.createRefreshToken(email);
         return ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)
