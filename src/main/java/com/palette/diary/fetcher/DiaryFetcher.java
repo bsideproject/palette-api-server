@@ -8,10 +8,10 @@ import com.palette.diary.fetcher.dto.DiaryDto;
 import com.palette.diary.fetcher.dto.DiaryInput;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
-import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @DgsComponent

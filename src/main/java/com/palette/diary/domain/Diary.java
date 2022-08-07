@@ -18,7 +18,7 @@ import org.hibernate.annotations.Where;
 @Getter
 @Entity
 @Builder
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "diary")
 @Where(clause = "isDel = 0")
 @AttributeOverrides({

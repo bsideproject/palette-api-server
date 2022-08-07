@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Builder
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "diary_group")
 @AttributeOverrides({
     @AttributeOverride(name = "id", column = @Column(name = "group_id")),
