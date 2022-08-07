@@ -4,8 +4,8 @@ import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.InputArgument;
 import com.palette.diary.domain.Diary;
-import com.palette.diary.fetcher.dto.DiaryDto;
-import com.palette.diary.fetcher.dto.DiaryInput;
+import com.palette.diary.fetcher.dto.CreateDiaryInput;
+import com.palette.diary.fetcher.dto.CreateDiaryOutput;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +23,11 @@ public class DiaryFetcher {
 
     @DgsMutation
     @Transactional
-    public DiaryDto createDiary(@InputArgument DiaryInput diaryInput) {
+    public CreateDiaryOutput createDiary(@InputArgument CreateDiaryInput createDiaryInput) {
         String invitationCode = RandomStringUtils.randomAlphabetic(8);
-        Diary diary = diaryRepository.save(diaryInput.toEntity(invitationCode));
-        diaryGroupRepository.save(diaryInput.toEntity(diary));
-        return DiaryDto.toCreateDto(diary.getInvitationCode());
+        Diary diary = diaryRepository.save(createDiaryInput.toEntity(invitationCode));
+        diaryGroupRepository.save(createDiaryInput.toEntity(diary));
+        return CreateDiaryOutput.toCreateDto(diary.getInvitationCode());
     }
 
 }

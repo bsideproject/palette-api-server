@@ -10,7 +10,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DiaryInput {
+public class CreateDiaryInput {
 
     private String title;
     private String color;

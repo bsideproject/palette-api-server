@@ -7,14 +7,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class DiaryDto {
+public class CreateDiaryOutput {
 
     private String title;
     private String color;
     private String invitationCode;
 
-    public static DiaryDto toCreateDto(String invitationCode) {
-        return DiaryDto.builder()
+    public static CreateDiaryOutput toCreateDto(String invitationCode) {
+        return CreateDiaryOutput.builder()
             .invitationCode(invitationCode)
             .build();
     }

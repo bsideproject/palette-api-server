@@ -1,14 +1,14 @@
 type Mutation {
-    createDiary(diaryInput: DiaryInput): DiaryDto
+    createDiary(createDiaryInput: CreateDiaryInput): CreateDiaryOutput
 }
 
-type DiaryDto{
+type CreateDiaryOutput{
     title: String
     invitationCode: String
     color: String
 }
 
-input DiaryInput {
+input CreateDiaryInput {
     title: String!
     color: String!
 }
