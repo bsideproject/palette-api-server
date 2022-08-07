@@ -3,13 +3,12 @@ spring:
     activate:
       on-profile: local
     import: 'aws-parameterstore:'
-  main:
-    banner-mode: off
 
   # ===============================
   # = jpa
   # ===============================
   jpa:
+    defer-datasource-initialization: true
     show-sql: true
     hibernate:
       ddl-auto: update
@@ -27,6 +26,10 @@ spring:
     url: jdbc:mysql://localhost:3306/palette
     username: dbuser
     password: dbuser1234
+
+  #  sql:
+  #    init:
+  #      mode: always
 
   # ===============================
   # = logging
