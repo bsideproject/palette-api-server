@@ -20,7 +20,7 @@ import org.hibernate.annotations.Where;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "diary")
-@Where(clause = "isDeleted = 0")
+@Where(clause = "is_deleted = 0")
 @AttributeOverrides({
     @AttributeOverride(name = "id", column = @Column(name = "diary_id")),
 })
