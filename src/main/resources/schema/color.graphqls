@@ -1,3 +1,8 @@
 type Query {
-    findColor: [String]
+    color: [ReadColorOutput]
+}
+
+type ReadColorOutput{
+    hexCode: String
+    order: String
 }
