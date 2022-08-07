@@ -25,7 +25,7 @@ import org.hibernate.annotations.Where;
     @AttributeOverride(name = "id", column = @Column(name = "diary_id")),
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE diary SET isDeleted = 1 WHERE id = ?")
+@SQLDelete(sql = "UPDATE diary SET is_deleted = 1 WHERE id = ?")
 public class Diary extends BaseEntity {
 
     @Column(length = 12)
