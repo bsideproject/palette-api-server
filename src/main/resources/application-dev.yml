@@ -3,8 +3,6 @@ spring:
     activate:
       on-profile: dev
     import: 'aws-parameterstore:'
-  main:
-    banner-mode: off
 
   # ===============================
   # = jpa
