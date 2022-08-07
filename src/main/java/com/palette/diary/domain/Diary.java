@@ -20,12 +20,12 @@ import org.hibernate.annotations.Where;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "diary")
-@Where(clause = "isDel = 0")
+@Where(clause = "is_deleted = 0")
 @AttributeOverrides({
     @AttributeOverride(name = "id", column = @Column(name = "diary_id")),
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE diary SET isDel = 1 WHERE id = ?")
+@SQLDelete(sql = "UPDATE diary SET is_deleted = 1 WHERE id = ?")
 public class Diary extends BaseEntity {
 
     @Column(length = 12)
@@ -39,7 +39,7 @@ public class Diary extends BaseEntity {
 
     @Builder.Default
     @ColumnDefault("0")
-    @Column(name = "id_deleted")
+    @Column(name = "is_deleted")
     private Integer isDeleted = 0;
 
 }
