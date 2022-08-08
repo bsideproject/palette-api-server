@@ -13,7 +13,7 @@ public class CreateDiaryOutput {
     private String color;
     private String invitationCode;
 
-    public static CreateDiaryOutput toCreateDto(String invitationCode) {
+    public static CreateDiaryOutput of(String invitationCode) {
         return CreateDiaryOutput.builder()
             .invitationCode(invitationCode)
             .build();

@@ -1,5 +1,11 @@
 type Mutation {
     createDiary(createDiaryInput: CreateDiaryInput): CreateDiaryOutput
+    inviteDiary(inviteDiaryInput: InviteDiaryInput): InviteDiaryOutput
+}
+
+input CreateDiaryInput {
+    title: String!
+    color: String!
 }
 
 type CreateDiaryOutput{
@@ -8,7 +14,11 @@ type CreateDiaryOutput{
     color: String
 }
 
-input CreateDiaryInput {
-    title: String!
-    color: String!
+input InviteDiaryInput {
+    invitationCode: String!
+}
+
+type InviteDiaryOutput{
+    nickname: String
+    title: String
 }
