@@ -7,14 +7,12 @@ import com.palette.token.domain.RefreshToken;
 import com.palette.token.repository.RefreshTokenRepository;
 import com.palette.user.domain.SocialType;
 import com.palette.user.domain.User;
-import com.palette.user.dto.LoginRequest;
-import com.palette.user.dto.TokenResponse;
+import com.palette.user.fetcher.dto.LoginRequest;
+import com.palette.user.fetcher.dto.TokenResponse;
 import com.palette.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;

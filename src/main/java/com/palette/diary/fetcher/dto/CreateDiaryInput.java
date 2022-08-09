@@ -27,9 +27,8 @@ public class CreateDiaryInput {
     public DiaryGroup toEntity(Diary diary) {
         return DiaryGroup.builder()
             .user(User.builder()
-                .id(1L)
-                .email("wlsgmdchemd@naver.com")
-                .socialTypes(List.of(SocialType.KAKAO))
+                .email("test@gmail.com")
+                .socialTypes(List.of(SocialType.NAVER))
                 .build()
             )
             .diary(diary)
