@@ -21,8 +21,8 @@ public class ColorFetcher {
 
     private final ColorRepository colorRepository;
 
-    @DgsQuery
-    public List<ReadColorOutput> color() {
+    @DgsQuery(field = "color")
+    public List<ReadColorOutput> findColor() {
         List<Color> colors = colorRepository.findAll(Sort.by(Direction.ASC, "order"));
         return colors.stream()
             .map(color -> ReadColorOutput.builder()
