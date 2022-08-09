@@ -1,15 +1,20 @@
 package com.palette.user.domain;
 
 import com.palette.BaseEntity;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.palette.diary.domain.DiaryGroup;
+import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.Set;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 @Entity
 public class User extends BaseEntity {
     @Column(nullable = false, unique = true)
@@ -21,12 +26,12 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Collection<SocialType> socialTypes;
 
-    @Builder
-    public User(Long id, String email, Collection<SocialType> socialTypes) {
-        this.id = id;
-        this.email = email;
-        this.socialTypes = socialTypes;
-    }
+    @Column(name = "profile_img", nullable = true)
+    private String profileImg = null;
+
+    @Builder.Default
+    @Column(name = "is_deleted")
+    private Boolean isDeleted = false;
 
     public boolean addSocialType(SocialType socialType) {
         if (this.socialTypes.contains(socialType)) {

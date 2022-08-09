@@ -1,4 +1,4 @@
-package com.palette.user.dto;
+package com.palette.user.fetcher.dto;
 
 import com.palette.user.domain.SocialType;
 import lombok.AllArgsConstructor;

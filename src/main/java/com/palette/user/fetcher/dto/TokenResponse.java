@@ -1,4 +1,4 @@
-package com.palette.user.dto;
+package com.palette.user.fetcher.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

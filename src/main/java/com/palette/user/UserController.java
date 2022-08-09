@@ -1,10 +1,9 @@
 package com.palette.user;
 
 import com.palette.infra.jwtTokenProvider.JwtRefreshTokenInfo;
-import com.palette.infra.jwtTokenProvider.JwtTokenInfo;
 import com.palette.infra.jwtTokenProvider.JwtTokenType;
-import com.palette.user.dto.LoginRequest;
-import com.palette.user.dto.TokenResponse;
+import com.palette.user.fetcher.dto.LoginRequest;
+import com.palette.user.fetcher.dto.TokenResponse;
 import com.palette.user.service.UserService;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
