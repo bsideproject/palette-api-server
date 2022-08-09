@@ -1,4 +1,12 @@
-type Mutation {
+type Diary {
+    title: String!
+    invitationCode: String!
+    color: String
+    users: [User]
+    isDeleted:Boolean
+}
+
+extend type Mutation {
     createDiary(createDiaryInput: CreateDiaryInput): CreateDiaryOutput
     inviteDiary(inviteDiaryInput: InviteDiaryInput): InviteDiaryOutput
 }
