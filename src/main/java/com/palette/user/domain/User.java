@@ -29,6 +29,9 @@ public class User extends BaseEntity {
     @Column(name = "profile_img", nullable = true)
     private String profileImg = null;
 
+    @Column(name = "agree_with_terms", nullable = false)
+    private Boolean agreeWithTerms = false;
+
     @Builder.Default
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
