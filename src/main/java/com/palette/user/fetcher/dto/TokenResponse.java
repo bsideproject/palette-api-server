@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TokenResponse {
 
-    private String accessToken;
+    protected String accessToken;
 
     public static TokenResponse of(String accessToken) {
         return TokenResponse.builder()

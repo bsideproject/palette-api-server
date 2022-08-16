@@ -28,12 +28,11 @@ public class UserService {
         this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
     }
-
     public String getEmailFromToken(String accessToken, JwtTokenType tokenType) {
         return jwtTokenProvider.getEmailFromPayLoad(accessToken, tokenType);
     }
 
-    public TokenResponse createAccessToken(LoginRequest loginRequest) {
+    public String createAccessToken(LoginRequest loginRequest) {
         String email = loginRequest.getEmail();
         SocialType socialLoginType = SocialType.of(loginRequest.getSocialType());
         Optional<User> user = userRepository.findByEmail(loginRequest.getEmail());
@@ -42,12 +41,12 @@ public class UserService {
             if (user.get().addSocialType(socialLoginType)) {
                 userRepository.save(user.get());
             }
-            return TokenResponse.of(jwtTokenProvider.createAccessToken(user.get().getEmail()));
+            return jwtTokenProvider.createAccessToken(user.get().getEmail());
         }
 
         User userInfo = User.builder().email(email).socialTypes(List.of(socialLoginType)).build();
         User savedUser = userRepository.save(userInfo);
-        return TokenResponse.of(jwtTokenProvider.createAccessToken(savedUser.getEmail()));
+        return jwtTokenProvider.createAccessToken(savedUser.getEmail());
     }
 
     public void validateAccessToken(String accessToken) {

@@ -2,8 +2,11 @@ package com.palette.user;
 
 import com.palette.infra.jwtTokenProvider.JwtRefreshTokenInfo;
 import com.palette.infra.jwtTokenProvider.JwtTokenType;
+import com.palette.user.domain.User;
 import com.palette.user.fetcher.dto.LoginRequest;
+import com.palette.user.fetcher.dto.LoginResponse;
 import com.palette.user.fetcher.dto.TokenResponse;
+import com.palette.user.repository.UserRepository;
 import com.palette.user.service.UserService;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.Optional;
 
 @RequestMapping("/api/v1")
 @RestController
@@ -18,23 +22,28 @@ public class UserController {
     private static final String SET_COOKIE = "Set-Cookie";
     private static final String REFRESH_TOKEN_COOKIE_NAME = "PTOKEN_REFRESH";
     private final UserService userService;
+
+    private final UserRepository userRepository;
     private final JwtRefreshTokenInfo jwtRefreshTokenInfo;
 
 
-    public UserController(UserService userService, JwtRefreshTokenInfo jwtRefreshTokenInfo) {
+    public UserController(UserService userService,UserRepository userRepository, JwtRefreshTokenInfo jwtRefreshTokenInfo) {
         this.userService = userService;
+        this.userRepository = userRepository;
         this.jwtRefreshTokenInfo = jwtRefreshTokenInfo;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(
+    public ResponseEntity<LoginResponse> login(
             @Valid @RequestBody LoginRequest loginRequest,
             HttpServletResponse response) {
-        TokenResponse tokenResponse = userService.createAccessToken(loginRequest);
-        String email = userService.getEmailFromToken(tokenResponse.getAccessToken(), JwtTokenType.ACCESS_TOKEN);
+        String accessToken = userService.createAccessToken(loginRequest);
+        String email = userService.getEmailFromToken(accessToken, JwtTokenType.ACCESS_TOKEN);
         ResponseCookie responseCookie = createRefreshTokenCookie(email);
         response.addHeader(SET_COOKIE, responseCookie.toString());
-        return ResponseEntity.ok(tokenResponse);
+        Optional<User> user = userRepository.findByEmail(email);
+        Boolean isRegistered = user.isPresent() ? user.get().getAgreeWithTerms() : false;
+        return ResponseEntity.ok(new LoginResponse(accessToken, isRegistered));
     }
 
     @GetMapping("/logout")

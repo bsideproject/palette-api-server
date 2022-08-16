@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Set;
 
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
@@ -26,8 +27,14 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Collection<SocialType> socialTypes;
 
+    @Column(name = "nickname")
+    private String nickname;
+
     @Column(name = "profile_img", nullable = true)
     private String profileImg = null;
+
+    @Column(name = "agree_with_terms", nullable = false)
+    private Boolean agreeWithTerms = false;
 
     @Builder.Default
     @Column(name = "is_deleted")

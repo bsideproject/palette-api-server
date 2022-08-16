@@ -1,15 +1,17 @@
 package com.palette.user.fetcher;
 
-import com.netflix.graphql.dgs.DgsComponent;
-import com.netflix.graphql.dgs.DgsData;
-import com.netflix.graphql.dgs.DgsDataFetchingEnvironment;
-import com.netflix.graphql.dgs.DgsQuery;
+import com.netflix.graphql.dgs.*;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
+import com.palette.resolver.Authentication;
+import com.palette.resolver.LoginUser;
 import com.palette.user.domain.User;
+import com.palette.user.fetcher.dto.EditMyProfileInput;
 import com.palette.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+@Slf4j
 @DgsComponent
 @RequiredArgsConstructor
 public class UserFetcher {
@@ -25,14 +28,35 @@ public class UserFetcher {
     private final DiaryRepository diaryRepository;
     private final EntityManager entityManager;
 
+    @Authentication
     @DgsQuery(field = "myProfile")
-    private User getMyProfile() { // TODO: AuthUser의 email 받아오기
-        return userRepository.findByEmail("test@gmail.com").orElseThrow(); // TODO: UserNotFoundException
+    public User getMyProfile(@InputArgument LoginUser loginUser) { // TODO: AuthUser의 email 받아오기
+        return userRepository.findByEmail(loginUser.getEmail()).orElseThrow(); // TODO: UserNotFoundException
     }
 
     @DgsData(parentType = "User", field = "diaries")
-    private List<Diary> getUserDiaries(DgsDataFetchingEnvironment dfe) {
+    public List<Diary> getUserDiaries(DgsDataFetchingEnvironment dfe) {
         User user = dfe.getSource();
         return diaryRepository.findUserDiaries(user);
+    }
+
+    @Authentication
+    @DgsMutation
+    public User editMyProfile(@InputArgument EditMyProfileInput editMyProfileInput, LoginUser loginUser) {
+        Optional<User> userOptional = userRepository.findByEmail(loginUser.getEmail());
+        if(userOptional.isEmpty()) {
+            throw new RuntimeException(); // TODO: UserNotFoundException
+        }
+        User user = userOptional.get();
+        Boolean agreeWithTerms = editMyProfileInput.getAgreeWithTerms();
+        String profileImg = editMyProfileInput.getProfileImg();
+        String nickname = editMyProfileInput.getNickname();
+
+        if(agreeWithTerms != null) user.setAgreeWithTerms(agreeWithTerms);
+        if(profileImg != null) user.setProfileImg(profileImg);
+        if(nickname != null) user.setNickname(nickname);
+        userRepository.save(user);
+
+        return user;
     }
 }

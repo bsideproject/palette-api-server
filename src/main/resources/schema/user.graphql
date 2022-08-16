@@ -7,10 +7,21 @@ type User {
     profileImg: String
     diaries: [Diary]!
     isDeleted: Boolean!
+    agreeWithTerms: Boolean!
     createdAt: LocalTime!
     updatedAt: LocalTime!
 }
 
 extend type Query {
     myProfile: User
+}
+
+extend type Mutation {
+    editMyProfile(editMyProfileInput: EditMyProfileInput): User
+}
+
+input EditMyProfileInput {
+    nickname: String
+    agreeWithTerms: Boolean
+    profileImg: String
 }
