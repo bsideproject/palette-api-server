@@ -15,3 +15,13 @@ type User {
 extend type Query {
     myProfile: User
 }
+
+extend type Mutation {
+    editMyProfile(editMyProfileInput: EditMyProfileInput): User
+}
+
+input EditMyProfileInput {
+    nickname: String
+    agreeWithTerms: Boolean
+    profileImg: String
+}
