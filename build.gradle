@@ -75,6 +75,9 @@ dependencies {
     // AWS Pamametor store
     implementation group: 'io.awspring.cloud', name: 'spring-cloud-starter-aws-parameter-store-config'
 
+    // AWS S3 for ncp object storage
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.11.238'
+
     // h2 & mysql
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'mysql:mysql-connector-java'
