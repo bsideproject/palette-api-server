@@ -57,7 +57,7 @@ jobs:
   deploy:
     needs: build
     name: deploy
-    runs-on: [ self-hosted,  api-server, dev]
+    runs-on: [ self-hosted,  api-server, dev ]
     steps:
       - name: Login to DockerHub
         uses: docker/login-action@v1
