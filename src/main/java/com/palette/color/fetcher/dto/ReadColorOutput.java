@@ -9,7 +9,8 @@ import lombok.Setter;
 @Builder
 public class ReadColorOutput {
 
-    private String hexCode;
+    private String startCode;
+    private String endCode;
     private Integer order;
 
 }
