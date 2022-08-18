@@ -3,6 +3,7 @@ extend type Query {
 }
 
 type ReadColorOutput{
-    hexCode: String
+    startCode: String
+    endCode: String
     order: String
 }
