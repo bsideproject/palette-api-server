@@ -1,10 +1,14 @@
 package com.palette.diary.domain;
 
 import com.palette.BaseEntity;
+import com.palette.color.domain.Color;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -34,8 +38,9 @@ public class Diary extends BaseEntity {
     @Column(length = 10)
     private String invitationCode;
 
-    @Column(length = 7)
-    private String color;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "color_id", nullable = false)
+    private Color color;
 
     @Builder.Default
     @ColumnDefault("0")

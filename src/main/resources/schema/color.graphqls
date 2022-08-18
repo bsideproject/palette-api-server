@@ -3,6 +3,7 @@ extend type Query {
 }
 
 type ReadColorOutput{
+    id: Int
     startCode: String
     endCode: String
     order: String

@@ -11,9 +11,11 @@ extend type Mutation {
     inviteDiary(inviteDiaryInput: InviteDiaryInput): InviteDiaryOutput
 }
 
+scalar Long
+
 input CreateDiaryInput {
     title: String!
-    color: String!
+    colorId: Long!
 }
 
 type CreateDiaryOutput{
