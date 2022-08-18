@@ -1,29 +1,36 @@
 package com.palette.infra.jwtTokenProvider;
 
-import com.palette.exception.TokenExpirationException;
-import com.palette.exception.TokenNotValidException;
-import io.jsonwebtoken.*;
-import org.springframework.stereotype.Component;
-
+import com.palette.exception.rest.TokenExpirationException;
+import com.palette.exception.rest.TokenNotValidException;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
 import java.util.Objects;
+import org.springframework.stereotype.Component;
 
 @Component
 public class JwtTokenProvider {
+
     private final JwtAccessTokenInfo jwtAccessTokenInfo;
     private final JwtRefreshTokenInfo jwtRefreshTokenInfo;
 
-    public JwtTokenProvider(JwtAccessTokenInfo jwtAccessTokenInfo, JwtRefreshTokenInfo jwtRefreshTokenInfo) {
+    public JwtTokenProvider(JwtAccessTokenInfo jwtAccessTokenInfo,
+        JwtRefreshTokenInfo jwtRefreshTokenInfo) {
         this.jwtAccessTokenInfo = jwtAccessTokenInfo;
         this.jwtRefreshTokenInfo = jwtRefreshTokenInfo;
     }
 
     public String createAccessToken(String email) {
-        return createToken(email, jwtAccessTokenInfo.getValidityInMilliseconds(), jwtAccessTokenInfo.getSecretKey());
+        return createToken(email, jwtAccessTokenInfo.getValidityInMilliseconds(),
+            jwtAccessTokenInfo.getSecretKey());
     }
 
     public String createRefreshToken(String email) {
-        return createToken(email, jwtRefreshTokenInfo.getValidityInMilliseconds(), jwtRefreshTokenInfo.getSecretKey());
+        return createToken(email, jwtRefreshTokenInfo.getValidityInMilliseconds(),
+            jwtRefreshTokenInfo.getSecretKey());
     }
 
     public String getEmailFromPayLoad(String token, JwtTokenType jwtTokenType) {
@@ -49,8 +56,8 @@ public class JwtTokenProvider {
         try {
             Objects.requireNonNull(token);
             Jwts.parser()
-                    .setSigningKey(getSecretKey(jwtTokenType))
-                    .parseClaimsJws(token);
+                .setSigningKey(getSecretKey(jwtTokenType))
+                .parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
             throw new TokenExpirationException();
         } catch (NullPointerException | JwtException | IllegalArgumentException e) {
@@ -63,18 +70,18 @@ public class JwtTokenProvider {
         Date validity = new Date(now.getTime() + validityTime);
 
         return Jwts.builder()
-                .claim("email", email)
-                .setIssuedAt(now)
-                .setExpiration(validity)
-                .signWith(SignatureAlgorithm.HS256, secretKey)
-                .compact();
+            .claim("email", email)
+            .setIssuedAt(now)
+            .setExpiration(validity)
+            .signWith(SignatureAlgorithm.HS256, secretKey)
+            .compact();
     }
 
     private Claims getClaims(String token, JwtTokenType jwtTokenType) {
         return Jwts
-                .parser()
-                .setSigningKey(getSecretKey(jwtTokenType))
-                .parseClaimsJws(token)
-                .getBody();
+            .parser()
+            .setSigningKey(getSecretKey(jwtTokenType))
+            .parseClaimsJws(token)
+            .getBody();
     }
 }

@@ -1,8 +1,8 @@
 package com.palette.exception.common;
 
-import com.palette.exception.SocialTypeNotFoundException;
-import com.palette.exception.TokenExpirationException;
-import com.palette.exception.TokenNotValidException;
+import com.palette.exception.rest.SocialTypeNotFoundException;
+import com.palette.exception.rest.TokenExpirationException;
+import com.palette.exception.rest.TokenNotValidException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

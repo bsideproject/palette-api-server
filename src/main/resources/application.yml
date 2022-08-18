@@ -16,5 +16,15 @@ management:
       path-mapping:
         health: healthcheck
 
+# ===============================
+# = server config
+# ===============================
 server:
   port: 8082
+  shutdown: graceful
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+  tomcat:
+    uri-encoding: UTF-8
