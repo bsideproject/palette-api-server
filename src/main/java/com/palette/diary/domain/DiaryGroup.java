@@ -35,7 +35,10 @@ public class DiaryGroup extends BaseEntity {
     @JoinColumn(name = "diary_id", nullable = false)
     private Diary diary;
 
-    @Column(name = "admin_status")
+    @Column(name = "is_outed")
+    private Integer isOuted;
+
+    @Column(name = "is_admin")
     private Integer isAdmin;
 
 }
