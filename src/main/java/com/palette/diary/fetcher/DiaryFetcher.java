@@ -3,6 +3,8 @@ package com.palette.diary.fetcher;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.InputArgument;
+import com.palette.color.domain.Color;
+import com.palette.color.repository.ColorRepository;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.DiaryGroup;
 import com.palette.diary.fetcher.dto.CreateDiaryInput;
@@ -29,16 +31,20 @@ public class DiaryFetcher {
     private final DiaryGroupRepository diaryGroupRepository;
     //TODO: 서비스 혹은 Component 패키지 생성 시 다른 도메인을 호출하는 패키지 위치 고민
     private final UserRepository userRepository;
+    private final ColorRepository colorRepository;
 
     @Authentication
     @DgsMutation
     @Transactional
     public CreateDiaryOutput createDiary(@InputArgument CreateDiaryInput createDiaryInput,
         LoginUser loginUser) {
+        Color color = colorRepository.findById(createDiaryInput.getColorId())
+            .orElseThrow(IllegalArgumentException::new);//TODO: 추후 예외처리
+
         User user = userRepository.findByEmail(loginUser.getEmail())
             .orElseThrow(IllegalArgumentException::new); //TODO: 추후 예외처리
         String invitationCode = RandomStringUtils.randomAlphabetic(8);
-        Diary diary = diaryRepository.save(createDiaryInput.toEntity(invitationCode));
+        Diary diary = diaryRepository.save(createDiaryInput.toEntity(invitationCode, color));
         diaryGroupRepository.save(createDiaryInput.toEntity(diary, user));
         return CreateDiaryOutput.of(diary.getInvitationCode());
     }

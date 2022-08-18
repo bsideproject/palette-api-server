@@ -1,5 +1,6 @@
 package com.palette.diary.fetcher.dto;
 
+import com.palette.color.domain.Color;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.DiaryGroup;
 import com.palette.user.domain.User;
@@ -11,13 +12,13 @@ import lombok.Setter;
 public class CreateDiaryInput {
 
     private String title;
-    private String color;
+    private Long colorId;
 
-    public Diary toEntity(String invitationCode) {
+    public Diary toEntity(String invitationCode, Color color) {
         return Diary.builder()
             .title(this.title)
             .invitationCode(invitationCode)
-            .color(this.color)
+            .color(color)
             .build();
     }
 
