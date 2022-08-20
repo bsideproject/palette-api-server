@@ -29,6 +29,6 @@ input InviteDiaryInput {
 }
 
 type InviteDiaryOutput{
-    nickname: String
-    title: String
+    adminUser: User!
+    diary: Diary!
 }
