@@ -33,8 +33,6 @@ public class GraphqlExceptionHandler implements DataFetcherExceptionHandler {
             Map<String, Object> debugInfo = new HashMap<>();
             debugInfo.put("somefield", "somevalue");
 
-            com.netflix.graphql.types.errors.ErrorType.BAD_REQUEST.name();
-
             GraphQLError graphqlError = TypedGraphQLError.newInternalErrorBuilder()
                 .errorType(graphqlErrorType.getErrorType())
                 .message(graphqlErrorType.getMessage())
