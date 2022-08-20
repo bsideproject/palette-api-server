@@ -26,7 +26,9 @@ public class ColorFetcher {
         List<Color> colors = colorRepository.findAll(Sort.by(Direction.ASC, "order"));
         return colors.stream()
             .map(color -> ReadColorOutput.builder()
-                .hexCode(color.getHexCode())
+                .id(color.getId())
+                .startCode(color.getStartCode())
+                .endCode(color.getEndCode())
                 .order(color.getOrder())
                 .build()
             )

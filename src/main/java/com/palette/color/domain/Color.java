@@ -29,7 +29,10 @@ import org.hibernate.annotations.Where;
 public class Color extends BaseEntity {
 
     @Column(length = 7, unique = true, nullable = false)
-    private String hexCode;
+    private String startCode;
+
+    @Column(length = 7, unique = true, nullable = false)
+    private String endCode;
 
     @Column(nullable = false, name = "\"order\"") //예약어 사용
     private Integer order;
