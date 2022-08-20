@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum ErrorType {
+public enum RestErrorType {
     A001("A001", "토큰이 유효하지 않습니다.", TokenNotValidException.class),
     A002("A002", "만료된 토큰입니다.", TokenExpirationException.class),
     A003("A003", "존재하지 않는 소셜 로그인 방식입니다.", SocialTypeNotFoundException.class);
@@ -16,5 +16,5 @@ public enum ErrorType {
 
     private final String code;
     private final String message;
-    private final Class<? extends BaseException> classType;
+    private final Class<? extends RestException> classType;
 }

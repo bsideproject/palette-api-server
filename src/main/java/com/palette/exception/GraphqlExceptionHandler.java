@@ -1,7 +1,7 @@
 package com.palette.exception;
 
 import com.netflix.graphql.types.errors.TypedGraphQLError;
-import com.palette.exception.common.ErrorType;
+import com.palette.exception.common.GraphqlErrorType;
 import com.palette.exception.common.GraphqlException;
 import graphql.GraphQLError;
 import graphql.execution.DataFetcherExceptionHandler;
@@ -23,17 +23,21 @@ public class GraphqlExceptionHandler implements DataFetcherExceptionHandler {
         DataFetcherExceptionHandlerParameters handlerParameters) {
         if (handlerParameters.getException() instanceof GraphqlException) {
             GraphqlException exception = (GraphqlException) handlerParameters.getException();
-            ErrorType errorType = exception.getErrorType();
+            GraphqlErrorType graphqlErrorType = exception.getGraphqlErrorType();
             HttpStatus httpStatus = exception.getHttpStatus();
-            log.info("errorType: {}, message: {}, httpStatus {}", errorType, errorType.getMessage(),
+            log.info("errorType: {}, message: {}, httpStatus {}", graphqlErrorType,
+                graphqlErrorType.getMessage(),
                 httpStatus);
 
             // 필요시 에러 추적을 위한 인자값 추가
             Map<String, Object> debugInfo = new HashMap<>();
             debugInfo.put("somefield", "somevalue");
 
+            com.netflix.graphql.types.errors.ErrorType.BAD_REQUEST.name();
+
             GraphQLError graphqlError = TypedGraphQLError.newInternalErrorBuilder()
-                .message(errorType.getMessage())
+                .errorType(graphqlErrorType.getErrorType())
+                .message(graphqlErrorType.getMessage())
                 .debugInfo(debugInfo)
                 .path(handlerParameters.getPath()).build();
 
