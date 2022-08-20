@@ -1,7 +1,7 @@
 package com.palette.exception;
 
 import com.netflix.graphql.types.errors.TypedGraphQLError;
-import com.palette.exception.common.GraphqlErrorType;
+import com.palette.exception.common.GlobalErrorType;
 import com.palette.exception.common.GraphqlException;
 import graphql.GraphQLError;
 import graphql.execution.DataFetcherExceptionHandler;
@@ -23,7 +23,7 @@ public class GraphqlExceptionHandler implements DataFetcherExceptionHandler {
         DataFetcherExceptionHandlerParameters handlerParameters) {
         if (handlerParameters.getException() instanceof GraphqlException) {
             GraphqlException exception = (GraphqlException) handlerParameters.getException();
-            GraphqlErrorType graphqlErrorType = exception.getGraphqlErrorType();
+            GlobalErrorType graphqlErrorType = exception.getGlobalErrorType();
             HttpStatus httpStatus = exception.getHttpStatus();
             log.info("errorType: {}, message: {}, httpStatus {}", graphqlErrorType,
                 graphqlErrorType.getMessage(),

@@ -20,7 +20,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(value = RestException.class)
     public ResponseEntity<ExceptionResponse> handleRestException(RestException e) {
         log.error("{} \n", e.getMessage(), e);
-        return this.sendException(e.getHttpStatus().value(), e.getRestErrorType().getCode(),
+        return this.sendException(e.getHttpStatus().value(), e.getGlobalErrorType().getCode(),
             e.getMessage());
     }
 
