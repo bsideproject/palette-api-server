@@ -1,24 +1,14 @@
-type Diary {
-    title: String!
-    invitationCode: String!
-    color: String
-    users: [User]
-    isDeleted:Boolean
-}
-
 extend type Mutation {
     createDiary(createDiaryInput: CreateDiaryInput): CreateDiaryOutput
     inviteDiary(inviteDiaryInput: InviteDiaryInput): InviteDiaryOutput
 }
-
-scalar Long
 
 input CreateDiaryInput {
     title: String!
     colorId: Long!
 }
 
-type CreateDiaryOutput{
+type CreateDiaryOutput {
     title: String
     invitationCode: String
     color: String
