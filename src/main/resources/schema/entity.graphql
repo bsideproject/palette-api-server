@@ -1,0 +1,63 @@
+scalar Long
+scalar LocalTime
+
+type Query {}
+type Mutation {}
+
+type User {
+    id: Long!
+    email: String!
+    nickname: String
+    profileImg: String
+    diaries: [Diary]!
+    agreeWithTerms: Boolean!
+    createdAt: LocalTime!
+    updatedAt: LocalTime!
+}
+
+type Diary {
+    id: Long!
+    title: String!
+    invitationCode: String!
+    color: Color
+    currentHistory: History
+    pastHistories: [History]!
+    joinedUsers: [User]!
+    leftUsers:[User]!
+    isDeleted: Boolean!
+    createdAt: LocalTime!
+    updatedAt: LocalTime!
+}
+
+type History {
+    id: Long!
+    diary: Diary!
+    pages: [Page]!
+    startDate: LocalTime!
+    endDate: LocalTime!
+    periodDays: Int!
+    isFinished: Boolean!
+    joinedUsers: [User]!
+    leftUsers:[User]!
+    createdAt: LocalTime!
+    updatedAt: LocalTime!
+}
+
+type Page {
+    id: Long!
+    title: String!
+    body: String!
+    author: User!
+    images: [String]!
+    createdAt: LocalTime!
+    updatedAt: LocalTime!
+}
+
+type Color {
+    id: Long!
+    order: Int!
+    startCode: String!
+    endCode: String!
+    createdAt: LocalTime!
+    updatedAt: LocalTime!
+}

@@ -1,10 +1,3 @@
 extend type Query {
-    color: [ReadColorOutput]
-}
-
-type ReadColorOutput{
-    id: Int
-    startCode: String
-    endCode: String
-    order: String
+    colors: [Color]!
 }
