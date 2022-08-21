@@ -9,6 +9,7 @@ type Diary {
 extend type Mutation {
     createDiary(createDiaryInput: CreateDiaryInput): CreateDiaryOutput
     inviteDiary(inviteDiaryInput: InviteDiaryInput): InviteDiaryOutput
+    updateDiaryDate(diaryDateInput: DiaryDateInput): DiaryDateOutput
 }
 
 scalar Long
@@ -16,6 +17,15 @@ scalar Long
 input CreateDiaryInput {
     title: String!
     colorId: Long!
+}
+
+input DiaryDateInput {
+    diaryId: Long!
+    period: Int!
+}
+
+type DiaryDateOutput {
+    historyId: Long!
 }
 
 type CreateDiaryOutput{

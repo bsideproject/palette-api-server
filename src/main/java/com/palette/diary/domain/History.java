@@ -1,7 +1,7 @@
 package com.palette.diary.domain;
 
 import com.palette.BaseEntity;
-import com.palette.user.domain.User;
+import java.time.LocalDateTime;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
@@ -15,31 +15,36 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Getter
 @Entity
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "diary_group")
+@Table(name = "history")
+@Where(clause = "is_deleted = 0")
 @AttributeOverrides({
-    @AttributeOverride(name = "id", column = @Column(name = "group_id")),
+    @AttributeOverride(name = "id", column = @Column(name = "history_id")),
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DiaryGroup extends BaseEntity {
-
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+@SQLDelete(sql = "UPDATE history SET is_deleted = 1 WHERE id = ?")
+public class History extends BaseEntity {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "diary_id", nullable = false)
     private Diary diary;
 
-    @Builder.Default
-    @Column(name = "is_outed")
-    private Boolean isOuted = false;
+    private LocalDateTime startDate;
 
-    @Column(name = "is_admin")
-    private Boolean isAdmin;
+    private LocalDateTime endDate;
+
+    @Builder.Default
+    @Column(name = "is_deadlined")
+    private Boolean isDeadlined = false;
+
+    @Builder.Default
+    @Column(name = "is_deleted")
+    private Boolean isDeleted = false;
 
 }

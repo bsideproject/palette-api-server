@@ -26,7 +26,6 @@ public class CreateDiaryInput {
         return DiaryGroup.builder()
             .user(user)
             .diary(diary)
-            .isAdmin(1)
             .build();
     }
 
