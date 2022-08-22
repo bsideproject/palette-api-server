@@ -33,6 +33,7 @@ public class User extends BaseEntity {
     @Column(name = "profile_img", nullable = true)
     private String profileImg = null;
 
+    @Builder.Default
     @Column(name = "agree_with_terms", nullable = false)
     private Boolean agreeWithTerms = false;
 
