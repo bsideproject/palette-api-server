@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class DiaryDateOutput {
+public class CreateHistoryOutput {
 
     private Long historyId;
 }
