@@ -7,12 +7,16 @@ import com.palette.color.domain.Color;
 import com.palette.color.repository.ColorRepository;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.DiaryGroup;
+import com.palette.diary.domain.History;
 import com.palette.diary.fetcher.dto.CreateDiaryInput;
 import com.palette.diary.fetcher.dto.CreateDiaryOutput;
+import com.palette.diary.fetcher.dto.CreateHistoryInput;
+import com.palette.diary.fetcher.dto.DiaryDateOutput;
 import com.palette.diary.fetcher.dto.InviteDiaryInput;
 import com.palette.diary.fetcher.dto.InviteDiaryOutput;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
+import com.palette.diary.repository.HistoryRepository;
 import com.palette.resolver.Authentication;
 import com.palette.resolver.LoginUser;
 import com.palette.user.domain.User;
@@ -29,6 +33,7 @@ public class DiaryFetcher {
 
     private final DiaryRepository diaryRepository;
     private final DiaryGroupRepository diaryGroupRepository;
+    private final HistoryRepository historyRepository;
     //TODO: 서비스 혹은 Component 패키지 생성 시 다른 도메인을 호출하는 패키지 위치 고민
     private final UserRepository userRepository;
     private final ColorRepository colorRepository;
@@ -71,6 +76,20 @@ public class DiaryFetcher {
         diaryGroupRepository.save(InviteDiaryInput.of(invitedUser, diary));
 
         return InviteDiaryOutput.of(adminUser, diary);
+    }
+
+    /**
+     * 중복으로 진행중인 교환일기가 있는지 검사
+     */
+    @DgsMutation
+    public DiaryDateOutput createHistory(@InputArgument CreateHistoryInput createHistoryInput) {
+        Diary diary = diaryRepository.findById(createHistoryInput.getDiaryId())
+            .orElseThrow(IllegalArgumentException::new);//TODO: 추후 예외처리
+        History history = historyRepository.save(createHistoryInput.toEntity(diary));
+
+        return DiaryDateOutput.builder()
+            .historyId(history.getId())
+            .build();
     }
 
 }
