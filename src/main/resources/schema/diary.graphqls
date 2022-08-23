@@ -1,7 +1,7 @@
 extend type Mutation {
     createDiary(createDiaryInput: CreateDiaryInput): CreateDiaryOutput
     inviteDiary(inviteDiaryInput: InviteDiaryInput): InviteDiaryOutput
-    updateDiaryDate(diaryDateInput: CreateDiaryInput): CreateDiaryOutput
+    createHistory(diaryDateInput: CreateDiaryInput): CreateDiaryOutput
 }
 
 input CreateDiaryInput {
