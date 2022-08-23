@@ -15,7 +15,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -43,8 +42,7 @@ public class Diary extends BaseEntity {
     private Color color;
 
     @Builder.Default
-    @ColumnDefault("0")
     @Column(name = "is_deleted")
-    private Integer isDeleted = 0;
+    private Boolean isDeleted = false;
 
 }

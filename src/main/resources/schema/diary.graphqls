@@ -1,6 +1,7 @@
 extend type Mutation {
     createDiary(createDiaryInput: CreateDiaryInput): CreateDiaryOutput
     inviteDiary(inviteDiaryInput: InviteDiaryInput): InviteDiaryOutput
+    createHistory(diaryDateInput: CreateDiaryInput): CreateDiaryOutput
 }
 
 input CreateDiaryInput {
@@ -8,7 +9,7 @@ input CreateDiaryInput {
     colorId: Long!
 }
 
-type CreateDiaryOutput {
+type CreateDiaryOutput{
     title: String
     invitationCode: String
     color: String
