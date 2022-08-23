@@ -7,16 +7,12 @@ import com.palette.color.domain.Color;
 import com.palette.color.repository.ColorRepository;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.DiaryGroup;
-import com.palette.diary.domain.History;
 import com.palette.diary.fetcher.dto.CreateDiaryInput;
 import com.palette.diary.fetcher.dto.CreateDiaryOutput;
-import com.palette.diary.fetcher.dto.CreateHistoryInput;
-import com.palette.diary.fetcher.dto.DiaryDateOutput;
 import com.palette.diary.fetcher.dto.InviteDiaryInput;
 import com.palette.diary.fetcher.dto.InviteDiaryOutput;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
-import com.palette.diary.repository.HistoryRepository;
 import com.palette.resolver.Authentication;
 import com.palette.resolver.LoginUser;
 import com.palette.user.domain.User;
@@ -33,7 +29,6 @@ public class DiaryFetcher {
 
     private final DiaryRepository diaryRepository;
     private final DiaryGroupRepository diaryGroupRepository;
-    private final HistoryRepository historyRepository;
     //TODO: 서비스 혹은 Component 패키지 생성 시 다른 도메인을 호출하는 패키지 위치 고민
     private final UserRepository userRepository;
     private final ColorRepository colorRepository;
