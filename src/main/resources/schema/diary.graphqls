@@ -1,7 +1,7 @@
 extend type Mutation {
     createDiary(createDiaryInput: CreateDiaryInput): CreateDiaryOutput
     inviteDiary(inviteDiaryInput: InviteDiaryInput): InviteDiaryOutput
-    createHistory(diaryDateInput: CreateDiaryInput): CreateDiaryOutput
+    createHistory(createHistoryInput: CreateHistoryInput): CreateHistoryOutput
 }
 
 input CreateDiaryInput {
@@ -22,4 +22,13 @@ input InviteDiaryInput {
 type InviteDiaryOutput{
     adminUser: User!
     diary: Diary!
+}
+
+input CreateHistoryInput {
+    diaryId: Long!
+    period: Int!
+}
+
+type CreateHistoryOutput{
+    historyId: Long!
 }
