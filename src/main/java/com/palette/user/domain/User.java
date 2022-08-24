@@ -20,11 +20,12 @@ public class User extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Builder.Default
     @ElementCollection(targetClass = SocialType.class)
     @CollectionTable(name = "social_type")
     @Column(name = "social_type")
     @Enumerated(EnumType.STRING)
-    private Set<SocialType> socialTypes;
+    private Set<SocialType> socialTypes = new HashSet<>();
 
     @Column(name = "nickname")
     private String nickname;
