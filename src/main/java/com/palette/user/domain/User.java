@@ -8,7 +8,9 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -41,11 +43,25 @@ public class User extends BaseEntity {
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
 
+    @Builder.Default
+    @ElementCollection
+    @CollectionTable(name = "fcm_tokens")
+    @Column(name = "fcm_token")
+    private Collection<String> fcmTokens = new ArrayList<>();
+
     public boolean addSocialType(SocialType socialType) {
         if (this.socialTypes.contains(socialType)) {
             return false;
         }
         this.socialTypes.add(socialType);
         return true;
+    }
+
+    public void addFcmToken(String token) {
+        this.fcmTokens.add(token);
+    }
+
+    public Boolean deleteFcmToken(String token) {
+        return this.fcmTokens.remove(token);
     }
 }

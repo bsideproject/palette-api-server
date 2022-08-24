@@ -4,10 +4,20 @@ extend type Query {
 
 extend type Mutation {
     editMyProfile(editMyProfileInput: EditMyProfileInput): User
+    addFcmToken(addFcmTokenInput: AddFcmTokenInput): User
+    deleteFcmToken(deleteFcmTokenInput: DeleteFcmTokenInput): Boolean
 }
 
 input EditMyProfileInput {
     nickname: String
     agreeWithTerms: Boolean
     profileImg: String
+}
+
+input AddFcmTokenInput {
+    token: String!
+}
+
+input DeleteFcmTokenInput {
+    token: String!
 }
