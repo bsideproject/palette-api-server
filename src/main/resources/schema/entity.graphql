@@ -11,6 +11,7 @@ type User {
     profileImg: String
     diaries: [Diary]!
     agreeWithTerms: Boolean!
+    socialTypes: [String]!
     createdAt: LocalTime!
     updatedAt: LocalTime!
 }

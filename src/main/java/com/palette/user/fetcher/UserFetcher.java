@@ -6,6 +6,7 @@ import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
 import com.palette.resolver.Authentication;
 import com.palette.resolver.LoginUser;
+import com.palette.user.domain.SocialType;
 import com.palette.user.domain.User;
 import com.palette.user.fetcher.dto.AddFcmTokenInput;
 import com.palette.user.fetcher.dto.DeleteFcmTokenInput;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -53,10 +55,17 @@ public class UserFetcher {
         Boolean agreeWithTerms = editMyProfileInput.getAgreeWithTerms();
         String profileImg = editMyProfileInput.getProfileImg();
         String nickname = editMyProfileInput.getNickname();
+        Set<String> socialTypesInput = editMyProfileInput.getSocialTypes();
 
         if (agreeWithTerms != null) user.setAgreeWithTerms(agreeWithTerms);
         if (profileImg != null) user.setProfileImg(profileImg);
         if (nickname != null) user.setNickname(nickname);
+        if (socialTypesInput != null) {
+            Set<SocialType> newSocialTypes = new HashSet<>();
+            socialTypesInput.forEach(socialTypeInput -> newSocialTypes.add(SocialType.of(socialTypeInput)));
+            user.setSocialTypes(newSocialTypes);
+        }
+
         userRepository.save(user);
 
         return user;
