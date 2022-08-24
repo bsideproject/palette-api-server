@@ -46,7 +46,7 @@ public class User extends BaseEntity {
     @Builder.Default
     @ElementCollection
     @CollectionTable(name = "fcm_tokens")
-    @Column(name = "fcm_tokens")
+    @Column(name = "fcm_token")
     private Collection<String> fcmTokens = new ArrayList<>();
 
     public boolean addSocialType(SocialType socialType) {
