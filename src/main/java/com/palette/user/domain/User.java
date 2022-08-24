@@ -24,7 +24,7 @@ public class User extends BaseEntity {
     @CollectionTable(name = "social_type")
     @Column(name = "social_type")
     @Enumerated(EnumType.STRING)
-    private Collection<SocialType> socialTypes;
+    private Set<SocialType> socialTypes;
 
     @Column(name = "nickname")
     private String nickname;

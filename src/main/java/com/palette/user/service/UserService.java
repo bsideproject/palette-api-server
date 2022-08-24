@@ -13,6 +13,7 @@ import com.palette.user.repository.UserRepository;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -40,13 +41,10 @@ public class UserService {
         Optional<User> user = userRepository.findByEmail(loginRequest.getEmail());
 
         if (user.isPresent()) {
-            if (user.get().addSocialType(socialLoginType)) {
-                userRepository.save(user.get());
-            }
             return jwtTokenProvider.createAccessToken(user.get().getEmail());
         }
 
-        User userInfo = User.builder().email(email).socialTypes(List.of(socialLoginType)).build();
+        User userInfo = User.builder().email(email).build();
         User savedUser = userRepository.save(userInfo);
         return jwtTokenProvider.createAccessToken(savedUser.getEmail());
     }
