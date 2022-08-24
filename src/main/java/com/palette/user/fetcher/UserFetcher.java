@@ -7,6 +7,8 @@ import com.palette.diary.repository.DiaryRepository;
 import com.palette.resolver.Authentication;
 import com.palette.resolver.LoginUser;
 import com.palette.user.domain.User;
+import com.palette.user.fetcher.dto.AddFcmTokenInput;
+import com.palette.user.fetcher.dto.DeleteFcmTokenInput;
 import com.palette.user.fetcher.dto.EditMyProfileInput;
 import com.palette.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +32,7 @@ public class UserFetcher {
 
     @Authentication
     @DgsQuery(field = "myProfile")
-    public User getMyProfile(@InputArgument LoginUser loginUser) { // TODO: AuthUser의 email 받아오기
+    public User getMyProfile(@InputArgument LoginUser loginUser) {
         return userRepository.findByEmail(loginUser.getEmail()).orElseThrow(); // TODO: UserNotFoundException
     }
 
@@ -44,7 +46,7 @@ public class UserFetcher {
     @DgsMutation
     public User editMyProfile(@InputArgument EditMyProfileInput editMyProfileInput, LoginUser loginUser) {
         Optional<User> userOptional = userRepository.findByEmail(loginUser.getEmail());
-        if(userOptional.isEmpty()) {
+        if (userOptional.isEmpty()) {
             throw new RuntimeException(); // TODO: UserNotFoundException
         }
         User user = userOptional.get();
@@ -52,11 +54,39 @@ public class UserFetcher {
         String profileImg = editMyProfileInput.getProfileImg();
         String nickname = editMyProfileInput.getNickname();
 
-        if(agreeWithTerms != null) user.setAgreeWithTerms(agreeWithTerms);
-        if(profileImg != null) user.setProfileImg(profileImg);
-        if(nickname != null) user.setNickname(nickname);
+        if (agreeWithTerms != null) user.setAgreeWithTerms(agreeWithTerms);
+        if (profileImg != null) user.setProfileImg(profileImg);
+        if (nickname != null) user.setNickname(nickname);
         userRepository.save(user);
 
         return user;
+    }
+
+    @Authentication
+    @DgsMutation
+    public User addFcmToken(@InputArgument AddFcmTokenInput addFcmTokenInput, LoginUser loginUser) {
+        Optional<User> userOptional = userRepository.findByEmail(loginUser.getEmail());
+        if (userOptional.isEmpty()) {
+            throw new RuntimeException(); // TODO: UserNotFoundException
+        }
+        User user = userOptional.get();
+        user.addFcmToken(addFcmTokenInput.getToken());
+        userRepository.save(user);
+        return user;
+    }
+
+    @Authentication
+    @DgsMutation
+    public Boolean deleteFcmToken(@InputArgument DeleteFcmTokenInput deleteFcmTokenInput, LoginUser loginUser) {
+        Optional<User> userOptional = userRepository.findByEmail(loginUser.getEmail());
+        if (userOptional.isEmpty()) {
+            throw new RuntimeException(); // TODO: UserNotFoundException
+        }
+        User user = userOptional.get();
+        Boolean isRemoved = user.deleteFcmToken(deleteFcmTokenInput.getToken());
+        if (isRemoved) {
+            userRepository.save(user);
+        }
+        return isRemoved;
     }
 }
