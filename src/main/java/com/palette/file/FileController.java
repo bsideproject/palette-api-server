@@ -26,7 +26,7 @@ public class FileController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<UploadResponse> upload(@Valid @RequestParam(name = "file[]") @Size(min = 1, max = 3) @NotNull ArrayList<MultipartFile> multipartFiles) throws IOException {
+    public ResponseEntity<UploadResponse> upload(@Valid @RequestParam(name = "file") @Size(min = 1, max = 3) @NotNull ArrayList<MultipartFile> multipartFiles) throws IOException {
         List<String> urls = new ArrayList<>();
         for(int i = 0; i < multipartFiles.size(); i++) {
             MultipartFile file = multipartFiles.get(i);
