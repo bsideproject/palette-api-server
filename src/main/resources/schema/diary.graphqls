@@ -1,3 +1,7 @@
+extend type Query {
+    myDiary: [Diary]!
+}
+
 extend type Mutation {
     createDiary(createDiaryInput: CreateDiaryInput): CreateDiaryOutput
     inviteDiary(inviteDiaryInput: InviteDiaryInput): InviteDiaryOutput

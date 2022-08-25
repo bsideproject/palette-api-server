@@ -36,10 +36,10 @@ public class DiaryGroup extends BaseEntity {
     private Diary diary;
 
     @Builder.Default
-    @Column(name = "is_outed")
+    @Column(name = "is_outed", columnDefinition = "tinyint(1) default 0")
     private Boolean isOuted = false;
 
-    @Column(name = "is_admin")
+    @Column(name = "is_admin", columnDefinition = "tinyint(1) default 0")
     private Boolean isAdmin;
 
 }

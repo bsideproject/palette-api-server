@@ -40,11 +40,11 @@ public class History extends BaseEntity {
     private LocalDateTime endDate;
 
     @Builder.Default
-    @Column(name = "is_deadlined")
+    @Column(name = "is_deadlined", columnDefinition = "tinyint(1) default 0")
     private Boolean isDeadlined = false;
 
     @Builder.Default
-    @Column(name = "is_deleted")
+    @Column(name = "is_deleted", columnDefinition = "tinyint(1) default 0")
     private Boolean isDeleted = false;
 
 }
