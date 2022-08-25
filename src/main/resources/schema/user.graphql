@@ -12,6 +12,7 @@ input EditMyProfileInput {
     nickname: String
     agreeWithTerms: Boolean
     profileImg: String
+    socialTypes: [String!]
 }
 
 input AddFcmTokenInput {

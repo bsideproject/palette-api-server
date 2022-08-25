@@ -8,10 +8,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -23,11 +20,12 @@ public class User extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Builder.Default
     @ElementCollection(targetClass = SocialType.class)
     @CollectionTable(name = "social_type")
     @Column(name = "social_type")
     @Enumerated(EnumType.STRING)
-    private Collection<SocialType> socialTypes;
+    private Set<SocialType> socialTypes = new HashSet<>();
 
     @Column(name = "nickname")
     private String nickname;
@@ -47,7 +45,7 @@ public class User extends BaseEntity {
     @ElementCollection
     @CollectionTable(name = "fcm_tokens")
     @Column(name = "fcm_token")
-    private Collection<String> fcmTokens = new ArrayList<>();
+    private Set<String> fcmTokens = new HashSet<>();
 
     public boolean addSocialType(SocialType socialType) {
         if (this.socialTypes.contains(socialType)) {

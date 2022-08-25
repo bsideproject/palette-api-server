@@ -43,7 +43,7 @@ public class UserController {
         response.addHeader(SET_COOKIE, responseCookie.toString());
         Optional<User> user = userRepository.findByEmail(email);
         Boolean isRegistered = user.isPresent() ? user.get().getAgreeWithTerms() : false;
-        return ResponseEntity.ok(new LoginResponse(accessToken, isRegistered));
+        return ResponseEntity.ok(new LoginResponse(accessToken, isRegistered, user.get().getSocialTypes()));
     }
 
     @GetMapping("/logout")
