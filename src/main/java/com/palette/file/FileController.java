@@ -40,4 +40,9 @@ public class FileController {
     public void delete(@RequestParam("url") String url) {
         fileService.delete(url);
     }
+
+    @DeleteMapping("/files")
+    public void delete(@RequestParam("url") ArrayList<String> urls) {
+        urls.forEach(fileService::delete);
+    }
 }
