@@ -5,14 +5,16 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class UploadResponse {
-    private String url;
+    private List<String> urls;
 
-    public static UploadResponse of(String url) {
-        return UploadResponse.builder().url(url).build();
+    public static UploadResponse of(List<String> urls) {
+        return UploadResponse.builder().urls(urls).build();
     }
 }
