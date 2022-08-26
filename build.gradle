@@ -11,7 +11,6 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
     id "com.ewerk.gradle.plugins.querydsl" version "1.0.10" //querydsl
-    id 'org.asciidoctor.jvm.convert' version '3.3.2'  // Spring REST Docs
 }
 
 group = 'com.palette'
@@ -99,45 +98,10 @@ jar {
     enabled = false
 }
 
-// Spring REST Docs
-task copyDocument(type: Copy) {
-    dependsOn bootJar
-    from file("build/docs/asciidoc/index.html")
-    into file("src/main/resources/static/docs")
-}
-
 bootJar {
     archivesBaseName = 'palette'
     archiveFileName = 'palette.jar'
-    dependsOn asciidoctor                        // Spring REST Docs
-    copy {
-        from "${asciidoctor.outputDir}"         // Spring REST Docs
-        into 'src/main/resources/static/docs'   // Spring REST Docs
-    }
-    finalizedBy 'copyDocument'
 }
-
-//Spring REST Docs
-ext {
-    snippetsDir = file('build/generated-snippets')
-}
-
-asciidoctor {
-    configurations 'asciidoctorExtensions'
-    inputs.dir snippetsDir
-    dependsOn test
-
-    sources {
-        include("**/*.adoc", "**/backoffice/*.adoc")
-    }
-
-    baseDirFollowsSourceFile()
-}
-
-asciidoctor.doFirst {
-    delete file('src/main/resources/static/docs')
-}
-//Spring REST Docs
 
 //querydsl
 def querydslDir = "$buildDir/generated/querydsl"
@@ -161,6 +125,5 @@ configurations {
 //querydsl
 
 tasks.named('test') {
-    outputs.dir snippetsDir    // Spring REST Docs
     useJUnitPlatform()
 }
