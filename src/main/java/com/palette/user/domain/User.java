@@ -47,6 +47,10 @@ public class User extends BaseEntity {
     @Column(name = "fcm_token")
     private Set<String> fcmTokens = new HashSet<>();
 
+    @Builder.Default
+    @Column(name = "push_enabled")
+    private Boolean pushEnabled = false;
+
     public boolean addSocialType(SocialType socialType) {
         if (this.socialTypes.contains(socialType)) {
             return false;

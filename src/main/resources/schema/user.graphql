@@ -6,6 +6,7 @@ extend type Mutation {
     editMyProfile(editMyProfileInput: EditMyProfileInput): User
     addFcmToken(addFcmTokenInput: AddFcmTokenInput): User
     deleteFcmToken(deleteFcmTokenInput: DeleteFcmTokenInput): Boolean
+    sendTestNotification(sendTestNotificationInput: SendTestNotificationInput): Boolean
 }
 
 input EditMyProfileInput {
@@ -13,6 +14,7 @@ input EditMyProfileInput {
     agreeWithTerms: Boolean
     profileImg: String
     socialTypes: [String!]
+    pushEnabled: Boolean
 }
 
 input AddFcmTokenInput {
@@ -21,4 +23,9 @@ input AddFcmTokenInput {
 
 input DeleteFcmTokenInput {
     token: String!
+}
+
+input SendTestNotificationInput {
+    title: String!
+    body: String!
 }
