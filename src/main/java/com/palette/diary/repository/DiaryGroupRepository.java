@@ -13,5 +13,5 @@ import java.util.Optional;
 public interface DiaryGroupRepository extends JpaRepository<DiaryGroup, Long> {
     Optional<DiaryGroup> findByUserId(String userId);
 
-    Optional<DiaryGroup> findByDiaryAndIsAdmin(Diary diary, Integer isAdmin);
+    Optional<DiaryGroup> findByDiaryAndIsAdmin(Diary diary, Boolean isAdmin);
 }

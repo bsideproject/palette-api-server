@@ -65,7 +65,7 @@ public class DiaryFetcher {
         Diary diary = diaryRepository.findByInvitationCode(inviteDiaryInput.getInvitationCode())
             .orElseThrow(() -> new IllegalArgumentException()); //TODO: 상세 예외처리(해당하는 초대코드 미존재)
 
-        DiaryGroup diaryGroup = diaryGroupRepository.findByDiaryAndIsAdmin(diary, 1)
+        DiaryGroup diaryGroup = diaryGroupRepository.findByDiaryAndIsAdmin(diary, true)
             .orElseThrow(() -> new IllegalArgumentException());//TODO: 상세 예외처리
 
         User adminUser = diaryGroup.getUser();
