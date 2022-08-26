@@ -1,6 +1,7 @@
 package com.palette.diary.fetcher;
 
 import com.netflix.graphql.dgs.DgsComponent;
+import com.netflix.graphql.dgs.DgsData;
 import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.InputArgument;
 import com.palette.color.domain.Color;
@@ -8,15 +9,12 @@ import com.palette.color.repository.ColorRepository;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.DiaryGroup;
 import com.palette.diary.domain.History;
-import com.palette.diary.fetcher.dto.CreateDiaryInput;
-import com.palette.diary.fetcher.dto.CreateDiaryOutput;
-import com.palette.diary.fetcher.dto.CreateHistoryInput;
-import com.palette.diary.fetcher.dto.CreateHistoryOutput;
-import com.palette.diary.fetcher.dto.InviteDiaryInput;
-import com.palette.diary.fetcher.dto.InviteDiaryOutput;
+import com.palette.diary.domain.Page;
+import com.palette.diary.fetcher.dto.*;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
 import com.palette.diary.repository.HistoryRepository;
+import com.palette.diary.repository.PageRepository;
 import com.palette.resolver.Authentication;
 import com.palette.resolver.LoginUser;
 import com.palette.user.domain.User;
@@ -37,6 +35,8 @@ public class DiaryFetcher {
     private final UserRepository userRepository;
     private final ColorRepository colorRepository;
     private final HistoryRepository historyRepository;
+
+    private final PageRepository pageRepository;
 
     @Authentication
     @DgsMutation
@@ -90,6 +90,11 @@ public class DiaryFetcher {
         return CreateHistoryOutput.builder()
             .historyId(history.getId())
             .build();
+    }
+
+    @DgsData(parentType = "Query", field = "page")
+    public Page getPage(@InputArgument PageQueryInput pageQueryInput) {
+        return pageRepository.getById(pageQueryInput.getId());
     }
 
 }

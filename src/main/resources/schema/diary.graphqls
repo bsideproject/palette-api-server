@@ -4,6 +4,10 @@ extend type Mutation {
     createHistory(createHistoryInput: CreateHistoryInput): CreateHistoryOutput
 }
 
+extend type Query {
+    page(pageQueryInput: PageQueryInput): Page
+}
+
 input CreateDiaryInput {
     title: String!
     colorId: Long!
@@ -31,4 +35,8 @@ input CreateHistoryInput {
 
 type CreateHistoryOutput{
     historyId: Long!
+}
+
+input PageQueryInput {
+    id: Long!
 }
