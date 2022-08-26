@@ -48,12 +48,12 @@ public class DiaryFetcher {
     @DgsMutation
     @Transactional
     public CreateDiaryOutput createDiary(@InputArgument CreateDiaryInput createDiaryInput,
-                                         LoginUser loginUser) {
+        LoginUser loginUser) {
         Color color = colorRepository.findById(createDiaryInput.getColorId())
-                .orElseThrow(IllegalArgumentException::new);//TODO: 추후 예외처리
+            .orElseThrow(IllegalArgumentException::new);//TODO: 추후 예외처리
 
         User user = userRepository.findByEmail(loginUser.getEmail())
-                .orElseThrow(IllegalArgumentException::new); //TODO: 추후 예외처리
+            .orElseThrow(IllegalArgumentException::new); //TODO: 추후 예외처리
         String invitationCode = RandomStringUtils.randomAlphabetic(8);
         Diary diary = diaryRepository.save(createDiaryInput.toEntity(invitationCode, color));
         diaryGroupRepository.save(createDiaryInput.toEntity(diary, user));
@@ -67,18 +67,18 @@ public class DiaryFetcher {
     @Transactional
     @DgsMutation
     public InviteDiaryOutput inviteDiary(@InputArgument InviteDiaryInput inviteDiaryInput,
-                                         LoginUser loginUser) {
+        LoginUser loginUser) {
         //TODO: join 사용하여 쿼리 한번으로 축소 가능성 검토
         Diary diary = diaryRepository.findByInvitationCode(inviteDiaryInput.getInvitationCode())
-                .orElseThrow(() -> new IllegalArgumentException()); //TODO: 상세 예외처리(해당하는 초대코드 미존재)
+            .orElseThrow(() -> new IllegalArgumentException()); //TODO: 상세 예외처리(해당하는 초대코드 미존재)
 
-        DiaryGroup diaryGroup = diaryGroupRepository.findByDiaryAndIsAdmin(diary, 1)
-                .orElseThrow(() -> new IllegalArgumentException());//TODO: 상세 예외처리
+        DiaryGroup diaryGroup = diaryGroupRepository.findByDiaryAndIsAdmin(diary, true)
+            .orElseThrow(() -> new IllegalArgumentException());//TODO: 상세 예외처리
 
         User adminUser = diaryGroup.getUser();
 
         User invitedUser = userRepository.findByEmail(loginUser.getEmail())
-                .orElseThrow(IllegalArgumentException::new); //TODO: 추후 예외처리
+            .orElseThrow(IllegalArgumentException::new); //TODO: 추후 예외처리
 
         diaryGroupRepository.save(InviteDiaryInput.of(invitedUser, diary));
 
@@ -92,7 +92,7 @@ public class DiaryFetcher {
     @Transactional
     public CreateHistoryOutput createHistory(@InputArgument CreateHistoryInput createHistoryInput) {
         Diary diary = diaryRepository.findById(createHistoryInput.getDiaryId())
-                .orElseThrow(IllegalArgumentException::new);//TODO: 추후 예외처리
+            .orElseThrow(IllegalArgumentException::new);//TODO: 추후 예외처리
         History history = historyRepository.save(createHistoryInput.toEntity(diary));
 
         return CreateHistoryOutput.builder()
@@ -123,11 +123,11 @@ public class DiaryFetcher {
     @DgsQuery(field = "diaries")
     public List<Diary> getDiary(LoginUser loginUser) {
         User user = userRepository.findByEmail(loginUser.getEmail())
-                .orElseThrow(IllegalArgumentException::new); //TODO: 추후 예외처리
+            .orElseThrow(IllegalArgumentException::new); //TODO: 추후 예외처리
 
         List<Diary> diaries = diaryGroupRepository.findByUser(user).stream()
-                .map(DiaryGroup::getDiary)
-                .collect(Collectors.toList());
+            .map(DiaryGroup::getDiary)
+            .collect(Collectors.toList());
 
         return diaries;
     }
@@ -141,7 +141,6 @@ public class DiaryFetcher {
         }
         return history;
     }
-
 
     @DgsData(parentType = "Diary", field = "diaryStatus")
     public String getDiaryStatus(DgsDataFetchingEnvironment dfe) {
