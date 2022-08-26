@@ -55,11 +55,13 @@ public class UserFetcher {
         Boolean agreeWithTerms = editMyProfileInput.getAgreeWithTerms();
         String profileImg = editMyProfileInput.getProfileImg();
         String nickname = editMyProfileInput.getNickname();
+        Boolean pushEnabled = editMyProfileInput.getPushEnabled();
         Set<String> socialTypesInput = editMyProfileInput.getSocialTypes();
 
         if (agreeWithTerms != null) user.setAgreeWithTerms(agreeWithTerms);
         if (profileImg != null) user.setProfileImg(profileImg);
         if (nickname != null) user.setNickname(nickname);
+        if (pushEnabled != null) user.setPushEnabled(pushEnabled);
         if (socialTypesInput != null) {
             Set<SocialType> newSocialTypes = new HashSet<>();
             socialTypesInput.forEach(socialTypeInput -> newSocialTypes.add(SocialType.of(socialTypeInput)));

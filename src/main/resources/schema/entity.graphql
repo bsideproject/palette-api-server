@@ -12,6 +12,7 @@ type User {
     diaries: [Diary]!
     agreeWithTerms: Boolean!
     socialTypes: [String]!
+    pushEnabled: Boolean!
     createdAt: LocalTime!
     updatedAt: LocalTime!
 }

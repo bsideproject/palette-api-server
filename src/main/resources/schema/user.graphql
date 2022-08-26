@@ -13,6 +13,7 @@ input EditMyProfileInput {
     agreeWithTerms: Boolean
     profileImg: String
     socialTypes: [String!]
+    pushEnabled: Boolean
 }
 
 input AddFcmTokenInput {
