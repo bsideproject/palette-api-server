@@ -97,4 +97,18 @@ public class DiaryFetcher {
         return pageRepository.getById(pageQueryInput.getId());
     }
 
+    @Authentication
+    @DgsData(parentType = "Mutation", field = "createPage")
+    public Page createPage(@InputArgument CreatePageInput createPageInput, LoginUser loginUser) {
+        User user = userRepository.findByEmail(loginUser.getEmail()).orElseThrow(); // TODO: UserNotFoundException
+        History history = historyRepository.findById(createPageInput.getHistoryId()).orElseThrow(); // TODO: HistoryNotFoundException
+        Page page = Page.builder()
+                .title(createPageInput.getTitle())
+                .body(createPageInput.getBody())
+                .author(user)
+                .history(history)
+                .build();
+        return pageRepository.save(page);
+    }
+
 }
