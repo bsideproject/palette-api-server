@@ -42,7 +42,7 @@ public class Diary extends BaseEntity {
     private Color color;
 
     @Builder.Default
-    @Column(name = "is_deleted", columnDefinition = "tinyint(1) default 0")
+    @Column(name = "is_deleted")
     private Boolean isDeleted = false;
 
 }

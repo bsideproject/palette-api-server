@@ -1,5 +1,5 @@
 extend type Query {
-    myDiary: [Diary]!
+    diaries: [Diary]!
 }
 
 extend type Mutation {

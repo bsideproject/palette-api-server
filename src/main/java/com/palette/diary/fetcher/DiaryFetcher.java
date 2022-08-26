@@ -43,7 +43,6 @@ public class DiaryFetcher {
     private final ColorRepository colorRepository;
     private final HistoryRepository historyRepository;
 
-
     @Authentication
     @DgsMutation
     @Transactional
@@ -101,7 +100,7 @@ public class DiaryFetcher {
     }
 
     @Authentication
-    @DgsQuery(field = "myDiary")
+    @DgsQuery(field = "diaries")
     public List<Diary> getDiary(LoginUser loginUser) {
         User user = userRepository.findByEmail(loginUser.getEmail())
             .orElseThrow(IllegalArgumentException::new); //TODO: 추후 예외처리
@@ -129,9 +128,17 @@ public class DiaryFetcher {
         History history = historyRepository.findProgressHistory(diary);
         List<DiaryGroup> diaryGroups = diaryGroupRepository.findByDiary(diary);
 
+        boolean isDiscard = diaryGroups.stream()
+                .anyMatch(DiaryGroup::getIsOuted);
+
         //일기 그룹에 속한 유저가 한명일때
         if (diaryGroups.size() == 1) {
             return "WAIT";
+        }
+
+        //일기그룹에서 한명이 나가서 일기그룹이 폐기된 상태일때
+        if (diaryGroups.size() == 2 && isDiscard) {
+            return "DISCARD";
         }
 
         //진행중인 히스토리가 없을때
