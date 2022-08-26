@@ -1,9 +1,12 @@
 package com.palette.user.fetcher;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.netflix.graphql.dgs.*;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
+import com.palette.infra.fcm.FcmService;
+import com.palette.infra.fcm.Note;
 import com.palette.resolver.Authentication;
 import com.palette.resolver.LoginUser;
 import com.palette.user.domain.SocialType;
@@ -11,6 +14,7 @@ import com.palette.user.domain.User;
 import com.palette.user.fetcher.dto.AddFcmTokenInput;
 import com.palette.user.fetcher.dto.DeleteFcmTokenInput;
 import com.palette.user.fetcher.dto.EditMyProfileInput;
+import com.palette.user.fetcher.dto.SendTestNotificationInput;
 import com.palette.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +35,7 @@ public class UserFetcher {
     private final DiaryGroupRepository diaryGroupRepository;
     private final DiaryRepository diaryRepository;
     private final EntityManager entityManager;
+    private final FcmService fcmService;
 
     @Authentication
     @DgsQuery(field = "myProfile")
@@ -99,5 +104,19 @@ public class UserFetcher {
             userRepository.save(user);
         }
         return isRemoved;
+    }
+
+    @Authentication
+    @DgsMutation
+    public Boolean sendTestNotification(@InputArgument SendTestNotificationInput sendTestNotificationInput, LoginUser loginUser) throws FirebaseMessagingException {
+        User user = userRepository.findByEmail(loginUser.getEmail()).orElseThrow(); // TODO: UserNotFoundExceptop
+        if(user.getPushEnabled()){
+            String title = sendTestNotificationInput.getTitle();
+            String body = sendTestNotificationInput.getBody();
+            Note note = Note.builder().title(title).body(body).build();
+            fcmService.sendNotification(note, user.getFcmTokens());
+            return true;
+        }
+        return false;
     }
 }

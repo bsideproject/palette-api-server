@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @AllArgsConstructor
@@ -21,7 +22,7 @@ public class FcmService {
 
     private final FirebaseMessaging firebaseMessaging;
 
-    public String sendNotification(Note note, List<String> tokens) throws FirebaseMessagingException {
+    public String sendNotification(Note note, Set<String> tokens) throws FirebaseMessagingException {
         Notification notification = buildNotification(note);
 
         MulticastMessage multicastMessage = MulticastMessage
