@@ -142,6 +142,7 @@ public class DiaryFetcher {
         return history;
     }
 
+
     @DgsData(parentType = "Diary", field = "diaryStatus")
     public String getDiaryStatus(DgsDataFetchingEnvironment dfe) {
         Diary diary = dfe.getSource();
@@ -169,4 +170,9 @@ public class DiaryFetcher {
         }
     }
 
+    @DgsData(parentType = "History", field = "pages")
+    public List<Page> getPages(DgsDataFetchingEnvironment dfe) {
+        History history = dfe.getSource();
+        return pageRepository.findByHistory(history);
+    }
 }
