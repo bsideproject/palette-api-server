@@ -113,10 +113,16 @@ public class DiaryFetcher {
         Page page = Page.builder()
                 .title(createPageInput.getTitle())
                 .body(createPageInput.getBody())
-                .author(user)
+                .userId(user.getId())
                 .history(history)
                 .build();
         return pageRepository.save(page);
+    }
+
+    @DgsData(parentType = "Page", field = "author")
+    public User getPageAuthor(DgsDataFetchingEnvironment dfe) {
+        Page page = dfe.getSource();
+        return userRepository.getById(page.getUserId());
     }
 
     @Authentication

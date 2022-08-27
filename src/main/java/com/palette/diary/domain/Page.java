@@ -1,8 +1,9 @@
 package com.palette.diary.domain;
 
 import com.palette.BaseEntity;
-import com.palette.user.domain.User;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -14,8 +15,10 @@ import java.util.ArrayList;
 @AttributeOverrides({
         @AttributeOverride(name = "id", column = @Column(name = "page_id")),
 })
+@Where(clause = "is_deleted = 0")
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE page SET is_deleted = 1 WHERE id = ?")
 public class Page extends BaseEntity {
 
     @Column(nullable = false)
@@ -24,9 +27,8 @@ public class Page extends BaseEntity {
     @Column(nullable = false)
     private String body;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User author;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "history_id", nullable = false)
@@ -36,4 +38,7 @@ public class Page extends BaseEntity {
     @Column(nullable = false)
     private ArrayList<String> images = new ArrayList<>();
 
+    @Builder.Default
+    @Column(name = "is_deleted")
+    private Boolean isDeleted = false;
 }
