@@ -12,10 +12,18 @@ import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.DiaryGroup;
 import com.palette.diary.domain.History;
 import com.palette.diary.domain.Page;
-import com.palette.diary.fetcher.dto.*;
+import com.palette.diary.fetcher.dto.CreateDiaryInput;
+import com.palette.diary.fetcher.dto.CreateDiaryOutput;
+import com.palette.diary.fetcher.dto.CreateHistoryInput;
+import com.palette.diary.fetcher.dto.CreateHistoryOutput;
+import com.palette.diary.fetcher.dto.CreatePageInput;
+import com.palette.diary.fetcher.dto.InviteDiaryInput;
+import com.palette.diary.fetcher.dto.InviteDiaryOutput;
+import com.palette.diary.fetcher.dto.PageQueryInput;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
 import com.palette.diary.repository.HistoryRepository;
+import com.palette.diary.repository.PageRepository;
 import com.palette.exception.graphql.ColorNotFoundException;
 import com.palette.exception.graphql.DiaryExistUserException;
 import com.palette.exception.graphql.DiaryNotFoundException;
@@ -24,15 +32,16 @@ import com.palette.exception.graphql.DiaryOverUserException;
 import com.palette.exception.graphql.InviteCodeNotFoundException;
 import com.palette.exception.graphql.ProgressedHistoryException;
 import com.palette.exception.graphql.UserNotFoundException;
-import com.palette.diary.repository.PageRepository;
 import com.palette.resolver.Authentication;
 import com.palette.resolver.LoginUser;
 import com.palette.user.domain.User;
 import com.palette.user.repository.UserRepository;
-
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -51,7 +60,7 @@ public class DiaryFetcher {
     private final HistoryRepository historyRepository;
     private final PageRepository pageRepository;
 
-  /**
+    /**
      * GlobalErrorType 참고
      *
      * @throws ColorNotFoundException
@@ -147,8 +156,8 @@ public class DiaryFetcher {
         History history = historyRepository.save(createHistoryInput.toEntity(diary));
 
         return CreateHistoryOutput.builder()
-                .historyId(history.getId())
-                .build();
+            .historyId(history.getId())
+            .build();
     }
 
     @DgsData(parentType = "Query", field = "page")
@@ -159,15 +168,17 @@ public class DiaryFetcher {
     @Authentication
     @DgsData(parentType = "Mutation", field = "createPage")
     public Page createPage(@InputArgument CreatePageInput createPageInput, LoginUser loginUser) {
-        User user = userRepository.findByEmail(loginUser.getEmail()).orElseThrow(); // TODO: UserNotFoundException
-        History history = historyRepository.findById(createPageInput.getHistoryId()).orElseThrow(); // TODO: HistoryNotFoundException
+        User user = userRepository.findByEmail(loginUser.getEmail())
+            .orElseThrow(); // TODO: UserNotFoundException
+        History history = historyRepository.findById(createPageInput.getHistoryId())
+            .orElseThrow(); // TODO: HistoryNotFoundException
         Page page = Page.builder()
-                .title(createPageInput.getTitle())
-                .body(createPageInput.getBody())
-                .userId(user.getId())
-                .imageUrls(createPageInput.getImageUrls())
-                .history(history)
-                .build();
+            .title(createPageInput.getTitle())
+            .body(createPageInput.getBody())
+            .userId(user.getId())
+            //.imageUrls(createPageInput.getImageUrls())
+            .history(history)
+            .build();
         return pageRepository.save(page);
     }
 
@@ -205,6 +216,24 @@ public class DiaryFetcher {
         return history;
     }
 
+    @DgsData(parentType = "Diary", field = "joinedUsers")
+    public List<User> getJoinedUsers(DgsDataFetchingEnvironment dfe) {
+        Diary diary = dfe.getSource();
+        return diaryGroupRepository.findByDiary(diary).stream()
+            .map(DiaryGroup::getUser)
+            .collect(Collectors.toList());
+    }
+
+    @DgsData(parentType = "History", field = "remainingDays")
+    public int getPeriodDays(DgsDataFetchingEnvironment dfe) {
+        History history = dfe.getSource();
+        if (!history.getIsDeleted()) {
+            return (int) ChronoUnit.DAYS.between(LocalDateTime.now(), history.getEndDate());
+        }
+
+        return 0;
+    }
+
     @DgsData(parentType = "Diary", field = "diaryStatus")
     public String getDiaryStatus(DgsDataFetchingEnvironment dfe) {
         Diary diary = dfe.getSource();
@@ -235,6 +264,38 @@ public class DiaryFetcher {
     @DgsData(parentType = "History", field = "pages")
     public List<Page> getPages(DgsDataFetchingEnvironment dfe) {
         History history = dfe.getSource();
-        return pageRepository.findByHistory(history);
+        List<Page> pages = pageRepository.findByHistory(history);
+        if (pages.size() < 1) {
+            return new ArrayList<>();
+        }
+        return pages;
     }
+
+    /**
+     * GlobalErrorType 참고
+     *
+     * @throws UserNotFoundException
+     */
+    @DgsData(parentType = "Page", field = "author")
+    public User getAuthor(DgsDataFetchingEnvironment dfe) {
+        Page page = dfe.getSource();
+        Long userId = page.getUserId();
+        return userRepository.findById(userId)
+            .orElseThrow(UserNotFoundException::new);
+    }
+
+    //과연 토큰을 받을 수 있을 것인가
+    @Authentication
+    @DgsData(parentType = "Page", field = "isSelf")
+    public Boolean getIsSelf(DgsDataFetchingEnvironment dfe, LoginUser loginUser) {
+        Page page = dfe.getSource();
+        Long authorId = page.getUserId();
+        log.info("currentUser: {} ", loginUser);
+        log.info("page authorId: {} ", authorId);
+        if (Objects.equals(loginUser.getUserId(), authorId)) {
+            return true;
+        }
+        return false;
+    }
+
 }

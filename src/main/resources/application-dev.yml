@@ -50,3 +50,8 @@ aws:
     profile-separator: '-'
     name: app-palette
     fail-fast: false
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false
