@@ -35,8 +35,8 @@ public class Page extends BaseEntity {
     private History history;
 
     @Builder.Default
-    @Column(nullable = false)
-    private ArrayList<String> images = new ArrayList<>();
+    @Column(name = "image_urls", nullable = false)
+    private ArrayList<String> imageUrls = new ArrayList<>();
 
     @Builder.Default
     @Column(name = "is_deleted")

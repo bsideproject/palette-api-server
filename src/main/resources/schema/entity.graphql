@@ -50,7 +50,7 @@ type Page {
     title: String!
     body: String!
     author: User!
-    images: [String]!
+    imageUrls: [String]!
     createdAt: LocalTime!
     updatedAt: LocalTime!
 }

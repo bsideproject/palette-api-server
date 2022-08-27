@@ -114,6 +114,7 @@ public class DiaryFetcher {
                 .title(createPageInput.getTitle())
                 .body(createPageInput.getBody())
                 .userId(user.getId())
+                .imageUrls(createPageInput.getImageUrls())
                 .history(history)
                 .build();
         return pageRepository.save(page);
