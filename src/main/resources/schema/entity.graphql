@@ -12,6 +12,7 @@ type User {
     diaries: [Diary]!
     agreeWithTerms: Boolean!
     socialTypes: [String]!
+    pushEnabled: Boolean!
     createdAt: LocalTime!
     updatedAt: LocalTime!
 }
@@ -50,7 +51,7 @@ type Page {
     title: String!
     body: String!
     author: User!
-    images: [String]!
+    imageUrls: [String]!
     createdAt: LocalTime!
     updatedAt: LocalTime!
 }

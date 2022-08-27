@@ -12,4 +12,5 @@ public class EditMyProfileInput {
     private Boolean agreeWithTerms;
     private String profileImg;
     private Set<String> socialTypes;
+    private Boolean pushEnabled;
 }

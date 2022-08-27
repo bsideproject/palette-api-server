@@ -6,6 +6,11 @@ extend type Mutation {
     createDiary(createDiaryInput: CreateDiaryInput): CreateDiaryOutput
     inviteDiary(inviteDiaryInput: InviteDiaryInput): InviteDiaryOutput
     createHistory(createHistoryInput: CreateHistoryInput): CreateHistoryOutput
+    createPage(createPageInput: CreatePageInput): Page
+}
+
+extend type Query {
+    page(pageQueryInput: PageQueryInput): Page
 }
 
 input CreateDiaryInput {
@@ -35,4 +40,15 @@ input CreateHistoryInput {
 
 type CreateHistoryOutput{
     historyId: Long!
+}
+
+input CreatePageInput {
+    title: String!
+    body: String!
+    historyId: Long!
+    imageUrls: [String]!
+}
+
+input PageQueryInput {
+    id: Long!
 }

@@ -12,6 +12,9 @@ import java.util.*;
 
 @Getter
 @Setter
+@AttributeOverrides({
+        @AttributeOverride(name = "id", column = @Column(name = "user_id")),
+})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
@@ -46,6 +49,10 @@ public class User extends BaseEntity {
     @CollectionTable(name = "fcm_tokens")
     @Column(name = "fcm_token")
     private Set<String> fcmTokens = new HashSet<>();
+
+    @Builder.Default
+    @Column(name = "push_enabled")
+    private Boolean pushEnabled = false;
 
     public boolean addSocialType(SocialType socialType) {
         if (this.socialTypes.contains(socialType)) {
