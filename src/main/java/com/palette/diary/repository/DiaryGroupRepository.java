@@ -8,11 +8,10 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DiaryGroupRepository extends JpaRepository<DiaryGroup, Long> {
+
     Optional<DiaryGroup> findByUserId(String userId);
 
     List<DiaryGroup> findByDiary(Diary diary);
-
-    Optional<DiaryGroup> findByDiaryAndIsAdmin(Diary diary, Boolean isAdmin);
 
     List<DiaryGroup> findByUser(User user);
 

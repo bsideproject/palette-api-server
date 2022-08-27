@@ -16,6 +16,14 @@ import com.palette.diary.fetcher.dto.*;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
 import com.palette.diary.repository.HistoryRepository;
+import com.palette.exception.graphql.ColorNotFoundException;
+import com.palette.exception.graphql.DiaryExistUserException;
+import com.palette.exception.graphql.DiaryNotFoundException;
+import com.palette.exception.graphql.DiaryOutedUserException;
+import com.palette.exception.graphql.DiaryOverUserException;
+import com.palette.exception.graphql.InviteCodeNotFoundException;
+import com.palette.exception.graphql.ProgressedHistoryException;
+import com.palette.exception.graphql.UserNotFoundException;
 import com.palette.diary.repository.PageRepository;
 import com.palette.resolver.Authentication;
 import com.palette.resolver.LoginUser;
@@ -41,19 +49,24 @@ public class DiaryFetcher {
     private final UserRepository userRepository;
     private final ColorRepository colorRepository;
     private final HistoryRepository historyRepository;
-
     private final PageRepository pageRepository;
 
+  /**
+     * GlobalErrorType 참고
+     *
+     * @throws ColorNotFoundException
+     * @throws UserNotFoundException
+     */
     @Authentication
     @DgsMutation
     @Transactional
     public CreateDiaryOutput createDiary(@InputArgument CreateDiaryInput createDiaryInput,
         LoginUser loginUser) {
         Color color = colorRepository.findById(createDiaryInput.getColorId())
-            .orElseThrow(IllegalArgumentException::new);//TODO: 추후 예외처리
+            .orElseThrow(ColorNotFoundException::new);
 
         User user = userRepository.findByEmail(loginUser.getEmail())
-            .orElseThrow(IllegalArgumentException::new); //TODO: 추후 예외처리
+            .orElseThrow(UserNotFoundException::new);
         String invitationCode = RandomStringUtils.randomAlphabetic(8);
         Diary diary = diaryRepository.save(createDiaryInput.toEntity(invitationCode, color));
         diaryGroupRepository.save(createDiaryInput.toEntity(diary, user));
@@ -61,24 +74,53 @@ public class DiaryFetcher {
     }
 
     /**
-     * 예외 종류 한 그룹에 2명이상 존재시 예외처리, 기존에 나간 회원일 경우 예외처리
+     * GlobalErrorType 참고
+     *
+     * @throws InviteCodeNotFoundException
+     * @throws UserNotFoundException
+     * @throws DiaryNotFoundException
+     * @throws DiaryOverUserException
+     * @throws DiaryOutedUserException
+     * @throws DiaryExistUserException
      */
     @Authentication
     @Transactional
     @DgsMutation
     public InviteDiaryOutput inviteDiary(@InputArgument InviteDiaryInput inviteDiaryInput,
         LoginUser loginUser) {
-        //TODO: join 사용하여 쿼리 한번으로 축소 가능성 검토
         Diary diary = diaryRepository.findByInvitationCode(inviteDiaryInput.getInvitationCode())
-            .orElseThrow(() -> new IllegalArgumentException()); //TODO: 상세 예외처리(해당하는 초대코드 미존재)
+            .orElseThrow(InviteCodeNotFoundException::new);
 
-        DiaryGroup diaryGroup = diaryGroupRepository.findByDiaryAndIsAdmin(diary, true)
-            .orElseThrow(() -> new IllegalArgumentException());//TODO: 상세 예외처리
-
-        User adminUser = diaryGroup.getUser();
+        List<DiaryGroup> diaryGroups = diaryGroupRepository.findByDiary(diary);
 
         User invitedUser = userRepository.findByEmail(loginUser.getEmail())
-            .orElseThrow(IllegalArgumentException::new); //TODO: 추후 예외처리
+            .orElseThrow(UserNotFoundException::new);
+
+        if (diaryGroups.isEmpty()) {
+            throw new DiaryNotFoundException();
+        }
+
+        if (diaryGroups.size() >= 2) {
+            throw new DiaryOverUserException();
+        }
+
+        for (DiaryGroup diaryGroup : diaryGroups) {
+            User user = diaryGroup.getUser();
+
+            if (user.getEmail().equals(loginUser.getEmail()) && diaryGroup.getIsOuted()) {
+                throw new DiaryOutedUserException();
+            }
+
+            if (user.getEmail().equals(loginUser.getEmail())) {
+                throw new DiaryExistUserException();
+            }
+        }
+
+        User adminUser = diaryGroups.stream()
+            .filter(DiaryGroup::getIsAdmin)
+            .map(DiaryGroup::getUser)
+            .findAny()
+            .orElse(null);
 
         diaryGroupRepository.save(InviteDiaryInput.of(invitedUser, diary));
 
@@ -86,13 +128,22 @@ public class DiaryFetcher {
     }
 
     /**
-     * TODO: 중복으로 진행중인 교환일기가 있는지 검사
+     * GlobalErrorType 참고
+     *
+     * @throws UserNotFoundException
+     * @throws ProgressedHistoryException
      */
     @DgsMutation
     @Transactional
     public CreateHistoryOutput createHistory(@InputArgument CreateHistoryInput createHistoryInput) {
         Diary diary = diaryRepository.findById(createHistoryInput.getDiaryId())
-            .orElseThrow(IllegalArgumentException::new);//TODO: 추후 예외처리
+            .orElseThrow(UserNotFoundException::new);
+
+        History progressHistory = historyRepository.findProgressHistory(diary);
+        if (progressHistory != null) {
+            throw new ProgressedHistoryException();
+        }
+
         History history = historyRepository.save(createHistoryInput.toEntity(diary));
 
         return CreateHistoryOutput.builder()
@@ -126,11 +177,16 @@ public class DiaryFetcher {
         return userRepository.getById(page.getUserId());
     }
 
+    /**
+     * GlobalErrorType 참고
+     *
+     * @throws UserNotFoundException
+     */
     @Authentication
     @DgsQuery(field = "diaries")
     public List<Diary> getDiary(LoginUser loginUser) {
         User user = userRepository.findByEmail(loginUser.getEmail())
-            .orElseThrow(IllegalArgumentException::new); //TODO: 추후 예외처리
+            .orElseThrow(UserNotFoundException::new);
 
         List<Diary> diaries = diaryGroupRepository.findByUser(user).stream()
             .map(DiaryGroup::getDiary)
@@ -156,7 +212,7 @@ public class DiaryFetcher {
         List<DiaryGroup> diaryGroups = diaryGroupRepository.findByDiary(diary);
 
         boolean isDiscard = diaryGroups.stream()
-                .anyMatch(DiaryGroup::getIsOuted);
+            .anyMatch(DiaryGroup::getIsOuted);
 
         //일기 그룹에 속한 유저가 한명일때
         if (diaryGroups.size() == 1) {
