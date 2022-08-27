@@ -23,13 +23,13 @@ public class JwtTokenProvider {
         this.jwtRefreshTokenInfo = jwtRefreshTokenInfo;
     }
 
-    public String createAccessToken(String email) {
-        return createToken(email, jwtAccessTokenInfo.getValidityInMilliseconds(),
+    public String createAccessToken(Long userId, String email) {
+        return createToken(userId, email, jwtAccessTokenInfo.getValidityInMilliseconds(),
             jwtAccessTokenInfo.getSecretKey());
     }
 
-    public String createRefreshToken(String email) {
-        return createToken(email, jwtRefreshTokenInfo.getValidityInMilliseconds(),
+    public String createRefreshToken(Long userId, String email) {
+        return createToken(userId, email, jwtRefreshTokenInfo.getValidityInMilliseconds(),
             jwtRefreshTokenInfo.getSecretKey());
     }
 
@@ -65,16 +65,17 @@ public class JwtTokenProvider {
         }
     }
 
-    private String createToken(String email, Long validityTime, String secretKey) {
+    private String createToken(Long userId, String email, Long validityTime, String secretKey) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityTime);
 
         return Jwts.builder()
-            .claim("email", email)
-            .setIssuedAt(now)
-            .setExpiration(validity)
-            .signWith(SignatureAlgorithm.HS256, secretKey)
-            .compact();
+                .claim("id", userId)
+                .claim("email", email)
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
     }
 
     private Claims getClaims(String token, JwtTokenType jwtTokenType) {

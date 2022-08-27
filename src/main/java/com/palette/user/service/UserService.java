@@ -5,15 +5,9 @@ import com.palette.infra.jwtTokenProvider.JwtTokenProvider;
 import com.palette.infra.jwtTokenProvider.JwtTokenType;
 import com.palette.token.domain.RefreshToken;
 import com.palette.token.repository.RefreshTokenRepository;
-import com.palette.user.domain.SocialType;
-import com.palette.user.domain.User;
-import com.palette.user.fetcher.dto.LoginRequest;
 import com.palette.user.fetcher.dto.TokenResponse;
 import com.palette.user.repository.UserRepository;
 import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -35,20 +29,6 @@ public class UserService {
         return jwtTokenProvider.getEmailFromPayLoad(accessToken, tokenType);
     }
 
-    public String createAccessToken(LoginRequest loginRequest) {
-        String email = loginRequest.getEmail();
-        SocialType socialLoginType = SocialType.of(loginRequest.getSocialType());
-        Optional<User> user = userRepository.findByEmail(loginRequest.getEmail());
-
-        if (user.isPresent()) {
-            return jwtTokenProvider.createAccessToken(user.get().getEmail());
-        }
-
-        User userInfo = User.builder().email(email).build();
-        User savedUser = userRepository.save(userInfo);
-        return jwtTokenProvider.createAccessToken(savedUser.getEmail());
-    }
-
     public void validateAccessToken(String accessToken) {
         jwtTokenProvider.validateToken(accessToken, JwtTokenType.ACCESS_TOKEN);
     }
@@ -58,12 +38,12 @@ public class UserService {
         validateStoredRefreshToken(refreshToken);
     }
 
-    public TokenResponse renewAccessToken(String email, String refreshToken) {
-        return TokenResponse.of(jwtTokenProvider.createAccessToken(email));
+    public TokenResponse renewAccessToken(Long userId, String email, String refreshToken) {
+        return TokenResponse.of(jwtTokenProvider.createAccessToken(userId, email));
     }
 
-    public String createRefreshToken(String email) {
-        String refreshTokenValue = jwtTokenProvider.createRefreshToken(email);
+    public String createRefreshToken(Long userId, String email) {
+        String refreshTokenValue = jwtTokenProvider.createRefreshToken(userId, email);
         Long timeToLive = jwtTokenProvider.getTimeToLiveInMilliseconds(JwtTokenType.REFRESH_TOKEN);
         RefreshToken savedRefreshToken = refreshTokenRepository.save(
             new RefreshToken(email, refreshTokenValue,
