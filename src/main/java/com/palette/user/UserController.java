@@ -1,7 +1,10 @@
 package com.palette.user;
 
+import com.palette.exception.graphql.UserNotFoundException;
 import com.palette.infra.jwtTokenProvider.JwtRefreshTokenInfo;
+import com.palette.infra.jwtTokenProvider.JwtTokenProvider;
 import com.palette.infra.jwtTokenProvider.JwtTokenType;
+import com.palette.user.domain.SocialType;
 import com.palette.user.domain.User;
 import com.palette.user.fetcher.dto.LoginRequest;
 import com.palette.user.fetcher.dto.LoginResponse;
@@ -14,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
 
 @RequestMapping("/api/v1")
@@ -25,25 +30,35 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final JwtRefreshTokenInfo jwtRefreshTokenInfo;
+    private final JwtTokenProvider jwtTokenProvider;
 
 
-    public UserController(UserService userService,UserRepository userRepository, JwtRefreshTokenInfo jwtRefreshTokenInfo) {
+    public UserController(UserService userService,UserRepository userRepository, JwtRefreshTokenInfo jwtRefreshTokenInfo, JwtTokenProvider jwtTokenProvider) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.jwtRefreshTokenInfo = jwtRefreshTokenInfo;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
             @Valid @RequestBody LoginRequest loginRequest,
             HttpServletResponse response) {
-        String accessToken = userService.createAccessToken(loginRequest);
-        String email = userService.getEmailFromToken(accessToken, JwtTokenType.ACCESS_TOKEN);
-        ResponseCookie responseCookie = createRefreshTokenCookie(email);
+        String email = loginRequest.getEmail();
+        SocialType loginSocialType = SocialType.of(loginRequest.getSocialType());
+        Optional<User> optionalUser = userRepository.findByEmail(loginRequest.getEmail());
+        User user;
+        if (optionalUser.isEmpty()) {
+            User userInfo = User.builder().email(email).socialTypes(new HashSet<>(Collections.singletonList(loginSocialType))).build();
+            user = userRepository.save(userInfo);
+        } else {
+            user = optionalUser.get();
+        }
+        String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getEmail());
+        ResponseCookie responseCookie = createRefreshTokenCookie(user.getId(), email);
         response.addHeader(SET_COOKIE, responseCookie.toString());
-        Optional<User> user = userRepository.findByEmail(email);
-        Boolean isRegistered = user.isPresent() ? user.get().getAgreeWithTerms() : false;
-        return ResponseEntity.ok(new LoginResponse(accessToken, isRegistered, user.get().getSocialTypes()));
+        Boolean isRegistered = user.getAgreeWithTerms();
+        return ResponseEntity.ok(new LoginResponse(accessToken, isRegistered, user.getSocialTypes()));
     }
 
     @GetMapping("/logout")
@@ -61,12 +76,13 @@ public class UserController {
             HttpServletResponse response) {
         userService.validateRefreshToken(refreshToken);
         String email = userService.getEmailFromToken(refreshToken, JwtTokenType.REFRESH_TOKEN);
-        TokenResponse tokenResponse = userService.renewAccessToken(email, refreshToken);
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        TokenResponse tokenResponse = userService.renewAccessToken(user.getId(), email, refreshToken);
         return ResponseEntity.ok(tokenResponse);
     }
 
-    private ResponseCookie createRefreshTokenCookie(String email) {
-        String refreshToken = userService.createRefreshToken(email);
+    private ResponseCookie createRefreshTokenCookie(Long userId, String email) {
+        String refreshToken = userService.createRefreshToken(userId, email);
         return ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)
                 .sameSite("Lax")
 //                .secure(true)
