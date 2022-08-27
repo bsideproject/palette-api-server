@@ -1,6 +1,7 @@
 package com.palette.exception;
 
 import com.palette.exception.common.ExceptionResponse;
+import com.palette.exception.common.GlobalErrorType;
 import com.palette.exception.common.RestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +21,9 @@ public class RestExceptionHandler {
     @ExceptionHandler(value = RestException.class)
     public ResponseEntity<ExceptionResponse> handleRestException(RestException e) {
         log.error("{} \n", e.getMessage(), e);
+        GlobalErrorType globalErrorType = e.getGlobalErrorType();
         return this.sendException(e.getHttpStatus().value(), e.getGlobalErrorType().getCode(),
-            e.getMessage());
+            globalErrorType.getMessage());
     }
 
     /**
