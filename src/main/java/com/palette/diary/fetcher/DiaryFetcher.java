@@ -11,21 +11,20 @@ import com.palette.color.repository.ColorRepository;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.DiaryGroup;
 import com.palette.diary.domain.History;
-import com.palette.diary.fetcher.dto.CreateDiaryInput;
-import com.palette.diary.fetcher.dto.CreateDiaryOutput;
-import com.palette.diary.fetcher.dto.CreateHistoryInput;
-import com.palette.diary.fetcher.dto.CreateHistoryOutput;
-import com.palette.diary.fetcher.dto.InviteDiaryInput;
-import com.palette.diary.fetcher.dto.InviteDiaryOutput;
+import com.palette.diary.domain.Page;
+import com.palette.diary.fetcher.dto.*;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
 import com.palette.diary.repository.HistoryRepository;
+import com.palette.diary.repository.PageRepository;
 import com.palette.resolver.Authentication;
 import com.palette.resolver.LoginUser;
 import com.palette.user.domain.User;
 import com.palette.user.repository.UserRepository;
+
 import java.util.List;
 import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -42,6 +41,8 @@ public class DiaryFetcher {
     private final UserRepository userRepository;
     private final ColorRepository colorRepository;
     private final HistoryRepository historyRepository;
+
+    private final PageRepository pageRepository;
 
     @Authentication
     @DgsMutation
@@ -95,8 +96,34 @@ public class DiaryFetcher {
         History history = historyRepository.save(createHistoryInput.toEntity(diary));
 
         return CreateHistoryOutput.builder()
-            .historyId(history.getId())
-            .build();
+                .historyId(history.getId())
+                .build();
+    }
+
+    @DgsData(parentType = "Query", field = "page")
+    public Page getPage(@InputArgument PageQueryInput pageQueryInput) {
+        return pageRepository.getById(pageQueryInput.getId());
+    }
+
+    @Authentication
+    @DgsData(parentType = "Mutation", field = "createPage")
+    public Page createPage(@InputArgument CreatePageInput createPageInput, LoginUser loginUser) {
+        User user = userRepository.findByEmail(loginUser.getEmail()).orElseThrow(); // TODO: UserNotFoundException
+        History history = historyRepository.findById(createPageInput.getHistoryId()).orElseThrow(); // TODO: HistoryNotFoundException
+        Page page = Page.builder()
+                .title(createPageInput.getTitle())
+                .body(createPageInput.getBody())
+                .userId(user.getId())
+                .imageUrls(createPageInput.getImageUrls())
+                .history(history)
+                .build();
+        return pageRepository.save(page);
+    }
+
+    @DgsData(parentType = "Page", field = "author")
+    public User getPageAuthor(DgsDataFetchingEnvironment dfe) {
+        Page page = dfe.getSource();
+        return userRepository.getById(page.getUserId());
     }
 
     @Authentication
@@ -149,4 +176,9 @@ public class DiaryFetcher {
         }
     }
 
+    @DgsData(parentType = "History", field = "pages")
+    public List<Page> getPages(DgsDataFetchingEnvironment dfe) {
+        History history = dfe.getSource();
+        return pageRepository.findByHistory(history);
+    }
 }

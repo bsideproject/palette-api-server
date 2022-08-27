@@ -12,6 +12,9 @@ import java.util.*;
 
 @Getter
 @Setter
+@AttributeOverrides({
+        @AttributeOverride(name = "id", column = @Column(name = "user_id")),
+})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
