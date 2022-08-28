@@ -56,5 +56,6 @@ input PageQueryInput {
 
 input UpdateDiaryInput {
     diaryId: Long!
+    colorId: Long!
     title: String!
 }

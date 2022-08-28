@@ -303,8 +303,12 @@ public class DiaryFetcher {
     public Boolean updateDiary(@InputArgument UpdateDiaryInput updateDiaryInput) {
         Diary diary = diaryRepository.findById(updateDiaryInput.getDiaryId())
             .orElseThrow(DiaryNotFoundException::new);
+        diary.changeTitle(updateDiaryInput.getTitle());
 
-        diary.changeDiary(updateDiaryInput.getTitle());
+        Color color = colorRepository.findById(updateDiaryInput.getColorId())
+            .orElseThrow(ColorNotFoundException::new);
+
+        diary.changeColor(color);
 
         return true;
     }
