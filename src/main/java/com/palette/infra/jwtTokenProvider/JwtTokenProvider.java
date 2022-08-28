@@ -38,6 +38,11 @@ public class JwtTokenProvider {
         return claims.get("email", String.class);
     }
 
+    public Long getUserIdFromPayLoad(String token, JwtTokenType jwtTokenType) {
+        Claims claims = getClaims(token, jwtTokenType);
+        return claims.get("id", Long.class);
+    }
+
     public Long getTimeToLiveInMilliseconds(JwtTokenType jwtTokenType) {
         if (jwtTokenType.equals(JwtTokenType.ACCESS_TOKEN)) {
             return jwtAccessTokenInfo.getValidityInMilliseconds();
@@ -70,12 +75,12 @@ public class JwtTokenProvider {
         Date validity = new Date(now.getTime() + validityTime);
 
         return Jwts.builder()
-                .claim("id", userId)
-                .claim("email", email)
-                .setIssuedAt(now)
-                .setExpiration(validity)
-                .signWith(SignatureAlgorithm.HS256, secretKey)
-                .compact();
+            .claim("id", userId)
+            .claim("email", email)
+            .setIssuedAt(now)
+            .setExpiration(validity)
+            .signWith(SignatureAlgorithm.HS256, secretKey)
+            .compact();
     }
 
     private Claims getClaims(String token, JwtTokenType jwtTokenType) {

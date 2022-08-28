@@ -2,7 +2,7 @@ package com.palette.diary.fetcher.dto;
 
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.History;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,8 +16,8 @@ public class CreateHistoryInput {
     public History toEntity(Diary diary) {
         return History.builder()
             .diary(diary)
-            .startDate(LocalDateTime.now())
-            .endDate(LocalDateTime.now().plusDays(period))
+            .startDate(OffsetDateTime.now())
+            .endDate(OffsetDateTime.now().plusDays(period))
             .build();
     }
 

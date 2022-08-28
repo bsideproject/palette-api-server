@@ -9,13 +9,13 @@ spring:
   # ===============================
   jpa:
     defer-datasource-initialization: true
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: update
     database-platform: org.hibernate.dialect.MySQL8Dialect
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
         default_batch_fetch_size: 1000
 
   # ===============================
@@ -55,3 +55,8 @@ aws:
     profile-separator: '-'
     name: app-palette
     fail-fast: true
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false

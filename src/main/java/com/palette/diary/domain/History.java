@@ -1,7 +1,7 @@
 package com.palette.diary.domain;
 
 import com.palette.BaseEntity;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
@@ -35,9 +35,9 @@ public class History extends BaseEntity {
     @JoinColumn(name = "diary_id", nullable = false)
     private Diary diary;
 
-    private LocalDateTime startDate;
+    private OffsetDateTime startDate;
 
-    private LocalDateTime endDate;
+    private OffsetDateTime endDate;
 
     @Builder.Default
     @Column(name = "is_deadlined")
