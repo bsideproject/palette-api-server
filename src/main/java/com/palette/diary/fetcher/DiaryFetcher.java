@@ -20,6 +20,7 @@ import com.palette.diary.fetcher.dto.CreatePageInput;
 import com.palette.diary.fetcher.dto.InviteDiaryInput;
 import com.palette.diary.fetcher.dto.InviteDiaryOutput;
 import com.palette.diary.fetcher.dto.PageQueryInput;
+import com.palette.diary.fetcher.dto.UpdateDiaryInput;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
 import com.palette.diary.repository.HistoryRepository;
@@ -38,7 +39,6 @@ import com.palette.user.domain.User;
 import com.palette.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -280,7 +280,6 @@ public class DiaryFetcher {
             .orElseThrow(UserNotFoundException::new);
     }
 
-    //과연 토큰을 받을 수 있을 것인가
     @Authentication
     @DgsData(parentType = "Page", field = "isSelf")
     public Boolean getIsSelf(DgsDataFetchingEnvironment dfe, LoginUser loginUser) {
@@ -292,6 +291,22 @@ public class DiaryFetcher {
             return true;
         }
         return false;
+    }
+
+    /**
+     * GlobalErrorType 참고
+     *
+     * @throws DiaryNotFoundException
+     */
+    @DgsMutation
+    @Transactional
+    public Boolean updateDiary(@InputArgument UpdateDiaryInput updateDiaryInput) {
+        Diary diary = diaryRepository.findById(updateDiaryInput.getDiaryId())
+            .orElseThrow(DiaryNotFoundException::new);
+
+        diary.changeDiary(updateDiaryInput.getTitle());
+
+        return true;
     }
 
 }

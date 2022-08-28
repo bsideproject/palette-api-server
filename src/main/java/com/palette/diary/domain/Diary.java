@@ -45,4 +45,8 @@ public class Diary extends BaseEntity {
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
 
+    public void changeDiary(String title) {
+        this.title = title;
+    }
+
 }
