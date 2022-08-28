@@ -42,4 +42,8 @@ public class DiaryGroup extends BaseEntity {
     @Column(name = "is_admin")
     private Boolean isAdmin;
 
+    public void userOut() {
+        this.isOuted = true;
+    }
+
 }

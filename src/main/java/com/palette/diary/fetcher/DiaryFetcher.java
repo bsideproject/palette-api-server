@@ -19,6 +19,7 @@ import com.palette.diary.fetcher.dto.CreateHistoryOutput;
 import com.palette.diary.fetcher.dto.CreatePageInput;
 import com.palette.diary.fetcher.dto.InviteDiaryInput;
 import com.palette.diary.fetcher.dto.InviteDiaryOutput;
+import com.palette.diary.fetcher.dto.OutDiaryInput;
 import com.palette.diary.fetcher.dto.PageQueryInput;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
@@ -38,7 +39,6 @@ import com.palette.user.domain.User;
 import com.palette.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -139,14 +139,14 @@ public class DiaryFetcher {
     /**
      * GlobalErrorType 참고
      *
-     * @throws UserNotFoundException
+     * @throws DiaryNotFoundException
      * @throws ProgressedHistoryException
      */
     @DgsMutation
     @Transactional
     public CreateHistoryOutput createHistory(@InputArgument CreateHistoryInput createHistoryInput) {
         Diary diary = diaryRepository.findById(createHistoryInput.getDiaryId())
-            .orElseThrow(UserNotFoundException::new);
+            .orElseThrow(DiaryNotFoundException::new);
 
         History progressHistory = historyRepository.findProgressHistory(diary);
         if (progressHistory != null) {
@@ -240,6 +240,10 @@ public class DiaryFetcher {
         History history = historyRepository.findProgressHistory(diary);
         List<DiaryGroup> diaryGroups = diaryGroupRepository.findByDiary(diary);
 
+        if (diaryGroups.isEmpty()) {
+            return "";
+        }
+
         boolean isDiscard = diaryGroups.stream()
             .anyMatch(DiaryGroup::getIsOuted);
 
@@ -292,6 +296,30 @@ public class DiaryFetcher {
             return true;
         }
         return false;
+    }
+
+    /**
+     * GlobalErrorType 참고
+     *
+     * @throws UserNotFoundException
+     * @throws DiaryNotFoundException
+     */
+    @DgsMutation
+    @Authentication
+    @Transactional
+    public Boolean outDiary(@InputArgument OutDiaryInput outDiaryInput, LoginUser loginUser) {
+        Diary diary = diaryRepository.findById(outDiaryInput.getDiaryId())
+            .orElseThrow(DiaryNotFoundException::new);
+
+        User user = userRepository.findById(loginUser.getUserId())
+            .orElseThrow(UserNotFoundException::new);
+
+        DiaryGroup diaryGroup = diaryGroupRepository.findByDiaryAndUser(diary, user)
+            .orElseThrow(DiaryNotFoundException::new);
+
+        diaryGroup.userOut();
+
+        return true;
     }
 
 }
