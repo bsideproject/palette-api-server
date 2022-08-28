@@ -264,11 +264,7 @@ public class DiaryFetcher {
     @DgsData(parentType = "History", field = "pages")
     public List<Page> getPages(DgsDataFetchingEnvironment dfe) {
         History history = dfe.getSource();
-        List<Page> pages = pageRepository.findByHistory(history);
-        if (pages.size() < 1) {
-            return new ArrayList<>();
-        }
-        return pages;
+        return pageRepository.findByHistory(history);
     }
 
     /**
