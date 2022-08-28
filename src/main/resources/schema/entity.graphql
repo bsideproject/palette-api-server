@@ -1,5 +1,5 @@
 scalar Long
-scalar DateTime
+scalar LocalDateTime
 
 type Query {}
 type Mutation {}
@@ -13,8 +13,8 @@ type User {
     agreeWithTerms: Boolean!
     socialTypes: [String]!
     pushEnabled: Boolean!
-    createdAt: DateTime!
-    updatedAt: DateTime!
+    createdAt: LocalDateTime!
+    updatedAt: LocalDateTime!
 }
 
 type Diary {
@@ -28,22 +28,22 @@ type Diary {
     diaryStatus: String!
     leftUsers:[User]!
     isDeleted: Boolean!
-    createdAt: DateTime!
-    updatedAt: DateTime!
+    createdAt: LocalDateTime!
+    updatedAt: LocalDateTime!
 }
 
 type History {
     id: Long!
     diary: Diary!
     pages: [Page]
-    startDate: DateTime!
-    endDate: DateTime!
+    startDate: LocalDateTime!
+    endDate: LocalDateTime!
     remainingDays: Int!
     isFinished: Boolean!
     joinedUsers: [User]!
     leftUsers:[User]!
-    createdAt: DateTime!
-    updatedAt: DateTime!
+    createdAt: LocalDateTime!
+    updatedAt: LocalDateTime!
 }
 
 type Page {
@@ -53,8 +53,8 @@ type Page {
     author: User!
     imageUrls: [String]!
     isSelf: Boolean
-    createdAt: DateTime!
-    updatedAt: DateTime!
+    createdAt: LocalDateTime!
+    updatedAt: LocalDateTime!
 }
 
 type Color {
@@ -62,6 +62,7 @@ type Color {
     order: Int!
     startCode: String!
     endCode: String!
-    createdAt: DateTime!
-    updatedAt: DateTime!
+    createdAt: LocalDateTime!
+    updatedAt: LocalDateTime!
 }
+
