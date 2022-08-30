@@ -11,6 +11,8 @@ public interface DiaryGroupRepository extends JpaRepository<DiaryGroup, Long> {
 
     Optional<DiaryGroup> findByUserId(String userId);
 
+    Optional<DiaryGroup> findByDiaryAndUser(Diary diary, User user);
+
     List<DiaryGroup> findByDiary(Diary diary);
 
     List<DiaryGroup> findByUser(User user);
