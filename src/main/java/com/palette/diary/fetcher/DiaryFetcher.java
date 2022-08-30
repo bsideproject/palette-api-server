@@ -21,6 +21,7 @@ import com.palette.diary.fetcher.dto.InviteDiaryInput;
 import com.palette.diary.fetcher.dto.InviteDiaryOutput;
 import com.palette.diary.fetcher.dto.OutDiaryInput;
 import com.palette.diary.fetcher.dto.PageQueryInput;
+import com.palette.diary.fetcher.dto.UpdateDiaryInput;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
 import com.palette.diary.repository.HistoryRepository;
@@ -284,7 +285,6 @@ public class DiaryFetcher {
             .orElseThrow(UserNotFoundException::new);
     }
 
-    //과연 토큰을 받을 수 있을 것인가
     @Authentication
     @DgsData(parentType = "Page", field = "isSelf")
     public Boolean getIsSelf(DgsDataFetchingEnvironment dfe, LoginUser loginUser) {
@@ -301,8 +301,28 @@ public class DiaryFetcher {
     /**
      * GlobalErrorType 참고
      *
-     * @throws UserNotFoundException
      * @throws DiaryNotFoundException
+     */
+    @DgsMutation
+    @Transactional
+    public Boolean updateDiary(@InputArgument UpdateDiaryInput updateDiaryInput) {
+        Diary diary = diaryRepository.findById(updateDiaryInput.getDiaryId())
+            .orElseThrow(DiaryNotFoundException::new);
+        diary.changeTitle(updateDiaryInput.getTitle());
+
+        Color color = colorRepository.findById(updateDiaryInput.getColorId())
+            .orElseThrow(ColorNotFoundException::new);
+
+        diary.changeColor(color);
+        
+        return true;
+     }
+
+    /**
+     * GlobalErrorType 참고
+     *
+     * @throws DiaryNotFoundException
+     * @throws UserNotFoundException
      */
     @DgsMutation
     @Authentication
