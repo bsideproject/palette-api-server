@@ -30,6 +30,7 @@ import com.palette.resolver.LoginUser;
 import com.palette.user.domain.User;
 import com.palette.user.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -237,4 +238,5 @@ public class DiaryFetcher {
         History history = dfe.getSource();
         return pageRepository.findByHistory(history);
     }
+
 }
