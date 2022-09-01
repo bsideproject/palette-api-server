@@ -16,6 +16,7 @@ import com.palette.diary.fetcher.dto.*;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
 import com.palette.diary.repository.HistoryRepository;
+import com.palette.diary.service.DiaryService;
 import com.palette.exception.graphql.ColorNotFoundException;
 import com.palette.exception.graphql.DiaryExistUserException;
 import com.palette.exception.graphql.DiaryNotFoundException;
@@ -30,7 +31,6 @@ import com.palette.resolver.LoginUser;
 import com.palette.user.domain.User;
 import com.palette.user.repository.UserRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,6 +51,7 @@ public class DiaryFetcher {
     private final ColorRepository colorRepository;
     private final HistoryRepository historyRepository;
     private final PageRepository pageRepository;
+    private final DiaryService diaryService;
 
   /**
      * GlobalErrorType 참고
@@ -146,6 +147,7 @@ public class DiaryFetcher {
         }
 
         History history = historyRepository.save(createHistoryInput.toEntity(diary));
+        diaryService.registerHistoryFinishedJob(history);
 
         return CreateHistoryOutput.builder()
                 .historyId(history.getId())
