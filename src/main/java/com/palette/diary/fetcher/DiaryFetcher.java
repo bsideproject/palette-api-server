@@ -185,12 +185,6 @@ public class DiaryFetcher {
         return pageRepository.save(page);
     }
 
-    @DgsData(parentType = "Page", field = "author")
-    public User getPageAuthor(DgsDataFetchingEnvironment dfe) {
-        Page page = dfe.getSource();
-        return userRepository.getById(page.getUserId());
-    }
-
     /**
      * GlobalErrorType 참고
      *
