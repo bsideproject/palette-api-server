@@ -26,6 +26,7 @@ import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
 import com.palette.diary.repository.HistoryRepository;
 import com.palette.diary.repository.PageRepository;
+import com.palette.diary.repository.query.DiaryQueryRepository;
 import com.palette.exception.graphql.ColorNotFoundException;
 import com.palette.exception.graphql.DiaryExistUserException;
 import com.palette.exception.graphql.DiaryNotFoundException;
@@ -55,6 +56,7 @@ public class DiaryFetcher {
 
     private final DiaryRepository diaryRepository;
     private final DiaryGroupRepository diaryGroupRepository;
+    private final DiaryQueryRepository diaryQueryRepository;
     //TODO: 서비스 혹은 Component 패키지 생성 시 다른 도메인을 호출하는 패키지 위치 고민
     private final UserRepository userRepository;
     private final ColorRepository colorRepository;
@@ -200,7 +202,7 @@ public class DiaryFetcher {
         User user = userRepository.findByEmail(loginUser.getEmail())
             .orElseThrow(UserNotFoundException::new);
 
-        List<Diary> diaries = diaryGroupRepository.findByUser(user).stream()
+        List<Diary> diaries = diaryQueryRepository.findByUser(user).stream()
             .map(DiaryGroup::getDiary)
             .collect(Collectors.toList());
 
@@ -314,9 +316,9 @@ public class DiaryFetcher {
             .orElseThrow(ColorNotFoundException::new);
 
         diary.changeColor(color);
-        
+
         return true;
-     }
+    }
 
     /**
      * GlobalErrorType 참고

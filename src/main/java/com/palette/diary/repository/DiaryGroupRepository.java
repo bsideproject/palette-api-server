@@ -15,6 +15,4 @@ public interface DiaryGroupRepository extends JpaRepository<DiaryGroup, Long> {
 
     List<DiaryGroup> findByDiary(Diary diary);
 
-    List<DiaryGroup> findByUser(User user);
-
 }
