@@ -1,13 +1,9 @@
 package com.palette.infra.scheduler.job;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.History;
 import com.palette.diary.repository.HistoryRepository;
-import com.palette.infra.fcm.FcmService;
-import com.palette.infra.fcm.Note;
-import com.palette.user.domain.User;
-import com.palette.user.repository.UserRepository;
+import com.palette.infra.fcm.PushNotificationService;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -30,10 +26,7 @@ public class HistoryFinished implements Job {
     private HistoryRepository historyRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private FcmService fcmService;
+    private PushNotificationService pushNotificationService;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -48,31 +41,10 @@ public class HistoryFinished implements Job {
             if (historyOptional.isEmpty()) return;
 
             History history = historyOptional.get();
-            Diary diary = history.getDiary();
-            List<User> users = userRepository.findUsers(history);
-
-            Set<String> tokens = new HashSet<>();
-            users.forEach(user -> {
-                if (user.getPushEnabled()) {
-                    tokens.addAll(user.getFcmTokens());
-                }
-            });
-            if (tokens.isEmpty()) return;
-
-            String noteTitle = "일기가 완성됐어요!";
-            String noteBody = diary.getTitle() + " 일기가 완성됐어요.";
-            Map<String, String> noteData = new HashMap<>();
-            noteData.put("page", "history");
-            noteData.put("historyId", history.getId().toString());
-            Note note = Note.builder().title(noteTitle).body(noteBody).data(noteData).build();
-
-            try {
-                fcmService.sendNotification(note, tokens);
-            } catch (FirebaseMessagingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        catch (Exception ex) {
+            pushNotificationService.historyFinished(history);
+        } catch (FirebaseMessagingException e) {
+            throw new RuntimeException(e);
+        } catch (Exception ex) {
             transactionManager.rollback(status);
             throw ex;
         }
