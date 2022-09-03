@@ -1,7 +1,6 @@
 package com.palette.diary.domain;
 
 import com.palette.BaseEntity;
-import com.palette.color.domain.Color;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
@@ -22,35 +21,31 @@ import org.hibernate.annotations.Where;
 @Entity
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "diary")
+@Table(name = "image")
 @Where(clause = "is_deleted = 0")
 @AttributeOverrides({
-    @AttributeOverride(name = "id", column = @Column(name = "diary_id")),
+    @AttributeOverride(name = "id", column = @Column(name = "image_id")),
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE diary SET is_deleted = 1 WHERE id = ?")
-public class Diary extends BaseEntity {
+@SQLDelete(sql = "UPDATE history SET is_deleted = 1 WHERE id = ?")
+public class Image extends BaseEntity {
 
-    @Column
-    private String title;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "page_id", nullable = false)
+    private Page page;
 
-    @Column(length = 10)
-    private String invitationCode;
+    @Column(nullable = false)
+    private String domain;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "color_id", nullable = false)
-    private Color color;
+    @Column(nullable = false, name = "\"path\"") //예약어 사용
+    private String path;
 
     @Builder.Default
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
 
-    public void changeTitle(String title) {
-        this.title = title;
-    }
-
-    public void changeColor(Color color) {
-        this.color = color;
+    public void setPage(Page page) {
+        this.page = page;
     }
 
 }

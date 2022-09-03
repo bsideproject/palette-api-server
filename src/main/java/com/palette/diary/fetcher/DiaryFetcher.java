@@ -11,6 +11,7 @@ import com.palette.color.repository.ColorRepository;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.DiaryGroup;
 import com.palette.diary.domain.History;
+import com.palette.diary.domain.Image;
 import com.palette.diary.domain.Page;
 import com.palette.diary.fetcher.dto.CreateDiaryInput;
 import com.palette.diary.fetcher.dto.CreateDiaryOutput;
@@ -41,6 +42,7 @@ import com.palette.user.domain.User;
 import com.palette.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -179,9 +181,24 @@ public class DiaryFetcher {
             .title(createPageInput.getTitle())
             .body(createPageInput.getBody())
             .userId(user.getId())
-            //.imageUrls(createPageInput.getImageUrls())
             .history(history)
             .build();
+
+        List<Image> images = new ArrayList<>();
+
+        createPageInput.getImageUrls().forEach(imageUrl -> {
+            String path = imageUrl.substring(imageUrl.indexOf("com") + 3);
+            images.add(
+                Image.builder()
+                    .page(page)
+                    .domain("https://palette.kr.object.ncloudstorage.com") //TODO: 파라미터 스토어 등록
+                    .path(path)
+                    .build()
+            );
+        });
+
+        images.forEach(page::addImage);
+
         return pageRepository.save(page);
     }
 
