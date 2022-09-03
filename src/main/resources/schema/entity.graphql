@@ -51,8 +51,16 @@ type Page {
     title: String!
     body: String!
     author: User!
-    imageUrls: [String]!
+    images: [Image]
     isSelf: Boolean
+    createdAt: LocalDateTime!
+    updatedAt: LocalDateTime!
+}
+
+type Image {
+    id: Long!
+    domain: String!
+    path: String!
     createdAt: LocalDateTime!
     updatedAt: LocalDateTime!
 }
