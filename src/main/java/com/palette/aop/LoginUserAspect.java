@@ -4,9 +4,7 @@ import com.palette.infra.jwtTokenProvider.JwtTokenProvider;
 import com.palette.infra.jwtTokenProvider.JwtTokenType;
 import com.palette.resolver.LoginUser;
 import com.palette.utils.AuthorizationExtractor;
-
 import javax.servlet.http.HttpServletRequest;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -33,7 +31,9 @@ public class LoginUserAspect {
         Object inputArgument = args[0];
 
         String email = jwtTokenProvider.getEmailFromPayLoad(token, JwtTokenType.ACCESS_TOKEN);
-        LoginUser loginUser = new LoginUser(email);
+        Long userId = jwtTokenProvider.getUserIdFromPayLoad(token,
+            JwtTokenType.ACCESS_TOKEN);
+        LoginUser loginUser = new LoginUser(userId, email);
         Object resultObj;
         if (inputArgument == null) {
             resultObj = pjp.proceed(new Object[]{loginUser});

@@ -31,7 +31,7 @@ import org.hibernate.annotations.Where;
 @SQLDelete(sql = "UPDATE diary SET is_deleted = 1 WHERE id = ?")
 public class Diary extends BaseEntity {
 
-    @Column(length = 12)
+    @Column
     private String title;
 
     @Column(length = 10)
@@ -44,5 +44,13 @@ public class Diary extends BaseEntity {
     @Builder.Default
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
+
+    public void changeTitle(String title) {
+        this.title = title;
+    }
+
+    public void changeColor(Color color) {
+        this.color = color;
+    }
 
 }

@@ -1,7 +1,6 @@
 package com.palette.diary.domain;
 
 import com.palette.BaseEntity;
-import java.time.OffsetDateTime;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
@@ -22,29 +21,31 @@ import org.hibernate.annotations.Where;
 @Entity
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "history")
+@Table(name = "image")
 @Where(clause = "is_deleted = 0")
 @AttributeOverrides({
-    @AttributeOverride(name = "id", column = @Column(name = "history_id")),
+    @AttributeOverride(name = "id", column = @Column(name = "image_id")),
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE history SET is_deleted = 1 WHERE id = ?")
-public class History extends BaseEntity {
+public class Image extends BaseEntity {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "diary_id", nullable = false)
-    private Diary diary;
+    @JoinColumn(name = "page_id", nullable = false)
+    private Page page;
 
-    private OffsetDateTime startDate;
+    @Column(nullable = false)
+    private String domain;
 
-    private OffsetDateTime endDate;
-
-    @Builder.Default
-    @Column(name = "is_deadlined")
-    private Boolean isDeadlined = false;
+    @Column(nullable = false, name = "\"path\"") //예약어 사용
+    private String path;
 
     @Builder.Default
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
+
+    public void setPage(Page page) {
+        this.page = page;
+    }
 
 }

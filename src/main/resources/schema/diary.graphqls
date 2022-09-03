@@ -7,6 +7,8 @@ extend type Mutation {
     inviteDiary(inviteDiaryInput: InviteDiaryInput): InviteDiaryOutput
     createHistory(createHistoryInput: CreateHistoryInput): CreateHistoryOutput
     createPage(createPageInput: CreatePageInput): Page
+    updateDiary(updateDiaryInput: UpdateDiaryInput): Boolean
+    outDiary(outDiaryInput: OutDiaryInput): Boolean
 }
 
 extend type Query {
@@ -51,4 +53,15 @@ input CreatePageInput {
 
 input PageQueryInput {
     id: Long!
+}
+
+
+input UpdateDiaryInput {
+    diaryId: Long!
+    colorId: Long!
+    title: String!
+}
+
+input OutDiaryInput {
+    diaryId: Long!
 }
