@@ -25,7 +25,7 @@ public class PushNotificationService {
         if (tokens.isEmpty()) return;
 
         HashMap<String, String> noteData = new HashMap<>();
-        noteData.put("page", "diary");
+        noteData.put("page", "home");
         noteData.put("diaryId", diary.getId().toString());
         Note note = Note.builder().title("'" + diary.getTitle() + "'" + " 일기장이 생성되었어요.").body("첫 교환일기를 시작해보세요!").data(noteData).build();
         fcmService.sendNotification(note, tokens);

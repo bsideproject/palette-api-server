@@ -37,7 +37,6 @@ public class DiaryService {
             Scheduler scheduler = schedulerConfig.schedulerFactoryBean().getScheduler();
             scheduler.scheduleJob(jobDetail, trigger);
             scheduler.start();
-            System.out.println("Registered! -> " + history.getId());
         } catch (IOException | SchedulerException e) {
             e.printStackTrace();
         }
