@@ -37,3 +37,10 @@ server:
       charset: UTF-8
   tomcat:
     uri-encoding: UTF-8
+
+
+# ===============================
+# = logback
+# ===============================
+logging:
+  config: classpath:logback-spring.xml
