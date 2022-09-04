@@ -23,13 +23,12 @@
     </root>
 
   </springProfile>
-
   <springProfile name="dev, prod">
     <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE-INFO">
       <encoder>
         <pattern>${LOG_PATTERN}</pattern>
       </encoder>
-      <file>${LOG_PARENT_PATH}/${LOG_CHILD_INFO}/info-${BY_DATE}.log</file>
+      <file>${LOG_PARENT_PATH}/${LOG_CHILD_INFO}/info.log</file>
       <filter class="ch.qos.logback.classic.filter.LevelFilter">
         <level>INFO</level>
         <onMatch>ACCEPT</onMatch>
@@ -45,7 +44,7 @@
       <encoder>
         <pattern>${LOG_PATTERN}</pattern>
       </encoder>
-      <file>${LOG_PARENT_PATH}/${LOG_CHILD_WARN}/warn-${BY_DATE}.log</file>
+      <file>${LOG_PARENT_PATH}/${LOG_CHILD_WARN}/warn.log</file>
       <filter class="ch.qos.logback.classic.filter.LevelFilter">
         <level>WARN</level>
         <onMatch>ACCEPT</onMatch>
@@ -61,7 +60,7 @@
       <encoder>
         <pattern>${LOG_PATTERN}</pattern>
       </encoder>
-      <file>${LOG_PARENT_PATH}/${LOG_CHILD_ERROR}/error-${BY_DATE}.log</file>
+      <file>${LOG_PARENT_PATH}/${LOG_CHILD_ERROR}/error.log</file>
       <filter class="ch.qos.logback.classic.filter.LevelFilter">
         <level>ERROR</level>
         <onMatch>ACCEPT</onMatch>
@@ -81,7 +80,7 @@
 
   </springProfile>
 
-  <timestamp datePattern="yyyy-MM-dd" key="BY_DATE"/>
+  <!--  <timestamp datePattern="yyyy-MM-dd" key="BY_DATE"/>-->
 
 
 </configuration>
