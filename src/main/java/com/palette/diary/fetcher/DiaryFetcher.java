@@ -9,6 +9,7 @@ import com.netflix.graphql.dgs.InputArgument;
 import com.palette.color.domain.Color;
 import com.palette.color.repository.ColorRepository;
 import com.palette.common.PageInput;
+import com.palette.common.S3Properties;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.DiaryGroup;
 import com.palette.diary.domain.History;
@@ -195,7 +196,7 @@ public class DiaryFetcher {
             images.add(
                 Image.builder()
                     .page(page)
-                    .domain("https://palette.kr.object.ncloudstorage.com") //TODO: 파라미터 스토어 등록
+                    .domain(S3Properties.domain)
                     .path(path)
                     .build()
             );

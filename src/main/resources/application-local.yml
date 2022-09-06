@@ -56,7 +56,17 @@ aws:
     name: app-palette
     fail-fast: true
 
+# ===============================
+# = p6spy
+# ===============================
 decorator:
   datasource:
     p6spy:
       enable-logging: false
+
+# ===============================
+# = sentry
+# ===============================
+sentry:
+  logging:
+    enabled: false # local 비활성화

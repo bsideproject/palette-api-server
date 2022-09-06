@@ -7,12 +7,21 @@ spring:
       local: local
       dev: dev
 
+# ===============================
+# = actuator, prometheus
+# ===============================
 management:
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+
   endpoints:
     web:
       base-path: /actuator
       exposure:
-        include: health, info
+        include: health, info, metrics, prometheus
       path-mapping:
         health: healthcheck
 
@@ -28,3 +37,9 @@ server:
       charset: UTF-8
   tomcat:
     uri-encoding: UTF-8
+
+# ===============================
+# = logback
+# ===============================
+logging:
+  config: classpath:logback-spring.xml
