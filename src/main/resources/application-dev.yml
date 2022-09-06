@@ -66,7 +66,7 @@ decorator:
 # = sentry
 # ===============================
 sentry:
-  dsn: http://be81cf31346d41fcb4e9814e2958b0c8@61.97.188.37:9000/2
+  dsn: ${sentry.dns}
   traces-sample-rate: 1.0 # 성능 모니터링을 위해 100% 트랜잭션을 캡처하려면 trace-sample-rate를 1.0으로 설정합니다.
   logging:
     minimum-breadcrumb-level: warn
