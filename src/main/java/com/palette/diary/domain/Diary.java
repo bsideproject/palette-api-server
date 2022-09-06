@@ -41,10 +41,6 @@ public class Diary extends BaseEntity {
     @JoinColumn(name = "color_id", nullable = false)
     private Color color;
 
-    @Builder.Default
-    @Column(name = "is_deleted")
-    private Boolean isDeleted = false;
-
     public void changeTitle(String title) {
         this.title = title;
     }

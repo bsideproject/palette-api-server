@@ -8,6 +8,7 @@ import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
 import com.palette.color.domain.Color;
 import com.palette.color.repository.ColorRepository;
+import com.palette.common.PageInput;
 import com.palette.common.S3Properties;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.DiaryGroup;
@@ -27,9 +28,10 @@ import com.palette.diary.fetcher.dto.UpdateDiaryInput;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
 import com.palette.diary.repository.HistoryRepository;
-import com.palette.diary.service.DiaryService;
+import com.palette.diary.repository.ImageRepository;
 import com.palette.diary.repository.PageRepository;
 import com.palette.diary.repository.query.DiaryQueryRepository;
+import com.palette.diary.service.DiaryService;
 import com.palette.exception.graphql.ColorNotFoundException;
 import com.palette.exception.graphql.DiaryExistUserException;
 import com.palette.exception.graphql.DiaryNotFoundException;
@@ -51,6 +53,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -67,6 +70,7 @@ public class DiaryFetcher {
     private final HistoryRepository historyRepository;
     private final PageRepository pageRepository;
     private final DiaryService diaryService;
+    private final ImageRepository imageRepository;
 
     /**
      * GlobalErrorType 참고
@@ -207,21 +211,47 @@ public class DiaryFetcher {
     }
 
     /**
+     * TODO: histories와 하위 pages에도 개수 제한
+     */
+    /**
      * GlobalErrorType 참고
      *
      * @throws UserNotFoundException
      */
     @Authentication
     @DgsQuery(field = "diaries")
-    public List<Diary> getDiary(LoginUser loginUser) {
+    public List<Diary> getDiary(@InputArgument PageInput pageInput,
+        LoginUser loginUser) {
         User user = userRepository.findByEmail(loginUser.getEmail())
             .orElseThrow(UserNotFoundException::new);
 
-        List<Diary> diaries = diaryQueryRepository.findByUser(user).stream()
+        Integer page = pageInput.getPage();
+        Integer size = pageInput.getSize();
+
+        List<Diary> diaries = diaryQueryRepository.findByUser(user, PageRequest.of(page, size))
+            .stream()
             .map(DiaryGroup::getDiary)
             .collect(Collectors.toList());
 
         return diaries;
+    }
+
+    /**
+     * GlobalErrorType 참고
+     *
+     * @throws UserNotFoundException
+     */
+    @Authentication
+    @DgsQuery(field = "histories")
+    public List<History> getHistories(@InputArgument PageInput pageInput,
+        LoginUser loginUser) {
+        User user = userRepository.findByEmail(loginUser.getEmail())
+            .orElseThrow(UserNotFoundException::new);
+
+        Integer page = pageInput.getPage();
+        Integer size = pageInput.getSize();
+
+        return diaryQueryRepository.findHistories(user, PageRequest.of(page, size));
     }
 
     @DgsData(parentType = "Diary", field = "currentHistory")
@@ -232,6 +262,12 @@ public class DiaryFetcher {
             return null;
         }
         return history;
+    }
+
+    @DgsData(parentType = "Diary", field = "pastHistories")
+    public List<History> getPastHistories(DgsDataFetchingEnvironment dfe) {
+        Diary diary = dfe.getSource();
+        return diaryQueryRepository.findPastHistories(diary);
     }
 
     @DgsData(parentType = "Diary", field = "joinedUsers")
@@ -313,6 +349,12 @@ public class DiaryFetcher {
             return true;
         }
         return false;
+    }
+
+    @DgsData(parentType = "Page", field = "images")
+    public List<Image> getImages(DgsDataFetchingEnvironment dfe) {
+        Page page = dfe.getSource();
+        return imageRepository.findByPage(page);
     }
 
     /**
