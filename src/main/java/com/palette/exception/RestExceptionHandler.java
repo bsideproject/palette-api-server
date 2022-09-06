@@ -3,6 +3,8 @@ package com.palette.exception;
 import com.palette.exception.common.ExceptionResponse;
 import com.palette.exception.common.GlobalErrorType;
 import com.palette.exception.common.RestException;
+import io.sentry.Sentry;
+import io.sentry.SentryLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,9 @@ public class RestExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleRestException(RestException e) {
         log.error("{} \n", e.getMessage(), e);
         GlobalErrorType globalErrorType = e.getGlobalErrorType();
+        Sentry.captureMessage(globalErrorType.getCode(), SentryLevel.INFO);
+        Sentry.captureMessage(globalErrorType.getMessage(), SentryLevel.INFO);
+        Sentry.captureException(e);
         return this.sendException(e.getHttpStatus().value(), e.getGlobalErrorType().getCode(),
             globalErrorType.getMessage());
     }
@@ -32,6 +37,8 @@ public class RestExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ExceptionResponse> handleException(Exception e) {
         log.error("{} \n", e.getMessage(), e);
+        Sentry.captureMessage(e.getMessage(), SentryLevel.WARNING);
+        Sentry.captureException(e);
         return this.sendException(HttpStatus.INTERNAL_SERVER_ERROR.value(), "9999",
             HttpStatus.INTERNAL_SERVER_ERROR.name());
     }

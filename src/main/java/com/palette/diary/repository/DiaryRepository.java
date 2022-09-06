@@ -12,7 +12,7 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
 
     @Query("SELECT d FROM DiaryGroup g " +
         "RIGHT JOIN Diary d ON g.diary = d.id " +
-        "WHERE g.user = :user"
+        "WHERE g.user = :user AND g.isOuted = false"
     )
     public List<Diary> findUserDiaries(@Param("user") User user);
 

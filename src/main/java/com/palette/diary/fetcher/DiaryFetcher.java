@@ -8,6 +8,7 @@ import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
 import com.palette.color.domain.Color;
 import com.palette.color.repository.ColorRepository;
+import com.palette.common.S3Properties;
 import com.palette.common.PageInput;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.DiaryGroup;
@@ -28,6 +29,7 @@ import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
 import com.palette.diary.repository.HistoryRepository;
 import com.palette.diary.repository.ImageRepository;
+import com.palette.diary.service.DiaryService;
 import com.palette.diary.repository.PageRepository;
 import com.palette.diary.repository.query.DiaryQueryRepository;
 import com.palette.exception.graphql.ColorNotFoundException;
@@ -67,6 +69,7 @@ public class DiaryFetcher {
     private final ColorRepository colorRepository;
     private final HistoryRepository historyRepository;
     private final PageRepository pageRepository;
+    private final DiaryService diaryService;
     private final ImageRepository imageRepository;
 
     /**
@@ -195,7 +198,7 @@ public class DiaryFetcher {
             images.add(
                 Image.builder()
                     .page(page)
-                    .domain("https://palette.kr.object.ncloudstorage.com") //TODO: 파라미터 스토어 등록
+                    .domain(S3Properties.domain)
                     .path(path)
                     .build()
             );

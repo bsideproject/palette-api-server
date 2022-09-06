@@ -1,18 +1,11 @@
 package com.palette.infra.fcm;
 
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.*;
+import com.palette.user.domain.User;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -45,6 +38,15 @@ public class FcmService {
                 .build();
 
         return firebaseMessaging.send(message);
+    }
+
+    public HashSet<String> getTokens(List<User> users) {
+        if (users.isEmpty()) return new HashSet<>();
+        HashSet<String> tokens = new HashSet<>();
+        users.forEach(user -> {
+            tokens.addAll(user.getFcmTokens());
+        });
+        return tokens;
     }
 
     private Notification buildNotification(Note note) {
