@@ -1,5 +1,7 @@
 package com.palette.infra.scheduler;
 
+import java.io.IOException;
+import java.util.Properties;
 import org.quartz.spi.JobFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,20 +12,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.Properties;
-
 @Configuration
 public class SchedulerConfig {
 
-    @Value("${datasource.url}")
+    @Value("${spring.datasource.url}")
     private String datasourceUrl;
 
-    @Value("${datasource.username}")
+    @Value("${spring.datasource.username}")
     private String datasourceUsername;
 
-    @Value("${datasource.password}")
+    @Value("${spring.datasource.password}")
     private String datasourcePassword;
 
     @Autowired
