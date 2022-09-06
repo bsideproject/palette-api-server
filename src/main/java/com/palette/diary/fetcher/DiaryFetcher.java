@@ -8,8 +8,8 @@ import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
 import com.palette.color.domain.Color;
 import com.palette.color.repository.ColorRepository;
-import com.palette.common.S3Properties;
 import com.palette.common.PageInput;
+import com.palette.common.S3Properties;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.DiaryGroup;
 import com.palette.diary.domain.History;
@@ -29,9 +29,9 @@ import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
 import com.palette.diary.repository.HistoryRepository;
 import com.palette.diary.repository.ImageRepository;
-import com.palette.diary.service.DiaryService;
 import com.palette.diary.repository.PageRepository;
 import com.palette.diary.repository.query.DiaryQueryRepository;
+import com.palette.diary.service.DiaryService;
 import com.palette.exception.graphql.ColorNotFoundException;
 import com.palette.exception.graphql.DiaryExistUserException;
 import com.palette.exception.graphql.DiaryNotFoundException;
@@ -166,6 +166,7 @@ public class DiaryFetcher {
         }
 
         History history = historyRepository.save(createHistoryInput.toEntity(diary));
+        diaryService.registerHistoryFinishedJob(history);
 
         return CreateHistoryOutput.builder()
             .historyId(history.getId())
@@ -209,6 +210,9 @@ public class DiaryFetcher {
         return pageRepository.save(page);
     }
 
+    /**
+     * TODO: histories와 하위 pages에도 개수 제한
+     */
     /**
      * GlobalErrorType 참고
      *

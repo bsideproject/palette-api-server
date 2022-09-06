@@ -9,5 +9,4 @@ public class PageInput {
 
     private Integer page;
     private Integer size;
-    private Integer skip;
 }
