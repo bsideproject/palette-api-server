@@ -91,6 +91,9 @@ dependencies {
     // firebase
     implementation 'com.google.firebase:firebase-admin:9.0.0'
 
+    // quartz
+    implementation 'org.springframework.boot:spring-boot-starter-quartz'
+
     //sentry
     implementation 'io.sentry:sentry-spring-boot-starter:6.4.1'
     implementation 'io.sentry:sentry-logback:6.4.1'
