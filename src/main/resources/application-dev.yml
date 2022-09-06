@@ -26,9 +26,9 @@ spring:
     username: palette # 개발서버에 반영시 수정 금지
     password: 1q2w3e4r1! # 개발서버에 반영시 수정 금지
 
-  # ===============================
-  # = logging
-  # ===============================
+# ===============================
+# = logging
+# ===============================
 logging:
   pattern:
     file: '%highlight(%-5level) %X{X-HIT-TRANSACTION-ID} %d{yyyy-MM-dd HH:mm:ss} [%-5p] [%F]%M\(%L\): %m%n'
@@ -43,6 +43,9 @@ logging:
     root: INFO
     org.springframework.web: INFO
 
+# ===============================
+# = aws
+# ==============================
 aws:
   paramstore:
     enabled: true
@@ -70,3 +73,11 @@ sentry:
     minimum-event-level: warn # info또는 그 이상으로 로그 메시지를 이동 경로로 포함합니다.
     enabled: true
   environment: dev
+
+# ===============================
+# = actuator, prometheus
+# ===============================
+management:
+  metrics:
+    tags:
+      application: 'dev-api-server'
