@@ -25,7 +25,8 @@ public class DiaryQueryRepository extends BaseRepository {
     public List<DiaryGroup> findByUser(User user, PageRequest pageRequest) {
         return queryFactory.selectFrom(diaryGroup)
             .where(
-                condition(user, diaryGroup.user::eq)
+                condition(user, diaryGroup.user::eq),
+                condition(false, diaryGroup.isOuted::eq)
             )
             .orderBy(diaryGroup.createdAt.desc())
             .offset(pageRequest.getOffset())
@@ -49,7 +50,8 @@ public class DiaryQueryRepository extends BaseRepository {
             .join(diaryGroup).on(diary.id.eq(diaryGroup.diary.id))
             .where(
                 condition(user, diaryGroup.user::eq),
-                condition(paramDiary, diaryGroup.diary::eq)
+                condition(paramDiary, diaryGroup.diary::eq),
+                condition(false, diaryGroup.isOuted::eq)
             )
             .orderBy(history.createdAt.desc())
             .offset(pageRequest.getOffset())

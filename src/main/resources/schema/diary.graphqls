@@ -68,7 +68,10 @@ input OutDiaryInput {
 }
 
 input PageInput {
-    page: Int!
-    size: Int!
-    skip: Int
+    diaryOffset: Int
+    diarySize: Int
+    historyOffset: Int
+    historySize: Int
+    pageOffset: Int
+    pageSize: Int
 }
