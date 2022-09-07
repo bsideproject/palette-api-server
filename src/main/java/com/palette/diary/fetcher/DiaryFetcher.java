@@ -6,7 +6,6 @@ import com.netflix.graphql.dgs.DgsDataFetchingEnvironment;
 import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
-import com.netflix.graphql.dgs.context.DgsContext;
 import com.palette.color.domain.Color;
 import com.palette.color.repository.ColorRepository;
 import com.palette.common.PageInput;
@@ -45,6 +44,7 @@ import com.palette.resolver.Authentication;
 import com.palette.resolver.LoginUser;
 import com.palette.user.domain.User;
 import com.palette.user.repository.UserRepository;
+import graphql.execution.DataFetcherResult;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -55,6 +55,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -222,20 +223,23 @@ public class DiaryFetcher {
      */
     @Authentication
     @DgsQuery(field = "diaries")
-    public List<Diary> getDiary(@InputArgument PageInput pageInput,
+    public DataFetcherResult<List<Diary>> getDiary(@InputArgument PageInput pageInput,
         LoginUser loginUser) {
         User user = userRepository.findByEmail(loginUser.getEmail())
             .orElseThrow(UserNotFoundException::new);
 
-        Integer page = pageInput.getPage();
-        Integer size = pageInput.getSize();
+        Integer offset = pageInput.getDiaryOffset();
+        Integer size = pageInput.getDiarySize();
 
-        List<Diary> diaries = diaryQueryRepository.findByUser(user, PageRequest.of(page, size))
+        List<Diary> diaries = diaryQueryRepository.findByUser(user, PageRequest.of(offset, size))
             .stream()
             .map(DiaryGroup::getDiary)
             .collect(Collectors.toList());
 
-        return diaries;
+        return DataFetcherResult.<List<Diary>>newResult()
+            .data(diaries)
+            .localContext(pageInput)
+            .build();
     }
 
     /**
@@ -245,7 +249,7 @@ public class DiaryFetcher {
      */
     @Authentication
     @DgsQuery(field = "histories")
-    public List<History> getHistories(
+    public DataFetcherResult<List<History>> getHistories(
         @InputArgument Long diaryId,
         @InputArgument PageInput pageInput,
         LoginUser loginUser) {
@@ -255,10 +259,16 @@ public class DiaryFetcher {
         Diary diary = diaryRepository.findById(diaryId)
             .orElseThrow(DiaryNotFoundException::new);
 
-        Integer page = pageInput.getPage();
-        Integer size = pageInput.getSize();
+        Integer offset = pageInput.getHistoryOffset();
+        Integer size = pageInput.getHistorySize();
 
-        return diaryQueryRepository.findHistories(user, diary, PageRequest.of(page, size));
+        List<History> histories = diaryQueryRepository.findHistories(user, diary,
+            PageRequest.of(offset, size));
+
+        return DataFetcherResult.<List<History>>newResult()
+            .data(histories)
+            .localContext(pageInput)
+            .build();
     }
 
     @DgsData(parentType = "Diary", field = "currentHistory")
@@ -289,7 +299,7 @@ public class DiaryFetcher {
     public int getPeriodDays(DgsDataFetchingEnvironment dfe) {
         History history = dfe.getSource();
         if (!history.getIsDeleted()) {
-            return (int) ChronoUnit.DAYS.between(LocalDateTime.now(), history.getEndDate());
+            return (int) ChronoUnit.DAYS.between(LocalDateTime.now(), history.getEndDate()) + 1;
         }
 
         return 0;
@@ -326,18 +336,16 @@ public class DiaryFetcher {
         }
     }
 
-    //TODO: 무조껀 3개 제한?
-    @DgsQuery(field = "pages")
-//    @DgsData(parentType = "Query", field = "pages")
     @DgsData(parentType = "History", field = "pages")
-    public List<Page> getPages(@InputArgument PageInput pageInput, DgsDataFetchingEnvironment dfe) {
+    public List<Page> getPages(DgsDataFetchingEnvironment dfe) {
         History history = dfe.getSource();
+        PageInput pageInput = dfe.getLocalContext();
 
-        DgsContext dgsContext = dfe.getDgsContext();
-        Object customContext = dgsContext.getCustomContext();
+        Integer offset = pageInput.getPageOffset();
+        Integer size = pageInput.getPageSize();
 
-        // https://netflix.github.io/dgs/mutations/
-        return pageRepository.findByHistory(history);
+        return pageRepository.findByHistory(history,
+            PageRequest.of(offset, size, Direction.DESC, "createdAt")).getContent();
     }
 
     /**
