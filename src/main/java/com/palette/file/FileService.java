@@ -1,17 +1,19 @@
 package com.palette.file;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.*;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.palette.infra.s3.S3Client;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import java.io.InputStream;
 import java.net.URI;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Component
 public class FileService {
+
     private final S3Client s3Client;
 
     @Value("${ncp.object-storage.bucket-name}")
@@ -33,8 +35,9 @@ public class FileService {
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(fileSize);
 
-        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, s3FileKey, inputStream, objectMetadata)
-                .withCannedAcl(CannedAccessControlList.PublicRead);
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, s3FileKey, inputStream,
+            objectMetadata)
+            .withCannedAcl(CannedAccessControlList.PublicRead);
         s3.putObject(putObjectRequest);
 
         return s3.getUrl(bucketName, s3FileKey).toString();
