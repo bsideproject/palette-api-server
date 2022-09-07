@@ -1,10 +1,16 @@
 package com.palette.user.fetcher;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.netflix.graphql.dgs.*;
+import com.netflix.graphql.dgs.DgsComponent;
+import com.netflix.graphql.dgs.DgsData;
+import com.netflix.graphql.dgs.DgsDataFetchingEnvironment;
+import com.netflix.graphql.dgs.DgsMutation;
+import com.netflix.graphql.dgs.DgsQuery;
+import com.netflix.graphql.dgs.InputArgument;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
+import com.palette.exception.graphql.UserNotFoundException;
 import com.palette.infra.fcm.FcmService;
 import com.palette.infra.fcm.Note;
 import com.palette.resolver.Authentication;
@@ -16,21 +22,19 @@ import com.palette.user.fetcher.dto.DeleteFcmTokenInput;
 import com.palette.user.fetcher.dto.EditMyProfileInput;
 import com.palette.user.fetcher.dto.SendTestNotificationInput;
 import com.palette.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import javax.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @DgsComponent
 @RequiredArgsConstructor
 public class UserFetcher {
+
     private final UserRepository userRepository;
     private final DiaryGroupRepository diaryGroupRepository;
     private final DiaryRepository diaryRepository;
@@ -40,7 +44,8 @@ public class UserFetcher {
     @Authentication
     @DgsQuery(field = "myProfile")
     public User getMyProfile(@InputArgument LoginUser loginUser) {
-        return userRepository.findByEmail(loginUser.getEmail()).orElseThrow(); // TODO: UserNotFoundException
+        return userRepository.findByEmail(loginUser.getEmail())
+            .orElseThrow(); // DateTime: UserNotFoundException
     }
 
     @DgsData(parentType = "User", field = "diaries")
@@ -51,7 +56,8 @@ public class UserFetcher {
 
     @Authentication
     @DgsMutation
-    public User editMyProfile(@InputArgument EditMyProfileInput editMyProfileInput, LoginUser loginUser) {
+    public User editMyProfile(@InputArgument EditMyProfileInput editMyProfileInput,
+        LoginUser loginUser) {
         Optional<User> userOptional = userRepository.findByEmail(loginUser.getEmail());
         if (userOptional.isEmpty()) {
             throw new RuntimeException(); // TODO: UserNotFoundException
@@ -63,13 +69,22 @@ public class UserFetcher {
         Boolean pushEnabled = editMyProfileInput.getPushEnabled();
         Set<String> socialTypesInput = editMyProfileInput.getSocialTypes();
 
-        if (agreeWithTerms != null) user.setAgreeWithTerms(agreeWithTerms);
-        if (profileImg != null) user.setProfileImg(profileImg);
-        if (nickname != null) user.setNickname(nickname);
-        if (pushEnabled != null) user.setPushEnabled(pushEnabled);
+        if (agreeWithTerms != null) {
+            user.setAgreeWithTerms(agreeWithTerms);
+        }
+        if (profileImg != null) {
+            user.setProfileImg(profileImg);
+        }
+        if (nickname != null) {
+            user.setNickname(nickname);
+        }
+        if (pushEnabled != null) {
+            user.setPushEnabled(pushEnabled);
+        }
         if (socialTypesInput != null) {
             Set<SocialType> newSocialTypes = new HashSet<>();
-            socialTypesInput.forEach(socialTypeInput -> newSocialTypes.add(SocialType.of(socialTypeInput)));
+            socialTypesInput.forEach(
+                socialTypeInput -> newSocialTypes.add(SocialType.of(socialTypeInput)));
             user.setSocialTypes(newSocialTypes);
         }
 
@@ -93,7 +108,8 @@ public class UserFetcher {
 
     @Authentication
     @DgsMutation
-    public Boolean deleteFcmToken(@InputArgument DeleteFcmTokenInput deleteFcmTokenInput, LoginUser loginUser) {
+    public Boolean deleteFcmToken(@InputArgument DeleteFcmTokenInput deleteFcmTokenInput,
+        LoginUser loginUser) {
         Optional<User> userOptional = userRepository.findByEmail(loginUser.getEmail());
         if (userOptional.isEmpty()) {
             throw new RuntimeException(); // TODO: UserNotFoundException
@@ -108,9 +124,12 @@ public class UserFetcher {
 
     @Authentication
     @DgsMutation
-    public Boolean sendTestNotification(@InputArgument SendTestNotificationInput sendTestNotificationInput, LoginUser loginUser) throws FirebaseMessagingException {
-        User user = userRepository.findByEmail(loginUser.getEmail()).orElseThrow(); // TODO: UserNotFoundExceptop
-        if(user.getPushEnabled()){
+    public Boolean sendTestNotification(
+        @InputArgument SendTestNotificationInput sendTestNotificationInput, LoginUser loginUser)
+        throws FirebaseMessagingException {
+        User user = userRepository.findByEmail(loginUser.getEmail())
+            .orElseThrow(UserNotFoundException::new);
+        if (user.getPushEnabled()) {
             String title = sendTestNotificationInput.getTitle();
             String body = sendTestNotificationInput.getBody();
             Note note = Note.builder().title(title).body(body).build();

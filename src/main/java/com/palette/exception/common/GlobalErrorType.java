@@ -7,6 +7,7 @@ import com.palette.exception.graphql.DiaryNotFoundException;
 import com.palette.exception.graphql.DiaryOutedUserException;
 import com.palette.exception.graphql.DiaryOverUserException;
 import com.palette.exception.graphql.DummyException;
+import com.palette.exception.graphql.HistoryNotFoundException;
 import com.palette.exception.graphql.InviteCodeNotFoundException;
 import com.palette.exception.graphql.ProgressedHistoryException;
 import com.palette.exception.graphql.UserNotFoundException;
@@ -30,6 +31,7 @@ public enum GlobalErrorType {
     D004("D004", "해당 일기에 이미 가입되어 있습니다.", ErrorType.BAD_REQUEST, DiaryExistUserException.class),
     D005("D005", "이전에 나간적이 있는 그룹입니다.", ErrorType.BAD_REQUEST, DiaryOutedUserException.class),
     D006("D006", "진행중인 히스토리가 있습니다", ErrorType.BAD_REQUEST, ProgressedHistoryException.class),
+    D007("D006", "히스토리가 존재하지 않습니다.", ErrorType.BAD_REQUEST, HistoryNotFoundException.class),
 
     U001("U001", "유저가 존재하지 않습니다.", ErrorType.NOT_FOUND, UserNotFoundException.class),
 

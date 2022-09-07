@@ -37,6 +37,7 @@ import com.palette.exception.graphql.DiaryExistUserException;
 import com.palette.exception.graphql.DiaryNotFoundException;
 import com.palette.exception.graphql.DiaryOutedUserException;
 import com.palette.exception.graphql.DiaryOverUserException;
+import com.palette.exception.graphql.HistoryNotFoundException;
 import com.palette.exception.graphql.InviteCodeNotFoundException;
 import com.palette.exception.graphql.ProgressedHistoryException;
 import com.palette.exception.graphql.UserNotFoundException;
@@ -185,9 +186,9 @@ public class DiaryFetcher {
     @DgsData(parentType = "Mutation", field = "createPage")
     public Page createPage(@InputArgument CreatePageInput createPageInput, LoginUser loginUser) {
         User user = userRepository.findByEmail(loginUser.getEmail())
-            .orElseThrow(); // TODO: UserNotFoundException
+            .orElseThrow(UserNotFoundException::new);
         History history = historyRepository.findById(createPageInput.getHistoryId())
-            .orElseThrow(); // TODO: HistoryNotFoundException
+            .orElseThrow(HistoryNotFoundException::new);
         Page page = Page.builder()
             .title(createPageInput.getTitle())
             .body(createPageInput.getBody())
@@ -213,9 +214,6 @@ public class DiaryFetcher {
         return pageRepository.save(page);
     }
 
-    /**
-     * TODO: histories와 하위 pages에도 개수 제한
-     */
     /**
      * GlobalErrorType 참고
      *
@@ -299,7 +297,7 @@ public class DiaryFetcher {
     public int getPeriodDays(DgsDataFetchingEnvironment dfe) {
         History history = dfe.getSource();
         if (!history.getIsDeleted()) {
-            return (int) ChronoUnit.DAYS.between(LocalDateTime.now(), history.getEndDate()) + 1;
+            return (int) ChronoUnit.DAYS.between(LocalDateTime.now(), history.getEndDate());
         }
 
         return 0;
