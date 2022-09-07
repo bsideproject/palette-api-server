@@ -16,6 +16,7 @@ public class InviteDiaryInput {
         return DiaryGroup.builder()
             .user(user)
             .diary(diary)
+            .isAdmin(false)
             .build();
     }
 

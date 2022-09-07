@@ -28,17 +28,22 @@ public class LoginUserAspect {
         String token = AuthorizationExtractor.extract(request);
 
         Object[] args = pjp.getArgs();
-        Object inputArgument = args[0];
+        int length = args.length - 1; // 보이지 않는 null값 추가로 인한 - 1
+        Object[] objects = new Object[length + 1]; // LoginUser 추가를 위한 + 1
+        for (int i = 0; i < args.length; i++) {
+            objects[i] = args[i];
+        }
 
         String email = jwtTokenProvider.getEmailFromPayLoad(token, JwtTokenType.ACCESS_TOKEN);
         Long userId = jwtTokenProvider.getUserIdFromPayLoad(token,
             JwtTokenType.ACCESS_TOKEN);
         LoginUser loginUser = new LoginUser(userId, email);
         Object resultObj;
-        if (inputArgument == null) {
+        if (length == 0) {
             resultObj = pjp.proceed(new Object[]{loginUser});
         } else {
-            resultObj = pjp.proceed(new Object[]{inputArgument, loginUser});
+            objects[length] = loginUser;
+            resultObj = pjp.proceed(objects);
         }
         return resultObj;
     }

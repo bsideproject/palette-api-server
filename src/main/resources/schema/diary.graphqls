@@ -1,6 +1,7 @@
 extend type Query {
     diaries(pageInput: PageInput): [Diary]!
-    histories(pageInput: PageInput): [History]!
+    histories(diaryId: Long, pageInput: PageInput): [History]!
+    pages(pageInput: PageInput): Boolean
 }
 
 extend type Mutation {
@@ -58,8 +59,8 @@ input PageQueryInput {
 
 input UpdateDiaryInput {
     diaryId: Long!
-    colorId: Long!
-    title: String!
+    colorId: Long
+    title: String
 }
 
 input OutDiaryInput {
