@@ -43,12 +43,13 @@ public class DiaryQueryRepository extends BaseRepository {
             .fetch();
     }
 
-    public List<History> findHistories(User user, PageRequest pageRequest) {
+    public List<History> findHistories(User user, Diary paramDiary, PageRequest pageRequest) {
         return queryFactory.selectFrom(history)
             .join(diary).on(history.diary.id.eq(diary.id))
             .join(diaryGroup).on(diary.id.eq(diaryGroup.diary.id))
             .where(
-                condition(user, diaryGroup.user::eq)
+                condition(user, diaryGroup.user::eq),
+                condition(paramDiary, diaryGroup.diary::eq)
             )
             .orderBy(history.createdAt.desc())
             .offset(pageRequest.getOffset())

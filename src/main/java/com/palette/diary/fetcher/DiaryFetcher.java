@@ -6,6 +6,7 @@ import com.netflix.graphql.dgs.DgsDataFetchingEnvironment;
 import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
+import com.netflix.graphql.dgs.context.DgsContext;
 import com.palette.color.domain.Color;
 import com.palette.color.repository.ColorRepository;
 import com.palette.common.PageInput;
@@ -55,6 +56,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @DgsComponent
@@ -243,15 +245,20 @@ public class DiaryFetcher {
      */
     @Authentication
     @DgsQuery(field = "histories")
-    public List<History> getHistories(@InputArgument PageInput pageInput,
+    public List<History> getHistories(
+        @InputArgument Long diaryId,
+        @InputArgument PageInput pageInput,
         LoginUser loginUser) {
         User user = userRepository.findByEmail(loginUser.getEmail())
             .orElseThrow(UserNotFoundException::new);
 
+        Diary diary = diaryRepository.findById(diaryId)
+            .orElseThrow(DiaryNotFoundException::new);
+
         Integer page = pageInput.getPage();
         Integer size = pageInput.getSize();
 
-        return diaryQueryRepository.findHistories(user, PageRequest.of(page, size));
+        return diaryQueryRepository.findHistories(user, diary, PageRequest.of(page, size));
     }
 
     @DgsData(parentType = "Diary", field = "currentHistory")
@@ -319,9 +326,17 @@ public class DiaryFetcher {
         }
     }
 
+    //TODO: 무조껀 3개 제한?
+    @DgsQuery(field = "pages")
+//    @DgsData(parentType = "Query", field = "pages")
     @DgsData(parentType = "History", field = "pages")
-    public List<Page> getPages(DgsDataFetchingEnvironment dfe) {
+    public List<Page> getPages(@InputArgument PageInput pageInput, DgsDataFetchingEnvironment dfe) {
         History history = dfe.getSource();
+
+        DgsContext dgsContext = dfe.getDgsContext();
+        Object customContext = dgsContext.getCustomContext();
+
+        // https://netflix.github.io/dgs/mutations/
         return pageRepository.findByHistory(history);
     }
 
@@ -367,14 +382,23 @@ public class DiaryFetcher {
     public Boolean updateDiary(@InputArgument UpdateDiaryInput updateDiaryInput) {
         Diary diary = diaryRepository.findById(updateDiaryInput.getDiaryId())
             .orElseThrow(DiaryNotFoundException::new);
-        diary.changeTitle(updateDiaryInput.getTitle());
+        String title = updateDiaryInput.getTitle();
+        Long colorId = updateDiaryInput.getColorId();
+        boolean isUpdated = false;
 
-        Color color = colorRepository.findById(updateDiaryInput.getColorId())
-            .orElseThrow(ColorNotFoundException::new);
+        if (StringUtils.hasText(title)) {
+            diary.changeTitle(updateDiaryInput.getTitle());
+            isUpdated = true;
+        }
 
-        diary.changeColor(color);
+        if (colorId != null) {
+            Color color = colorRepository.findById(updateDiaryInput.getColorId())
+                .orElseThrow(ColorNotFoundException::new);
+            diary.changeColor(color);
+            isUpdated = true;
+        }
 
-        return true;
+        return isUpdated;
     }
 
     /**
