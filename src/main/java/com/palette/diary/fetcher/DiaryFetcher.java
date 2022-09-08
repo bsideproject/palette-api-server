@@ -41,6 +41,7 @@ import com.palette.exception.graphql.HistoryNotFoundException;
 import com.palette.exception.graphql.InviteCodeNotFoundException;
 import com.palette.exception.graphql.ProgressedHistoryException;
 import com.palette.exception.graphql.UserNotFoundException;
+import com.palette.infra.fcm.PushNotificationService;
 import com.palette.resolver.Authentication;
 import com.palette.resolver.LoginUser;
 import com.palette.user.domain.User;
@@ -75,6 +76,7 @@ public class DiaryFetcher {
     private final PageRepository pageRepository;
     private final DiaryService diaryService;
     private final ImageRepository imageRepository;
+    private final PushNotificationService notificationService;
 
     /**
      * GlobalErrorType 참고
@@ -164,7 +166,7 @@ public class DiaryFetcher {
         Diary diary = diaryRepository.findById(createHistoryInput.getDiaryId())
             .orElseThrow(DiaryNotFoundException::new);
 
-        History progressHistory = historyRepository.findProgressHistory(diary);
+        History progressHistory = diaryQueryRepository.findProgressHistory(diary);
         if (progressHistory != null) {
             throw new ProgressedHistoryException();
         }
@@ -272,7 +274,7 @@ public class DiaryFetcher {
     @DgsData(parentType = "Diary", field = "currentHistory")
     public History getCurrentHistory(DgsDataFetchingEnvironment dfe) {
         Diary diary = dfe.getSource();
-        History history = historyRepository.findProgressHistory(diary);
+        History history = diaryQueryRepository.findProgressHistory(diary);
         if (history == null) {
             return null;
         }
@@ -306,7 +308,7 @@ public class DiaryFetcher {
     @DgsData(parentType = "Diary", field = "diaryStatus")
     public String getDiaryStatus(DgsDataFetchingEnvironment dfe) {
         Diary diary = dfe.getSource();
-        History history = historyRepository.findProgressHistory(diary);
+        History history = diaryQueryRepository.findProgressHistory(diary);
         List<DiaryGroup> diaryGroups = diaryGroupRepository.findByDiary(diary);
 
         if (diaryGroups.isEmpty()) {
