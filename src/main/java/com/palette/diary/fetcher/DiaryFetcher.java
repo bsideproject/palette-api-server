@@ -47,12 +47,14 @@ import com.palette.resolver.LoginUser;
 import com.palette.user.domain.User;
 import com.palette.user.repository.UserRepository;
 import graphql.execution.DataFetcherResult;
+
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -88,12 +90,12 @@ public class DiaryFetcher {
     @DgsMutation
     @Transactional
     public CreateDiaryOutput createDiary(@InputArgument CreateDiaryInput createDiaryInput,
-        LoginUser loginUser) {
+                                         LoginUser loginUser) {
         Color color = colorRepository.findById(createDiaryInput.getColorId())
-            .orElseThrow(ColorNotFoundException::new);
+                .orElseThrow(ColorNotFoundException::new);
 
         User user = userRepository.findByEmail(loginUser.getEmail())
-            .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(UserNotFoundException::new);
         String invitationCode = RandomStringUtils.randomAlphabetic(8);
         Diary diary = diaryRepository.save(createDiaryInput.toEntity(invitationCode, color));
         diaryGroupRepository.save(createDiaryInput.toEntity(diary, user));
@@ -114,14 +116,14 @@ public class DiaryFetcher {
     @Transactional
     @DgsMutation
     public InviteDiaryOutput inviteDiary(@InputArgument InviteDiaryInput inviteDiaryInput,
-        LoginUser loginUser) {
+                                         LoginUser loginUser) {
         Diary diary = diaryRepository.findByInvitationCode(inviteDiaryInput.getInvitationCode())
-            .orElseThrow(InviteCodeNotFoundException::new);
+                .orElseThrow(InviteCodeNotFoundException::new);
 
         List<DiaryGroup> diaryGroups = diaryGroupRepository.findByDiary(diary);
 
         User invitedUser = userRepository.findByEmail(loginUser.getEmail())
-            .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(UserNotFoundException::new);
 
         if (diaryGroups.isEmpty()) {
             throw new DiaryNotFoundException();
@@ -144,10 +146,10 @@ public class DiaryFetcher {
         }
 
         User adminUser = diaryGroups.stream()
-            .filter(DiaryGroup::getIsAdmin)
-            .map(DiaryGroup::getUser)
-            .findAny()
-            .orElse(null);
+                .filter(DiaryGroup::getIsAdmin)
+                .map(DiaryGroup::getUser)
+                .findAny()
+                .orElse(null);
 
         diaryGroupRepository.save(InviteDiaryInput.of(invitedUser, diary));
 
@@ -164,7 +166,7 @@ public class DiaryFetcher {
     @Transactional
     public CreateHistoryOutput createHistory(@InputArgument CreateHistoryInput createHistoryInput) {
         Diary diary = diaryRepository.findById(createHistoryInput.getDiaryId())
-            .orElseThrow(DiaryNotFoundException::new);
+                .orElseThrow(DiaryNotFoundException::new);
 
         History progressHistory = diaryQueryRepository.findProgressHistory(diary);
         if (progressHistory != null) {
@@ -175,8 +177,8 @@ public class DiaryFetcher {
         diaryService.registerHistoryFinishedJob(history);
 
         return CreateHistoryOutput.builder()
-            .historyId(history.getId())
-            .build();
+                .historyId(history.getId())
+                .build();
     }
 
     @DgsData(parentType = "Query", field = "page")
@@ -188,26 +190,26 @@ public class DiaryFetcher {
     @DgsData(parentType = "Mutation", field = "createPage")
     public Page createPage(@InputArgument CreatePageInput createPageInput, LoginUser loginUser) {
         User user = userRepository.findByEmail(loginUser.getEmail())
-            .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(UserNotFoundException::new);
         History history = historyRepository.findById(createPageInput.getHistoryId())
-            .orElseThrow(HistoryNotFoundException::new);
+                .orElseThrow(HistoryNotFoundException::new);
         Page page = Page.builder()
-            .title(createPageInput.getTitle())
-            .body(createPageInput.getBody())
-            .userId(user.getId())
-            .history(history)
-            .build();
+                .title(createPageInput.getTitle())
+                .body(createPageInput.getBody())
+                .userId(user.getId())
+                .history(history)
+                .build();
 
         List<Image> images = new ArrayList<>();
 
         createPageInput.getImageUrls().forEach(imageUrl -> {
             String path = imageUrl.substring(imageUrl.indexOf("com") + 3);
             images.add(
-                Image.builder()
-                    .page(page)
-                    .domain(S3Properties.domain)
-                    .path(path)
-                    .build()
+                    Image.builder()
+                            .page(page)
+                            .domain(S3Properties.domain)
+                            .path(path)
+                            .build()
             );
         });
 
@@ -224,22 +226,22 @@ public class DiaryFetcher {
     @Authentication
     @DgsQuery(field = "diaries")
     public DataFetcherResult<List<Diary>> getDiary(@InputArgument PageInput pageInput,
-        LoginUser loginUser) {
+                                                   LoginUser loginUser) {
         User user = userRepository.findByEmail(loginUser.getEmail())
-            .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(UserNotFoundException::new);
 
         Integer offset = pageInput.getDiaryOffset();
         Integer size = pageInput.getDiarySize();
 
         List<Diary> diaries = diaryQueryRepository.findByUser(user, PageRequest.of(offset, size))
-            .stream()
-            .map(DiaryGroup::getDiary)
-            .collect(Collectors.toList());
+                .stream()
+                .map(DiaryGroup::getDiary)
+                .collect(Collectors.toList());
 
         return DataFetcherResult.<List<Diary>>newResult()
-            .data(diaries)
-            .localContext(pageInput)
-            .build();
+                .data(diaries)
+                .localContext(pageInput)
+                .build();
     }
 
     /**
@@ -250,25 +252,25 @@ public class DiaryFetcher {
     @Authentication
     @DgsQuery(field = "histories")
     public DataFetcherResult<List<History>> getHistories(
-        @InputArgument Long diaryId,
-        @InputArgument PageInput pageInput,
-        LoginUser loginUser) {
+            @InputArgument Long diaryId,
+            @InputArgument PageInput pageInput,
+            LoginUser loginUser) {
         User user = userRepository.findByEmail(loginUser.getEmail())
-            .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(UserNotFoundException::new);
 
         Diary diary = diaryRepository.findById(diaryId)
-            .orElseThrow(DiaryNotFoundException::new);
+                .orElseThrow(DiaryNotFoundException::new);
 
         Integer offset = pageInput.getHistoryOffset();
         Integer size = pageInput.getHistorySize();
 
         List<History> histories = diaryQueryRepository.findHistories(user, diary,
-            PageRequest.of(offset, size));
+                PageRequest.of(offset, size));
 
         return DataFetcherResult.<List<History>>newResult()
-            .data(histories)
-            .localContext(pageInput)
-            .build();
+                .data(histories)
+                .localContext(pageInput)
+                .build();
     }
 
     @DgsData(parentType = "Diary", field = "currentHistory")
@@ -291,8 +293,8 @@ public class DiaryFetcher {
     public List<User> getJoinedUsers(DgsDataFetchingEnvironment dfe) {
         Diary diary = dfe.getSource();
         return diaryGroupRepository.findByDiary(diary).stream()
-            .map(DiaryGroup::getUser)
-            .collect(Collectors.toList());
+                .map(DiaryGroup::getUser)
+                .collect(Collectors.toList());
     }
 
     @DgsData(parentType = "History", field = "remainingDays")
@@ -316,7 +318,7 @@ public class DiaryFetcher {
         }
 
         boolean isDiscard = diaryGroups.stream()
-            .anyMatch(DiaryGroup::getIsOuted);
+                .anyMatch(DiaryGroup::getIsOuted);
 
         //일기 그룹에 속한 유저가 한명일때
         if (diaryGroups.size() == 1) {
@@ -340,12 +342,15 @@ public class DiaryFetcher {
     public List<Page> getPages(DgsDataFetchingEnvironment dfe) {
         History history = dfe.getSource();
         PageInput pageInput = dfe.getLocalContext();
+        if (pageInput != null) {
+            Integer offset = pageInput.getPageOffset();
+            Integer size = pageInput.getPageSize();
 
-        Integer offset = pageInput.getPageOffset();
-        Integer size = pageInput.getPageSize();
-
-        return pageRepository.findByHistory(history,
-            PageRequest.of(offset, size, Direction.DESC, "createdAt")).getContent();
+            return pageRepository.findByHistory(history,
+                    PageRequest.of(offset, size, Direction.DESC, "createdAt")).getContent();
+        } else {
+            return pageRepository.findByHistory(history);
+        }
     }
 
     /**
@@ -358,7 +363,7 @@ public class DiaryFetcher {
         Page page = dfe.getSource();
         Long userId = page.getUserId();
         return userRepository.findById(userId)
-            .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(UserNotFoundException::new);
     }
 
     @Authentication
@@ -389,7 +394,7 @@ public class DiaryFetcher {
     @Transactional
     public Boolean updateDiary(@InputArgument UpdateDiaryInput updateDiaryInput) {
         Diary diary = diaryRepository.findById(updateDiaryInput.getDiaryId())
-            .orElseThrow(DiaryNotFoundException::new);
+                .orElseThrow(DiaryNotFoundException::new);
         String title = updateDiaryInput.getTitle();
         Long colorId = updateDiaryInput.getColorId();
         boolean isUpdated = false;
@@ -401,7 +406,7 @@ public class DiaryFetcher {
 
         if (colorId != null) {
             Color color = colorRepository.findById(updateDiaryInput.getColorId())
-                .orElseThrow(ColorNotFoundException::new);
+                    .orElseThrow(ColorNotFoundException::new);
             diary.changeColor(color);
             isUpdated = true;
         }
@@ -420,13 +425,13 @@ public class DiaryFetcher {
     @Transactional
     public Boolean outDiary(@InputArgument OutDiaryInput outDiaryInput, LoginUser loginUser) {
         Diary diary = diaryRepository.findById(outDiaryInput.getDiaryId())
-            .orElseThrow(DiaryNotFoundException::new);
+                .orElseThrow(DiaryNotFoundException::new);
 
         User user = userRepository.findById(loginUser.getUserId())
-            .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(UserNotFoundException::new);
 
         DiaryGroup diaryGroup = diaryGroupRepository.findByDiaryAndUser(diary, user)
-            .orElseThrow(DiaryNotFoundException::new);
+                .orElseThrow(DiaryNotFoundException::new);
 
         diaryGroup.userOut();
 
