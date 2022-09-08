@@ -15,16 +15,7 @@ import com.palette.diary.domain.DiaryGroup;
 import com.palette.diary.domain.History;
 import com.palette.diary.domain.Image;
 import com.palette.diary.domain.Page;
-import com.palette.diary.fetcher.dto.CreateDiaryInput;
-import com.palette.diary.fetcher.dto.CreateDiaryOutput;
-import com.palette.diary.fetcher.dto.CreateHistoryInput;
-import com.palette.diary.fetcher.dto.CreateHistoryOutput;
-import com.palette.diary.fetcher.dto.CreatePageInput;
-import com.palette.diary.fetcher.dto.InviteDiaryInput;
-import com.palette.diary.fetcher.dto.InviteDiaryOutput;
-import com.palette.diary.fetcher.dto.OutDiaryInput;
-import com.palette.diary.fetcher.dto.PageQueryInput;
-import com.palette.diary.fetcher.dto.UpdateDiaryInput;
+import com.palette.diary.fetcher.dto.*;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
 import com.palette.diary.repository.HistoryRepository;
@@ -45,6 +36,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
@@ -430,7 +422,60 @@ public class DiaryFetcher {
     public Page getPage(@InputArgument PageQueryInput pageQueryInput, LoginUser loginUser) {
         Page page = pageRepository.findById(pageQueryInput.getId()).orElseThrow(PageNotFoundException::new);
         List<User> users = userRepository.findUsers(page);
-        if(users.stream().anyMatch(user -> user.getEmail().equals(loginUser.getEmail()))) {
+        if (users.stream().anyMatch(user -> user.getEmail().equals(loginUser.getEmail()))) {
+            return page;
+        } else {
+            throw new PermissionDeniedException();
+        }
+    }
+
+    @Authentication
+    @Transactional
+    @DgsMutation
+    public Page editPage(@InputArgument EditPageInput editPageInput, LoginUser loginUser) {
+        Page page = pageRepository.findById(editPageInput.getPageId()).orElseThrow(PageNotFoundException::new);
+        List<User> users = userRepository.findUsers(page);
+        if (users.stream().anyMatch(user -> user.getEmail().equals(loginUser.getEmail()))) {
+            boolean isPageChanged = false;
+            String title = editPageInput.getTitle();
+            String body = editPageInput.getBody();
+            List<String> image_urls = editPageInput.getImageUrls();
+
+            if (title != null) {
+                page.setTitle(title);
+                isPageChanged = true;
+            }
+
+            if (body != null) {
+                page.setBody(body);
+                isPageChanged = true;
+            }
+            page.clearImages();
+            pageRepository.save(page);
+
+
+            if (image_urls != null) {
+                page.clearImages();
+                List<Image> images = new ArrayList<>();
+
+                image_urls.forEach(imageUrl -> {
+                    String path = imageUrl.substring(imageUrl.indexOf("com") + 3);
+                    images.add(
+                            Image.builder()
+                                    .page(page)
+                                    .domain(S3Properties.domain)
+                                    .path(path)
+                                    .build()
+                    );
+                });
+
+                images.forEach(page::addImage);
+                isPageChanged = true;
+            }
+
+            if (isPageChanged) {
+                return pageRepository.save(page);
+            }
             return page;
         } else {
             throw new PermissionDeniedException();

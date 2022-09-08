@@ -9,7 +9,7 @@ spring:
   # ===============================
   jpa:
     defer-datasource-initialization: true
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: update
     database-platform: org.hibernate.dialect.MySQL8Dialect
@@ -17,6 +17,7 @@ spring:
       hibernate:
         format_sql: false
         default_batch_fetch_size: 1000
+    open-in-view: false
 
   # ===============================
   # = database
