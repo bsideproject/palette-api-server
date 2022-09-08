@@ -15,16 +15,7 @@ import com.palette.diary.domain.DiaryGroup;
 import com.palette.diary.domain.History;
 import com.palette.diary.domain.Image;
 import com.palette.diary.domain.Page;
-import com.palette.diary.fetcher.dto.CreateDiaryInput;
-import com.palette.diary.fetcher.dto.CreateDiaryOutput;
-import com.palette.diary.fetcher.dto.CreateHistoryInput;
-import com.palette.diary.fetcher.dto.CreateHistoryOutput;
-import com.palette.diary.fetcher.dto.CreatePageInput;
-import com.palette.diary.fetcher.dto.InviteDiaryInput;
-import com.palette.diary.fetcher.dto.InviteDiaryOutput;
-import com.palette.diary.fetcher.dto.OutDiaryInput;
-import com.palette.diary.fetcher.dto.PageQueryInput;
-import com.palette.diary.fetcher.dto.UpdateDiaryInput;
+import com.palette.diary.fetcher.dto.*;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
 import com.palette.diary.repository.HistoryRepository;
@@ -32,15 +23,7 @@ import com.palette.diary.repository.ImageRepository;
 import com.palette.diary.repository.PageRepository;
 import com.palette.diary.repository.query.DiaryQueryRepository;
 import com.palette.diary.service.DiaryService;
-import com.palette.exception.graphql.ColorNotFoundException;
-import com.palette.exception.graphql.DiaryExistUserException;
-import com.palette.exception.graphql.DiaryNotFoundException;
-import com.palette.exception.graphql.DiaryOutedUserException;
-import com.palette.exception.graphql.DiaryOverUserException;
-import com.palette.exception.graphql.HistoryNotFoundException;
-import com.palette.exception.graphql.InviteCodeNotFoundException;
-import com.palette.exception.graphql.ProgressedHistoryException;
-import com.palette.exception.graphql.UserNotFoundException;
+import com.palette.exception.graphql.*;
 import com.palette.infra.fcm.PushNotificationService;
 import com.palette.resolver.Authentication;
 import com.palette.resolver.LoginUser;
@@ -52,6 +35,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -177,11 +161,6 @@ public class DiaryFetcher {
         return CreateHistoryOutput.builder()
             .historyId(history.getId())
             .build();
-    }
-
-    @DgsData(parentType = "Query", field = "page")
-    public Page getPage(@InputArgument PageQueryInput pageQueryInput) {
-        return pageRepository.getById(pageQueryInput.getId());
     }
 
     @Authentication
@@ -436,4 +415,15 @@ public class DiaryFetcher {
         return true;
     }
 
+    @Authentication
+    @DgsData(parentType = "Query", field = "page")
+    public Page getPage(@InputArgument PageQueryInput pageQueryInput, LoginUser loginUser) {
+        Page page = pageRepository.findById(pageQueryInput.getId()).orElseThrow(PageNotFoundException::new);
+        List<User> users = userRepository.findUsers(page);
+        if (users.stream().anyMatch(user -> user.getEmail().equals(loginUser.getEmail()))) {
+            return page;
+        } else {
+            throw new PermissionDeniedException();
+        }
+    }
 }
