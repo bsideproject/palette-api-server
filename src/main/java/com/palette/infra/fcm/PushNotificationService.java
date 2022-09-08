@@ -1,8 +1,8 @@
 package com.palette.infra.fcm;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.palette.alarm.domain.AlarmHistory;
-import com.palette.alarm.service.AlarmHistoryService;
+import com.palette.alarmhistory.domain.AlarmHistory;
+import com.palette.alarmhistory.service.AlarmHistoryService;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.History;
 import com.palette.diary.domain.Page;

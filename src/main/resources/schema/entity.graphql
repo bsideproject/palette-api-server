@@ -74,3 +74,14 @@ type Color {
     updatedAt: LocalDateTime!
 }
 
+type AlarmHistory {
+    id: Long!
+    user: User!
+    body: String!
+    movePage: String!
+    diaryId: Long!
+    historyId: Long!
+    isRead: Boolean!
+    createdAt: LocalDateTime!
+    updatedAt: LocalDateTime!
+}

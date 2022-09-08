@@ -35,7 +35,9 @@ public enum GlobalErrorType {
 
     U001("U001", "유저가 존재하지 않습니다.", ErrorType.NOT_FOUND, UserNotFoundException.class),
 
-    C001("C001", "색깔이 존재하지 않습니다.", ErrorType.NOT_FOUND, ColorNotFoundException.class);
+    C001("C001", "색깔이 존재하지 않습니다.", ErrorType.NOT_FOUND, ColorNotFoundException.class),
+
+    R001("R001", "알림내역이 존재하지 않습니다.", ErrorType.NOT_FOUND, ColorNotFoundException.class);
 
     private final String code;
     private final String message;

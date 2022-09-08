@@ -1,0 +1,7 @@
+extend type Query {
+    alarmHistories: [AlarmHistory]!
+}
+
+extend type Mutation {
+    readAlarmHistory(alarmHistoryId: Long): Boolean
+}
