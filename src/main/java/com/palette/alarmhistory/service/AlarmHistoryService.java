@@ -1,7 +1,7 @@
-package com.palette.alarm.service;
+package com.palette.alarmhistory.service;
 
-import com.palette.alarm.domain.AlarmHistory;
-import com.palette.alarm.repository.AlarmHistoryRepository;
+import com.palette.alarmhistory.domain.AlarmHistory;
+import com.palette.alarmhistory.repository.AlarmHistoryRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

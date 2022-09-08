@@ -1,4 +1,4 @@
-package com.palette.alarm.domain;
+package com.palette.alarmhistory.domain;
 
 import com.palette.BaseEntity;
 import com.palette.user.domain.User;
@@ -15,16 +15,20 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Getter
 @Entity
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "alarm_history")
+@Where(clause = "is_deleted = 0")
 @AttributeOverrides({
     @AttributeOverride(name = "id", column = @Column(name = "alarm_history_id")),
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE alarm_history SET is_deleted = 1 WHERE id = ?")
 public class AlarmHistory extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -47,7 +51,11 @@ public class AlarmHistory extends BaseEntity {
     @Column(name = "is_read")
     private Boolean isRead = false;
 
-    public void alarmRead() {
+    @Builder.Default
+    @Column(name = "is_deleted")
+    private Boolean isDeleted = false;
+
+    public void read() {
         isRead = true;
     }
 
