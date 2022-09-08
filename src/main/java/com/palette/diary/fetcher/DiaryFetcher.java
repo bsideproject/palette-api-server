@@ -32,15 +32,7 @@ import com.palette.diary.repository.ImageRepository;
 import com.palette.diary.repository.PageRepository;
 import com.palette.diary.repository.query.DiaryQueryRepository;
 import com.palette.diary.service.DiaryService;
-import com.palette.exception.graphql.ColorNotFoundException;
-import com.palette.exception.graphql.DiaryExistUserException;
-import com.palette.exception.graphql.DiaryNotFoundException;
-import com.palette.exception.graphql.DiaryOutedUserException;
-import com.palette.exception.graphql.DiaryOverUserException;
-import com.palette.exception.graphql.HistoryNotFoundException;
-import com.palette.exception.graphql.InviteCodeNotFoundException;
-import com.palette.exception.graphql.ProgressedHistoryException;
-import com.palette.exception.graphql.UserNotFoundException;
+import com.palette.exception.graphql.*;
 import com.palette.infra.fcm.PushNotificationService;
 import com.palette.resolver.Authentication;
 import com.palette.resolver.LoginUser;
@@ -179,11 +171,6 @@ public class DiaryFetcher {
         return CreateHistoryOutput.builder()
                 .historyId(history.getId())
                 .build();
-    }
-
-    @DgsData(parentType = "Query", field = "page")
-    public Page getPage(@InputArgument PageQueryInput pageQueryInput) {
-        return pageRepository.getById(pageQueryInput.getId());
     }
 
     @Authentication
@@ -438,4 +425,15 @@ public class DiaryFetcher {
         return true;
     }
 
+    @Authentication
+    @DgsData(parentType = "Query", field = "page")
+    public Page getPage(@InputArgument PageQueryInput pageQueryInput, LoginUser loginUser) {
+        Page page = pageRepository.findById(pageQueryInput.getId()).orElseThrow(PageNotFoundException::new);
+        List<User> users = userRepository.findUsers(page);
+        if(users.stream().anyMatch(user -> user.getEmail().equals(loginUser.getEmail()))) {
+            return page;
+        } else {
+            throw new PermissionDeniedException();
+        }
+    }
 }
