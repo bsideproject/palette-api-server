@@ -27,7 +27,7 @@ import org.hibernate.annotations.Where;
     @AttributeOverride(name = "id", column = @Column(name = "image_id")),
 })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE image SET is_deleted = 1 WHERE id = ?")
+@SQLDelete(sql = "UPDATE image SET is_deleted = 1 WHERE image_id = ?")
 public class Image extends BaseEntity {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)

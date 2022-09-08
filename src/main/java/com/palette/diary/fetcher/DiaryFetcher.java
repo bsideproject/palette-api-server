@@ -426,4 +426,17 @@ public class DiaryFetcher {
             throw new PermissionDeniedException();
         }
     }
+
+    @Authentication
+    @DgsMutation
+    public Boolean deletePage(@InputArgument DeletePageInput deletePageInput, LoginUser loginUser) {
+        Page page = pageRepository.findById(deletePageInput.getPageId()).orElseThrow(PageNotFoundException::new);
+        if(loginUser.getUserId().equals(page.getUserId())) {
+            pageRepository.delete(page);
+            return true;
+        } else {
+            throw new PermissionDeniedException();
+        }
+    }
+
 }

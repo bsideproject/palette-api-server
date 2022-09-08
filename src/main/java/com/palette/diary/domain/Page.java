@@ -29,7 +29,7 @@ import org.hibernate.annotations.Where;
 @Where(clause = "is_deleted = 0")
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE page SET is_deleted = 1 WHERE id = ?")
+@SQLDelete(sql = "UPDATE page SET is_deleted = 1 WHERE page_id = ?")
 public class Page extends BaseEntity {
 
     @Builder.Default
