@@ -13,16 +13,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @Table(name = "page")
 @AttributeOverrides({
@@ -31,11 +29,11 @@ import org.hibernate.annotations.Where;
 @Where(clause = "is_deleted = 0")
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE page SET is_deleted = 1 WHERE id = ?")
+@SQLDelete(sql = "UPDATE page SET is_deleted = 1 WHERE page_id = ?")
 public class Page extends BaseEntity {
 
     @Builder.Default
-    @OneToMany(mappedBy = "page", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "page", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
 
     @Column(nullable = false)
@@ -64,6 +62,10 @@ public class Page extends BaseEntity {
         if (image.getPage() != this) {
             image.setPage(this);
         }
+    }
+
+    public void clearImages() {
+        this.images.clear();
     }
 
 }

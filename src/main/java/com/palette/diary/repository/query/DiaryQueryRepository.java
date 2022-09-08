@@ -39,8 +39,8 @@ public class DiaryQueryRepository extends BaseRepository {
         return queryFactory.selectFrom(history)
             .where(
                 condition(diary, history.diary::eq),
-                condition(now, history.startDate::goe),
-                condition(now, history.endDate::loe)
+                condition(now, history.startDate::loe),
+                condition(now, history.endDate::goe)
             )
             .orderBy(history.createdAt.desc())
             .fetchOne();
