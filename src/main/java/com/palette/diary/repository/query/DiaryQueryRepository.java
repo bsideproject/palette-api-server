@@ -34,6 +34,18 @@ public class DiaryQueryRepository extends BaseRepository {
             .fetch();
     }
 
+    public History findProgressHistory(Diary diary) {
+        LocalDateTime now = LocalDateTime.now();
+        return queryFactory.selectFrom(history)
+            .where(
+                condition(diary, history.diary::eq),
+                condition(now, history.startDate::goe),
+                condition(now, history.endDate::loe)
+            )
+            .orderBy(history.createdAt.desc())
+            .fetchOne();
+    }
+
     public List<History> findPastHistories(Diary diary) {
         return queryFactory.selectFrom(history)
             .where(
