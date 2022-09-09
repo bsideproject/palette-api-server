@@ -12,6 +12,7 @@ extend type Mutation {
     updateDiary(updateDiaryInput: UpdateDiaryInput): Boolean
     outDiary(outDiaryInput: OutDiaryInput): Boolean
     deletePage(deletePageInput: DeletePageInput): Boolean
+    editPage(editPageInput: EditPageInput): Page
 }
 
 extend type Query {
@@ -79,4 +80,11 @@ input PageInput {
 
 input DeletePageInput {
     pageId: Long!
+}
+
+input EditPageInput {
+    pageId: Long!
+    title: String
+    body: String
+    imageUrls: [String]
 }
