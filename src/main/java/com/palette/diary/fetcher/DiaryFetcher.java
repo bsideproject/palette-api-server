@@ -1,5 +1,6 @@
 package com.palette.diary.fetcher;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsData;
 import com.netflix.graphql.dgs.DgsDataFetchingEnvironment;
@@ -99,7 +100,7 @@ public class DiaryFetcher {
     @Transactional
     @DgsMutation
     public InviteDiaryOutput inviteDiary(@InputArgument InviteDiaryInput inviteDiaryInput,
-                                         LoginUser loginUser) {
+                                         LoginUser loginUser) throws FirebaseMessagingException {
         Diary diary = diaryRepository.findByInvitationCode(inviteDiaryInput.getInvitationCode())
                 .orElseThrow(InviteCodeNotFoundException::new);
 
@@ -135,7 +136,7 @@ public class DiaryFetcher {
                 .orElse(null);
 
         diaryGroupRepository.save(InviteDiaryInput.of(invitedUser, diary));
-
+        notificationService.diaryCreated(diary, List.of(adminUser, invitedUser));
         return InviteDiaryOutput.of(adminUser, diary);
     }
 
@@ -147,7 +148,7 @@ public class DiaryFetcher {
      */
     @DgsMutation
     @Transactional
-    public CreateHistoryOutput createHistory(@InputArgument CreateHistoryInput createHistoryInput) {
+    public CreateHistoryOutput createHistory(@InputArgument CreateHistoryInput createHistoryInput) throws FirebaseMessagingException {
         Diary diary = diaryRepository.findById(createHistoryInput.getDiaryId())
                 .orElseThrow(DiaryNotFoundException::new);
 
@@ -158,7 +159,7 @@ public class DiaryFetcher {
 
         History history = historyRepository.save(createHistoryInput.toEntity(diary));
         diaryService.registerHistoryFinishedJob(history);
-
+        notificationService.historyCreated(history);
         return CreateHistoryOutput.builder()
                 .historyId(history.getId())
                 .build();
@@ -166,7 +167,7 @@ public class DiaryFetcher {
 
     @Authentication
     @DgsData(parentType = "Mutation", field = "createPage")
-    public Page createPage(@InputArgument CreatePageInput createPageInput, LoginUser loginUser) {
+    public Page createPage(@InputArgument CreatePageInput createPageInput, LoginUser loginUser) throws FirebaseMessagingException {
         User user = userRepository.findByEmail(loginUser.getEmail())
                 .orElseThrow(UserNotFoundExceptionForGraphQL::new);
         History history = historyRepository.findById(createPageInput.getHistoryId())
@@ -192,7 +193,7 @@ public class DiaryFetcher {
         });
 
         images.forEach(page::addImage);
-
+        notificationService.pageCreated(page);
         return pageRepository.save(page);
     }
 
