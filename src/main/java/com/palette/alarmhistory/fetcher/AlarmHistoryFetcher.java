@@ -7,7 +7,7 @@ import com.palette.alarmhistory.domain.AlarmHistory;
 import com.palette.alarmhistory.repository.AlarmHistoryQueryRepository;
 import com.palette.alarmhistory.repository.AlarmHistoryRepository;
 import com.palette.exception.graphql.AlarmHistoryNotFoundException;
-import com.palette.exception.graphql.UserNotFoundException;
+import com.palette.exception.graphql.UserNotFoundExceptionForGraphQL;
 import com.palette.resolver.Authentication;
 import com.palette.resolver.LoginUser;
 import com.palette.user.domain.User;
@@ -30,13 +30,13 @@ public class AlarmHistoryFetcher {
     /**
      * GlobalErrorType 참고
      *
-     * @throws UserNotFoundException
+     * @throws UserNotFoundExceptionForGraphQL
      */
     @Authentication
     @DgsQuery(field = "alarmHistories")
     public List<AlarmHistory> findAlarmHistories(LoginUser loginUser) {
         User user = userRepository.findByEmail(loginUser.getEmail())
-            .orElseThrow(UserNotFoundException::new);
+            .orElseThrow(UserNotFoundExceptionForGraphQL::new);
 
         return queryRepository.findAlarmHistories(user);
     }

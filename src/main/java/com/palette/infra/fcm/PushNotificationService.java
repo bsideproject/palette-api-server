@@ -6,7 +6,7 @@ import com.palette.alarmhistory.service.AlarmHistoryService;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.History;
 import com.palette.diary.domain.Page;
-import com.palette.exception.graphql.UserNotFoundException;
+import com.palette.exception.graphql.UserNotFoundExceptionForGraphQL;
 import com.palette.user.domain.User;
 import com.palette.user.repository.UserRepository;
 import java.time.Duration;
@@ -98,7 +98,7 @@ public class PushNotificationService {
         Diary diary = history.getDiary();
         List<User> users = userRepository.findUsers(history);
         User author = users.stream().filter(user -> user.getId().equals(page.getUserId()))
-            .findFirst().orElseThrow(UserNotFoundException::new);
+            .findFirst().orElseThrow(UserNotFoundExceptionForGraphQL::new);
         users.remove(author);
 
         HashSet<String> tokens = fcmService.getTokens(users);

@@ -10,7 +10,7 @@ import com.netflix.graphql.dgs.InputArgument;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
-import com.palette.exception.graphql.UserNotFoundException;
+import com.palette.exception.graphql.UserNotFoundExceptionForGraphQL;
 import com.palette.infra.fcm.FcmService;
 import com.palette.infra.fcm.Note;
 import com.palette.resolver.Authentication;
@@ -45,7 +45,7 @@ public class UserFetcher {
     @DgsQuery(field = "myProfile")
     public User getMyProfile(@InputArgument LoginUser loginUser) {
         return userRepository.findByEmail(loginUser.getEmail())
-            .orElseThrow(); // DateTime: UserNotFoundException
+            .orElseThrow(UserNotFoundExceptionForGraphQL::new);
     }
 
     @DgsData(parentType = "User", field = "diaries")
@@ -58,11 +58,7 @@ public class UserFetcher {
     @DgsMutation
     public User editMyProfile(@InputArgument EditMyProfileInput editMyProfileInput,
         LoginUser loginUser) {
-        Optional<User> userOptional = userRepository.findByEmail(loginUser.getEmail());
-        if (userOptional.isEmpty()) {
-            throw new RuntimeException(); // TODO: UserNotFoundException
-        }
-        User user = userOptional.get();
+        User user = userRepository.findByEmail(loginUser.getEmail()).orElseThrow(UserNotFoundExceptionForGraphQL::new);
         Boolean agreeWithTerms = editMyProfileInput.getAgreeWithTerms();
         String profileImg = editMyProfileInput.getProfileImg();
         String nickname = editMyProfileInput.getNickname();
@@ -128,7 +124,7 @@ public class UserFetcher {
         @InputArgument SendTestNotificationInput sendTestNotificationInput, LoginUser loginUser)
         throws FirebaseMessagingException {
         User user = userRepository.findByEmail(loginUser.getEmail())
-            .orElseThrow(UserNotFoundException::new);
+            .orElseThrow(UserNotFoundExceptionForGraphQL::new);
         if (user.getPushEnabled()) {
             String title = sendTestNotificationInput.getTitle();
             String body = sendTestNotificationInput.getBody();

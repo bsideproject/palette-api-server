@@ -35,7 +35,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,7 +65,7 @@ public class DiaryFetcher {
      * GlobalErrorType 참고
      *
      * @throws ColorNotFoundException
-     * @throws UserNotFoundException
+     * @throws UserNotFoundExceptionForGraphQL
      */
     @Authentication
     @DgsMutation
@@ -77,7 +76,7 @@ public class DiaryFetcher {
             .orElseThrow(ColorNotFoundException::new);
 
         User user = userRepository.findByEmail(loginUser.getEmail())
-            .orElseThrow(UserNotFoundException::new);
+            .orElseThrow(UserNotFoundExceptionForGraphQL::new);
         String invitationCode = RandomStringUtils.randomAlphabetic(8);
         Diary diary = diaryRepository.save(createDiaryInput.toEntity(invitationCode, color));
         diaryGroupRepository.save(createDiaryInput.toEntity(diary, user));
@@ -88,7 +87,7 @@ public class DiaryFetcher {
      * GlobalErrorType 참고
      *
      * @throws InviteCodeNotFoundException
-     * @throws UserNotFoundException
+     * @throws UserNotFoundExceptionForGraphQL
      * @throws DiaryNotFoundException
      * @throws DiaryOverUserException
      * @throws DiaryOutedUserException
@@ -105,7 +104,7 @@ public class DiaryFetcher {
         List<DiaryGroup> diaryGroups = diaryGroupRepository.findByDiary(diary);
 
         User invitedUser = userRepository.findByEmail(loginUser.getEmail())
-            .orElseThrow(UserNotFoundException::new);
+            .orElseThrow(UserNotFoundExceptionForGraphQL::new);
 
         if (diaryGroups.isEmpty()) {
             throw new DiaryNotFoundException();
@@ -167,7 +166,7 @@ public class DiaryFetcher {
     @DgsData(parentType = "Mutation", field = "createPage")
     public Page createPage(@InputArgument CreatePageInput createPageInput, LoginUser loginUser) {
         User user = userRepository.findByEmail(loginUser.getEmail())
-            .orElseThrow(UserNotFoundException::new);
+            .orElseThrow(UserNotFoundExceptionForGraphQL::new);
         History history = historyRepository.findById(createPageInput.getHistoryId())
             .orElseThrow(HistoryNotFoundException::new);
         Page page = Page.builder()
@@ -198,14 +197,14 @@ public class DiaryFetcher {
     /**
      * GlobalErrorType 참고
      *
-     * @throws UserNotFoundException
+     * @throws UserNotFoundExceptionForGraphQL
      */
     @Authentication
     @DgsQuery(field = "diaries")
     public DataFetcherResult<List<Diary>> getDiary(@InputArgument PageInput pageInput,
         LoginUser loginUser) {
         User user = userRepository.findByEmail(loginUser.getEmail())
-            .orElseThrow(UserNotFoundException::new);
+            .orElseThrow(UserNotFoundExceptionForGraphQL::new);
 
         Integer offset = pageInput.getDiaryOffset();
         Integer size = pageInput.getDiarySize();
@@ -224,7 +223,7 @@ public class DiaryFetcher {
     /**
      * GlobalErrorType 참고
      *
-     * @throws UserNotFoundException
+     * @throws UserNotFoundExceptionForGraphQL
      */
     @Authentication
     @DgsQuery(field = "histories")
@@ -233,7 +232,7 @@ public class DiaryFetcher {
         @InputArgument PageInput pageInput,
         LoginUser loginUser) {
         User user = userRepository.findByEmail(loginUser.getEmail())
-            .orElseThrow(UserNotFoundException::new);
+            .orElseThrow(UserNotFoundExceptionForGraphQL::new);
 
         Diary diary = diaryRepository.findById(diaryId)
             .orElseThrow(DiaryNotFoundException::new);
@@ -333,14 +332,14 @@ public class DiaryFetcher {
     /**
      * GlobalErrorType 참고
      *
-     * @throws UserNotFoundException
+     * @throws UserNotFoundExceptionForGraphQL
      */
     @DgsData(parentType = "Page", field = "author")
     public User getAuthor(DgsDataFetchingEnvironment dfe) {
         Page page = dfe.getSource();
         Long userId = page.getUserId();
         return userRepository.findById(userId)
-            .orElseThrow(UserNotFoundException::new);
+            .orElseThrow(UserNotFoundExceptionForGraphQL::new);
     }
 
     @Authentication
@@ -395,7 +394,7 @@ public class DiaryFetcher {
      * GlobalErrorType 참고
      *
      * @throws DiaryNotFoundException
-     * @throws UserNotFoundException
+     * @throws UserNotFoundExceptionForGraphQL
      */
     @DgsMutation
     @Authentication
@@ -405,7 +404,7 @@ public class DiaryFetcher {
             .orElseThrow(DiaryNotFoundException::new);
 
         User user = userRepository.findById(loginUser.getUserId())
-            .orElseThrow(UserNotFoundException::new);
+            .orElseThrow(UserNotFoundExceptionForGraphQL::new);
 
         DiaryGroup diaryGroup = diaryGroupRepository.findByDiaryAndUser(diary, user)
             .orElseThrow(DiaryNotFoundException::new);

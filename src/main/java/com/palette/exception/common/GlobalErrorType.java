@@ -26,7 +26,7 @@ public enum GlobalErrorType {
     D007("D006", "히스토리가 존재하지 않습니다.", ErrorType.BAD_REQUEST, HistoryNotFoundException.class),
     D008("D008", "페이지가 존재하지 않습니다.", ErrorType.BAD_REQUEST, PageNotFoundException.class),
 
-    U001("U001", "유저가 존재하지 않습니다.", ErrorType.NOT_FOUND, UserNotFoundException.class),
+    U001("U001", "유저가 존재하지 않습니다.", ErrorType.NOT_FOUND, UserNotFoundExceptionForGraphQL.class),
 
     C001("C001", "색깔이 존재하지 않습니다.", ErrorType.NOT_FOUND, ColorNotFoundException.class),
 

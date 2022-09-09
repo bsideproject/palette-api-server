@@ -15,6 +15,8 @@ import java.util.*;
 @AttributeOverrides({
         @AttributeOverride(name = "id", column = @Column(name = "user_id")),
 })
+@SQLDelete(sql = "UPDATE user SET is_deleted = 1 WHERE user_id = ?")
+@Where(clause = "is_deleted = 0")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
