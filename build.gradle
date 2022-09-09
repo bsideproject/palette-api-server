@@ -98,6 +98,9 @@ dependencies {
     implementation 'io.sentry:sentry-spring-boot-starter:6.4.1'
     implementation 'io.sentry:sentry-logback:6.4.1'
 
+    //eureka-client
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'

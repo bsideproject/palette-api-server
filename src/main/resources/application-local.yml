@@ -48,6 +48,9 @@ logging:
     root: INFO
     org.springframework.web: INFO
 
+# ==============================
+# = aws
+# ==============================
 aws:
   paramstore:
     enabled: true
@@ -70,3 +73,13 @@ decorator:
 sentry:
   logging:
     enabled: false # local 비활성화
+
+# ===============================
+# = eureka
+# ===============================
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
