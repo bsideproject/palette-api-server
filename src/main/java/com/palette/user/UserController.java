@@ -1,6 +1,7 @@
 package com.palette.user;
 
-import com.palette.exception.graphql.UserNotFoundException;
+import com.palette.exception.graphql.UserNotFoundExceptionForGraphQL;
+import com.palette.exception.rest.UserNotFoundExceptionForRest;
 import com.palette.infra.jwtTokenProvider.JwtRefreshTokenInfo;
 import com.palette.infra.jwtTokenProvider.JwtTokenProvider;
 import com.palette.infra.jwtTokenProvider.JwtTokenType;
@@ -13,6 +14,7 @@ import com.palette.user.repository.UserRepository;
 import com.palette.user.service.UserService;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -28,12 +30,13 @@ public class UserController {
     private static final String REFRESH_TOKEN_COOKIE_NAME = "PTOKEN_REFRESH";
     private final UserService userService;
 
+    private static final String BEARER_TYPE = "Bearer";
     private final UserRepository userRepository;
     private final JwtRefreshTokenInfo jwtRefreshTokenInfo;
     private final JwtTokenProvider jwtTokenProvider;
 
 
-    public UserController(UserService userService,UserRepository userRepository, JwtRefreshTokenInfo jwtRefreshTokenInfo, JwtTokenProvider jwtTokenProvider) {
+    public UserController(UserService userService, UserRepository userRepository, JwtRefreshTokenInfo jwtRefreshTokenInfo, JwtTokenProvider jwtTokenProvider) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.jwtRefreshTokenInfo = jwtRefreshTokenInfo;
@@ -76,9 +79,25 @@ public class UserController {
             HttpServletResponse response) {
         userService.validateRefreshToken(refreshToken);
         String email = userService.getEmailFromToken(refreshToken, JwtTokenType.REFRESH_TOKEN);
-        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundExceptionForRest::new);
         TokenResponse tokenResponse = userService.renewAccessToken(user.getId(), email, refreshToken);
         return ResponseEntity.ok(tokenResponse);
+    }
+
+    @DeleteMapping("/user")
+    @Transactional
+    public ResponseEntity<Void> deleteUser(
+            @RequestHeader(name = "Authorization") String bearerToken,
+            @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME, required = false) String refreshToken,
+            HttpServletResponse response) {
+        String token = bearerToken.substring(BEARER_TYPE.length() + 1);
+        userService.validateAccessToken(token);
+        String email = userService.getEmailFromToken(token, JwtTokenType.ACCESS_TOKEN);
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundExceptionForRest::new);
+        userRepository.delete(user);
+        userService.removeRefreshToken(refreshToken);
+        expireRefreshTokenCookie(response);
+        return ResponseEntity.noContent().build();
     }
 
     private ResponseCookie createRefreshTokenCookie(Long userId, String email) {

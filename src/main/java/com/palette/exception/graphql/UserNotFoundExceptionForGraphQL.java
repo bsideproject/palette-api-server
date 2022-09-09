@@ -4,9 +4,9 @@ import com.palette.exception.common.GlobalErrorType;
 import com.palette.exception.common.GraphqlException;
 import org.springframework.http.HttpStatus;
 
-public class UserNotFoundException extends GraphqlException {
+public class UserNotFoundExceptionForGraphQL extends GraphqlException {
 
-    public UserNotFoundException() {
+    public UserNotFoundExceptionForGraphQL() {
         super(HttpStatus.NOT_FOUND, GlobalErrorType.U001);
     }
 }
