@@ -3,11 +3,14 @@ package com.palette.diary.repository.query;
 import static com.palette.diary.domain.QDiary.diary;
 import static com.palette.diary.domain.QDiaryGroup.diaryGroup;
 import static com.palette.diary.domain.QHistory.history;
+import static com.palette.diary.domain.QImage.image;
+import static com.palette.diary.domain.QPage.page;
 
 import com.palette.common.BaseRepository;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.DiaryGroup;
 import com.palette.diary.domain.History;
+import com.palette.diary.domain.Page;
 import com.palette.user.domain.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
@@ -68,6 +71,28 @@ public class DiaryQueryRepository extends BaseRepository {
             .orderBy(history.createdAt.desc())
             .offset(pageRequest.getOffset())
             .limit(pageRequest.getPageSize())
+            .fetch();
+    }
+
+    public List<Page> findPage(History history, PageRequest pageRequest) {
+        return queryFactory.selectFrom(page)
+            .join(page.images, image).fetchJoin()
+            .where(
+                condition(history, page.history::eq)
+            )
+            .orderBy(page.createdAt.desc())
+            .offset(pageRequest.getOffset())
+            .limit(pageRequest.getPageSize())
+            .fetch();
+    }
+
+    public List<Page> findPage(History history) {
+        return queryFactory.selectFrom(page)
+            .join(page.images, image).fetchJoin()
+            .where(
+                condition(history, page.history::eq)
+            )
+            .orderBy(page.createdAt.desc())
             .fetch();
     }
 
