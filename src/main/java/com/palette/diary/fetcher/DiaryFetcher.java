@@ -34,6 +34,10 @@ import com.palette.diary.repository.HistoryRepository;
 import com.palette.diary.repository.PageRepository;
 import com.palette.diary.repository.query.DiaryQueryRepository;
 import com.palette.diary.service.DiaryService;
+import com.palette.event.Events;
+import com.palette.event.EventsKind;
+import com.palette.event.PushAlarmEvent;
+import com.palette.event.PushAlarmEventDto;
 import com.palette.exception.graphql.ColorNotFoundException;
 import com.palette.exception.graphql.DiaryExistUserException;
 import com.palette.exception.graphql.DiaryNotFoundException;
@@ -45,7 +49,6 @@ import com.palette.exception.graphql.PageNotFoundException;
 import com.palette.exception.graphql.PermissionDeniedException;
 import com.palette.exception.graphql.ProgressedHistoryException;
 import com.palette.exception.graphql.UserNotFoundExceptionForGraphQL;
-import com.palette.infra.fcm.PushNotificationService;
 import com.palette.resolver.Authentication;
 import com.palette.resolver.LoginUser;
 import com.palette.user.domain.User;
@@ -78,7 +81,6 @@ public class DiaryFetcher {
     private final HistoryRepository historyRepository;
     private final PageRepository pageRepository;
     private final DiaryService diaryService;
-    private final PushNotificationService notificationService;
 
     /**
      * GlobalErrorType 참고
@@ -152,7 +154,15 @@ public class DiaryFetcher {
             .orElse(null);
 
         diaryGroupRepository.save(InviteDiaryInput.of(invitedUser, diary));
-        notificationService.diaryCreated(diary, List.of(adminUser, invitedUser));
+
+        PushAlarmEventDto eventDto = PushAlarmEventDto.builder()
+            .eventsKind(EventsKind.CREATE_DIARY)
+            .diary(diary)
+            .users(List.of(adminUser, invitedUser))
+            .build();
+
+        Events.raise(new PushAlarmEvent(eventDto));
+
         return InviteDiaryOutput.of(adminUser, diary);
     }
 
@@ -176,13 +186,21 @@ public class DiaryFetcher {
 
         History history = historyRepository.save(createHistoryInput.toEntity(diary));
         diaryService.registerHistoryFinishedJob(history);
-        notificationService.historyCreated(history);
+
+        PushAlarmEventDto eventDto = PushAlarmEventDto.builder()
+            .eventsKind(EventsKind.CREATE_HISTORY)
+            .history(history)
+            .build();
+
+        Events.raise(new PushAlarmEvent(eventDto));
+
         return CreateHistoryOutput.builder()
             .historyId(history.getId())
             .build();
     }
 
     @Authentication
+    @Transactional
     @DgsData(parentType = "Mutation", field = "createPage")
     public Page createPage(@InputArgument CreatePageInput createPageInput, LoginUser loginUser)
         throws FirebaseMessagingException {
@@ -211,7 +229,14 @@ public class DiaryFetcher {
         });
 
         images.forEach(page::addImage);
-        notificationService.pageCreated(page);
+
+        PushAlarmEventDto eventDto = PushAlarmEventDto.builder()
+            .eventsKind(EventsKind.CREATE_PAGE)
+            .page(page)
+            .build();
+
+        Events.raise(new PushAlarmEvent(eventDto));
+
         return pageRepository.save(page);
     }
 

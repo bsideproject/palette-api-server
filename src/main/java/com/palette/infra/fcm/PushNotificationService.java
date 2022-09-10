@@ -15,8 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @AllArgsConstructor
 public class PushNotificationService {
@@ -25,8 +27,8 @@ public class PushNotificationService {
     private FcmService fcmService;
     private AlarmHistoryService alarmHistoryService;
 
-
-    public void diaryCreated(Diary diary, List<User> users) throws FirebaseMessagingException {
+    public void createDiary(Diary diary, List<User> users) throws FirebaseMessagingException {
+        log.info("createDiary call");
         Map<User, Set<String>> fcmTokens = getFcmTokens(users);
 
         for (User user : fcmTokens.keySet()) {
@@ -56,7 +58,8 @@ public class PushNotificationService {
 
     }
 
-    public void historyCreated(History history) throws FirebaseMessagingException {
+    public void createHistory(History history) throws FirebaseMessagingException {
+        log.info("createHistory call");
         List<User> users = userRepository.findUsers(history);
         Map<User, Set<String>> fcmTokens = getFcmTokens(users);
 
@@ -103,7 +106,9 @@ public class PushNotificationService {
 
     }
 
-    public void pageCreated(Page page) throws FirebaseMessagingException {
+    public void createPage(Page page) throws FirebaseMessagingException {
+        log.info("createPage call");
+
         History history = page.getHistory();
         Diary diary = history.getDiary();
         List<User> users = userRepository.findUsers(history);
@@ -140,7 +145,9 @@ public class PushNotificationService {
 
     }
 
-    public void historyFinished(History history) throws FirebaseMessagingException {
+    public void finishHistory(History history) throws FirebaseMessagingException {
+        log.info("finishHistory call");
+
         Diary diary = history.getDiary();
         List<User> users = userRepository.findUsers(history);
 
