@@ -28,27 +28,36 @@ public class PushNotificationService {
     private AlarmHistoryService alarmHistoryService;
 
     public void diaryCreated(Diary diary, List<User> users) throws FirebaseMessagingException {
-        Set<String> tokens = fcmService.getTokens(users);
-        if (tokens.isEmpty()) {
-            return;
+
+        Map<User, Set<String>> fcmTokens = new HashMap<>();
+        for (User user : users) {
+            fcmTokens.put(user, user.getFcmTokens());
         }
 
-        Map<String, String> noteData = new HashMap<>();
-        noteData.put("page", "home");
-        noteData.put("diaryId", diary.getId().toString());
+        for (User user : fcmTokens.keySet()) {
+            Set<String> tokens = fcmTokens.get(user);
+            if (tokens.isEmpty()) {
+                return;
+            }
 
-        String title = "'" + diary.getTitle() + "'" + " 일기장이 생성되었어요.";
-        String body = "첫 교환일기를 시작해보세요!";
+            Map<String, String> noteData = new HashMap<>();
+            noteData.put("page", "home");
+            noteData.put("diaryId", diary.getId().toString());
 
-        fcmService.sendNotification(createNote(title, body, noteData), tokens);
+            String title = "'" + diary.getTitle() + "'" + " 일기장이 생성되었어요.";
+            String body = "첫 교환일기를 시작해보세요!";
 
-        StringBuilder historyBody = new StringBuilder();
-        historyBody.append(title);
-        historyBody.append(body);
+            StringBuilder historyBody = new StringBuilder();
+            historyBody.append(title);
+            historyBody.append(body);
 
-        alarmHistoryService.createAlarmHistory(
-            toEntities(users, historyBody.toString(), "home", diary.getId(), null)
-        );
+            AlarmHistory alarmHistory = alarmHistoryService.createAlarmHistory(
+                toEntity(user, historyBody.toString(), "home", diary.getId(), null)
+            );
+            noteData.put("alarmHistoryId", alarmHistory.getId().toString());
+
+            fcmService.sendNotification(createNote(title, body, noteData), tokens);
+        }
 
     }
 
@@ -80,8 +89,6 @@ public class PushNotificationService {
         noteData.put("diaryId", history.getDiary().getId().toString());
         noteData.put("historyId", history.getId().toString());
 
-        fcmService.sendNotification(createNote(noteTitle, noteBody, noteData), tokens);
-
         StringBuilder historyBody = new StringBuilder();
         historyBody.append(noteTitle);
         historyBody.append(noteBody);
@@ -90,6 +97,8 @@ public class PushNotificationService {
             toEntities(users, historyBody.toString(), "history",
                 history.getDiary().getId(), history.getId())
         );
+
+        fcmService.sendNotification(createNote(noteTitle, noteBody, noteData), tokens);
 
     }
 
@@ -117,12 +126,12 @@ public class PushNotificationService {
         StringBuilder historyBody = new StringBuilder();
         historyBody.append(noteTitle);
 
-        fcmService.sendNotification(createNote(noteTitle, noteBody, noteData), tokens);
-
         alarmHistoryService.createAlarmHistory(
             toEntities(users, historyBody.toString(), "history", diary.getId(),
                 history.getId())
         );
+
+        fcmService.sendNotification(createNote(noteTitle, noteBody, noteData), tokens);
 
     }
 
@@ -143,8 +152,6 @@ public class PushNotificationService {
         noteData.put("diaryId", diary.getId().toString());
         noteData.put("historyId", history.getId().toString());
 
-        fcmService.sendNotification(createNote(noteTitle, noteBody, noteData), tokens);
-
         StringBuilder historyBody = new StringBuilder();
         historyBody.append(noteTitle);
 
@@ -152,6 +159,8 @@ public class PushNotificationService {
             toEntities(users, historyBody.toString(), "history", diary.getId(),
                 history.getId())
         );
+
+        fcmService.sendNotification(createNote(noteTitle, noteBody, noteData), tokens);
 
     }
 
@@ -163,9 +172,19 @@ public class PushNotificationService {
             .build();
     }
 
-    private List<AlarmHistory> toEntities(List<User> users, String body, String movePage,
-        Long diaryId,
+    private AlarmHistory toEntity(User user, String body, String movePage, Long diaryId,
         Long historyId) {
+        return AlarmHistory.builder()
+            .user(user)
+            .body(body)
+            .movePage(movePage)
+            .diaryId(diaryId)
+            .historyId(historyId)
+            .build();
+    }
+
+    private List<AlarmHistory> toEntities(List<User> users, String body, String movePage,
+        Long diaryId, Long historyId) {
         List<AlarmHistory> alarmHistories = new ArrayList<>();
         for (User user : users) {
             alarmHistories.add(AlarmHistory.builder()
