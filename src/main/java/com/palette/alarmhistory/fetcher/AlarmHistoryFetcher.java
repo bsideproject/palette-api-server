@@ -4,6 +4,7 @@ import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.DgsQuery;
 import com.palette.alarmhistory.domain.AlarmHistory;
+import com.palette.alarmhistory.fetcher.dto.ReadAlarmHistoriesInput;
 import com.palette.alarmhistory.repository.AlarmHistoryQueryRepository;
 import com.palette.alarmhistory.repository.AlarmHistoryRepository;
 import com.palette.exception.graphql.AlarmHistoryNotFoundException;
@@ -48,11 +49,9 @@ public class AlarmHistoryFetcher {
      */
     @DgsMutation
     @Transactional
-    public Boolean readAlarmHistory(Long alarmHistoryId) {
-        AlarmHistory alarmHistory = repository.findById(alarmHistoryId)
-            .orElseThrow(AlarmHistoryNotFoundException::new);
-
-        alarmHistory.read();
+    public Boolean readAlarmHistories(ReadAlarmHistoriesInput readAlarmHistoriesInput) {
+        int count = repository.readAlarmHistories(
+            readAlarmHistoriesInput.getAlarmHistoryIds());
 
         return true;
     }
