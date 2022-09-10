@@ -3,5 +3,9 @@ extend type Query {
 }
 
 extend type Mutation {
-    readAlarmHistory(alarmHistoryId: Long): Boolean
+    readAlarmHistories(readAlarmHistoriesInput: ReadAlarmHistoriesInput): Boolean
+}
+
+input ReadAlarmHistoriesInput {
+    alarmHistoryIds: [Long]!
 }
