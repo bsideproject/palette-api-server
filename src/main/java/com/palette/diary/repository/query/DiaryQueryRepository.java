@@ -5,6 +5,7 @@ import static com.palette.diary.domain.QDiaryGroup.diaryGroup;
 import static com.palette.diary.domain.QHistory.history;
 import static com.palette.diary.domain.QImage.image;
 import static com.palette.diary.domain.QPage.page;
+import static com.palette.user.domain.QUser.user;
 
 import com.palette.common.BaseRepository;
 import com.palette.diary.domain.Diary;
@@ -34,6 +35,16 @@ public class DiaryQueryRepository extends BaseRepository {
             .orderBy(diaryGroup.createdAt.desc())
             .offset(pageRequest.getOffset())
             .limit(pageRequest.getPageSize())
+            .fetch();
+    }
+
+    public List<DiaryGroup> findByDiary(Diary paramDiary) {
+        return queryFactory.selectFrom(diaryGroup)
+            .join(diaryGroup.user, user).fetchJoin()
+            .join(diaryGroup.diary, diary).fetchJoin()
+            .where(
+                condition(paramDiary, diaryGroup.diary::eq)
+            )
             .fetch();
     }
 

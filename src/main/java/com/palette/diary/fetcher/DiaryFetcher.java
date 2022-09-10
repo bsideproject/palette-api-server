@@ -1,6 +1,5 @@
 package com.palette.diary.fetcher;
 
-import com.google.firebase.messaging.FirebaseMessagingException;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsData;
 import com.netflix.graphql.dgs.DgsDataFetchingEnvironment;
@@ -118,11 +117,11 @@ public class DiaryFetcher {
     @Transactional
     @DgsMutation
     public InviteDiaryOutput inviteDiary(@InputArgument InviteDiaryInput inviteDiaryInput,
-        LoginUser loginUser) throws FirebaseMessagingException {
+        LoginUser loginUser) {
         Diary diary = diaryRepository.findByInvitationCode(inviteDiaryInput.getInvitationCode())
             .orElseThrow(InviteCodeNotFoundException::new);
 
-        List<DiaryGroup> diaryGroups = diaryGroupRepository.findByDiary(diary);
+        List<DiaryGroup> diaryGroups = diaryQueryRepository.findByDiary(diary);
 
         User invitedUser = userRepository.findByEmail(loginUser.getEmail())
             .orElseThrow(UserNotFoundExceptionForGraphQL::new);
@@ -174,8 +173,7 @@ public class DiaryFetcher {
      */
     @DgsMutation
     @Transactional
-    public CreateHistoryOutput createHistory(@InputArgument CreateHistoryInput createHistoryInput)
-        throws FirebaseMessagingException {
+    public CreateHistoryOutput createHistory(@InputArgument CreateHistoryInput createHistoryInput) {
         Diary diary = diaryRepository.findById(createHistoryInput.getDiaryId())
             .orElseThrow(DiaryNotFoundException::new);
 
@@ -202,8 +200,7 @@ public class DiaryFetcher {
     @Authentication
     @Transactional
     @DgsData(parentType = "Mutation", field = "createPage")
-    public Page createPage(@InputArgument CreatePageInput createPageInput, LoginUser loginUser)
-        throws FirebaseMessagingException {
+    public Page createPage(@InputArgument CreatePageInput createPageInput, LoginUser loginUser) {
         User user = userRepository.findByEmail(loginUser.getEmail())
             .orElseThrow(UserNotFoundExceptionForGraphQL::new);
         History history = historyRepository.findById(createPageInput.getHistoryId())
@@ -314,7 +311,7 @@ public class DiaryFetcher {
     @DgsData(parentType = "Diary", field = "joinedUsers")
     public List<User> getJoinedUsers(DgsDataFetchingEnvironment dfe) {
         Diary diary = dfe.getSource();
-        return diaryGroupRepository.findByDiary(diary).stream()
+        return diaryQueryRepository.findByDiary(diary).stream()
             .map(DiaryGroup::getUser)
             .collect(Collectors.toList());
     }
@@ -333,7 +330,7 @@ public class DiaryFetcher {
     public String getDiaryStatus(DgsDataFetchingEnvironment dfe) {
         Diary diary = dfe.getSource();
         History history = diaryQueryRepository.findProgressHistory(diary);
-        List<DiaryGroup> diaryGroups = diaryGroupRepository.findByDiary(diary);
+        List<DiaryGroup> diaryGroups = diaryQueryRepository.findByDiary(diary);
 
         if (diaryGroups.isEmpty()) {
             return "";
