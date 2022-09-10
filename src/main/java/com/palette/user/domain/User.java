@@ -22,7 +22,7 @@ import java.util.*;
 @Builder
 @Entity
 public class User extends BaseEntity {
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
     @Builder.Default
