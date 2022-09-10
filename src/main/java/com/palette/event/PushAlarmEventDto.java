@@ -21,6 +21,5 @@ public class PushAlarmEventDto {
     private List<User> users;
     private Diary diary;
     private Page page;
-    private Long loginUserId;
 
 }

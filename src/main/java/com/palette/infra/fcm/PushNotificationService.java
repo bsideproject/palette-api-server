@@ -17,9 +17,11 @@ import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
+@Transactional
 @AllArgsConstructor
 public class PushNotificationService {
 
@@ -53,7 +55,9 @@ public class PushNotificationService {
             );
             noteData.put("alarmHistoryId", alarmHistory.getId().toString());
 
-            fcmService.sendNotification(createNote(title, body, noteData), tokens);
+            String resultMessage = fcmService.sendNotification(createNote(title, body, noteData),
+                tokens);
+            log.info("fcm resultMessage: {} ", resultMessage);
         }
 
     }
@@ -101,7 +105,10 @@ public class PushNotificationService {
 
             noteData.put("alarmHistoryId", alarmHistory.getId().toString());
 
-            fcmService.sendNotification(createNote(noteTitle, noteBody, noteData), tokens);
+            String resultMessage = fcmService.sendNotification(
+                createNote(noteTitle, noteBody, noteData),
+                tokens);
+            log.info("fcm resultMessage: {} ", resultMessage);
         }
 
     }
@@ -141,8 +148,9 @@ public class PushNotificationService {
 
         noteData.put("alarmHistoryId", alarmHistory.getId().toString());
 
-        fcmService.sendNotification(createNote(noteTitle, noteBody, noteData), tokens);
-
+        String resultMessage = fcmService.sendNotification(
+            createNote(noteTitle, noteBody, noteData), tokens);
+        log.info("fcm resultMessage: {} ", resultMessage);
     }
 
     public void finishHistory(History history) throws FirebaseMessagingException {
@@ -177,7 +185,10 @@ public class PushNotificationService {
 
             noteData.put("alarmHistoryId", alarmHistory.getId().toString());
 
-            fcmService.sendNotification(createNote(noteTitle, noteBody, noteData), tokens);
+            String resultMessage = fcmService.sendNotification(
+                createNote(noteTitle, noteBody, noteData),
+                tokens);
+            log.info("fcm resultMessage: {} ", resultMessage);
         }
 
     }
