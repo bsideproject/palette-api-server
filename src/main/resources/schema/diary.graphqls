@@ -13,6 +13,7 @@ extend type Mutation {
     outDiary(outDiaryInput: OutDiaryInput): Boolean
     deletePage(deletePageInput: DeletePageInput): Boolean
     editPage(editPageInput: EditPageInput): Page
+    testCreateHistory(testCreateHistoryInput: TestCreateHistoryInput): CreateHistoryOutput
 }
 
 extend type Query {
@@ -87,4 +88,9 @@ input EditPageInput {
     title: String!
     body: String
     imageUrls: [String]
+}
+
+input TestCreateHistoryInput {
+    diaryId: Long!
+    seconds: Long!
 }
