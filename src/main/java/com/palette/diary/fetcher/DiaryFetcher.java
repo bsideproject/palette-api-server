@@ -314,9 +314,10 @@ public class DiaryFetcher {
     @DgsData(parentType = "Diary", field = "currentHistory")
     public CompletableFuture<History> getCurrentHistory(DgsDataFetchingEnvironment dfe) {
         Diary diary = dfe.getSource();
-        DataLoader<Diary, History> dataLoader = dfe.getDataLoader(CurrentHistoryDataLoader.class);
 
-        return dataLoader.load(diary);
+        DataLoader<Long, History> dataLoader = dfe.getDataLoader(CurrentHistoryDataLoader.class);
+
+        return dataLoader.load(diary.getId());
     }
 
     @DgsData(parentType = "Diary", field = "pastHistories")
@@ -375,6 +376,7 @@ public class DiaryFetcher {
     }
 
     @DgsData(parentType = "History", field = "pages")
+    @Transactional(readOnly = true)
     public List<Page> getPages(DgsDataFetchingEnvironment dfe) {
         History history = dfe.getSource();
         DiaryFetcherDto diaryFetcherDto = dfe.getLocalContext();

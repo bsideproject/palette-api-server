@@ -61,11 +61,11 @@ public class DiaryQueryRepository extends BaseRepository {
     }
 
 
-    public List<History> findProgressHistory(List<Diary> diaries) {
+    public List<History> findProgressHistory(List<Long> diaryIds) {
         LocalDateTime now = LocalDateTime.now();
         return queryFactory.selectFrom(history)
             .where(
-                condition(diaries, history.diary::in),
+                condition(diaryIds, history.diary.id::in),
                 condition(now, history.startDate::loe),
                 condition(now, history.endDate::goe)
             )
