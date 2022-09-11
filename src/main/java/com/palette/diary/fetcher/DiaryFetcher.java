@@ -293,8 +293,8 @@ public class DiaryFetcher {
 
         Integer offset = pageInput.getHistoryOffset();
         Integer size = pageInput.getHistorySize();
-        Integer pageOffset = pageInput.getPageSize();
-        Integer pageSize = pageInput.getPageOffset();
+        Integer pageOffset = pageInput.getPageOffset();
+        Integer pageSize = pageInput.getPageSize();
 
         DiaryFetcherDto diaryFetcherDto = DiaryFetcherDto.builder()
             .pageOffset(pageOffset)
@@ -384,6 +384,8 @@ public class DiaryFetcher {
         if (diaryFetcherDto != null) {
             Integer offset = diaryFetcherDto.getPageOffset();
             Integer size = diaryFetcherDto.getPageSize();
+            log.info("offset: {}", offset);
+            log.info("size: {}", size);
 
             return diaryQueryRepository.findPage(history, PageRequest.of(offset, size));
         } else {
