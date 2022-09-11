@@ -52,7 +52,7 @@ input CreatePageInput {
     title: String!
     body: String!
     historyId: Long!
-    imageUrls: [String]!
+    imageUrls: [String]
 }
 
 input PageQueryInput {
