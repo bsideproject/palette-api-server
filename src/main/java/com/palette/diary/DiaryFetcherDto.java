@@ -12,5 +12,7 @@ public class DiaryFetcherDto {
 
     private Integer pageOffset;
     private Integer pageSize;
+    private Integer historyOffset;
+    private Integer historySize;
     private LoginUser loginUser;
 }
