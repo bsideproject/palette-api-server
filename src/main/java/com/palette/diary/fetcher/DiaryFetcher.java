@@ -490,6 +490,14 @@ public class DiaryFetcher {
         DiaryGroup diaryGroup = diaryGroupRepository.findByDiaryAndUser(diary, user)
             .orElseThrow(DiaryNotFoundException::new);
 
+        PushAlarmEventDto eventDto = PushAlarmEventDto.builder()
+                .eventsKind(EventsKind.OUT_DIARY)
+                .diary(diary)
+                .user(user)
+                .build();
+
+        Events.raise(new PushAlarmEvent(eventDto));
+
         diaryGroup.userOut();
 
         return true;

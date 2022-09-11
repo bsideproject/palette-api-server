@@ -8,5 +8,6 @@ import lombok.Getter;
 public enum EventsKind {
     CREATE_DIARY,
     CREATE_HISTORY,
-    CREATE_PAGE
+    CREATE_PAGE,
+    OUT_DIARY
 }

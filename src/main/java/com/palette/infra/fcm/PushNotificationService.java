@@ -5,8 +5,11 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.palette.alarmhistory.domain.AlarmHistory;
 import com.palette.alarmhistory.service.AlarmHistoryService;
 import com.palette.diary.domain.Diary;
+import com.palette.diary.domain.DiaryGroup;
 import com.palette.diary.domain.History;
 import com.palette.diary.domain.Page;
+import com.palette.diary.repository.DiaryGroupRepository;
+import com.palette.exception.graphql.DiaryNotFoundException;
 import com.palette.exception.graphql.UserNotFoundExceptionForGraphQL;
 import com.palette.user.domain.User;
 import com.palette.user.repository.UserRepository;
@@ -29,6 +32,8 @@ public class PushNotificationService {
     private final UserRepository userRepository;
     private final FcmService fcmService;
     private final AlarmHistoryService alarmHistoryService;
+
+    private final DiaryGroupRepository diaryGroupRepository;
 
     public void createDiary(Diary diary, List<Long> userIds) throws FirebaseMessagingException {
         log.info("createDiary call");
@@ -69,6 +74,50 @@ public class PushNotificationService {
                     .peek(response -> {
                         log.info("messageId: {}", response.getMessageId());
                     })
+            );
+        }
+
+    }
+
+    public void outDiary(Diary diary, User outUser) throws FirebaseMessagingException {
+        log.info("outDiary call");
+        List<DiaryGroup> diaryGroups = diaryGroupRepository.findByDiaryId(diary.getId()).orElseThrow(DiaryNotFoundException::new);
+        List<User> users = diaryGroups.stream().map(DiaryGroup::getUser).toList();
+        Map<User, Set<String>> fcmTokens = getFcmTokens(users);
+        log.info("outDiary of fcmTokens: {}", fcmTokens);
+
+        Map<String, String> noteData = new HashMap<>();
+        noteData.put("page", "history");
+        noteData.put("diaryId", diary.getId().toString());
+        String title = outUser.getNickname()+"님이 일기장을 나갔어요.";
+        String body = "";
+
+        StringBuilder historyBody = new StringBuilder();
+        historyBody.append(title);
+        historyBody.append(body);
+
+        for (User user : fcmTokens.keySet()) {
+            AlarmHistory alarmHistory = alarmHistoryService.createAlarmHistory(
+                    toEntity(user, historyBody.toString(), "home", diary.getId(), null)
+            );
+            noteData.put("alarmHistoryId", alarmHistory.getId().toString());
+
+            Set<String> tokens = fcmTokens.get(user);
+            if (tokens.isEmpty()) {
+                return;
+            }
+
+            BatchResponse batchResponse = fcmService.sendNotification(
+                    createNote(title, body, noteData),
+                    tokens);
+
+            log.info("outDiary push fcm successCount: {}", batchResponse.getSuccessCount());
+            log.info("outDiary push fcm failCount: {}", batchResponse.getFailureCount());
+            log.info("outDiary push fcm messageId {}",
+                    batchResponse.getResponses().stream()
+                            .peek(response -> {
+                                log.info("messageId: {}", response.getMessageId());
+                            })
             );
         }
 

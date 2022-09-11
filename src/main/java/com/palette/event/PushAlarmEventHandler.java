@@ -31,6 +31,7 @@ public class PushAlarmEventHandler {
                     service.createDiary(eventDto.getDiary(), eventDto.getUserIds());
                 case CREATE_HISTORY -> service.createHistory(eventDto.getHistory());
                 case CREATE_PAGE -> service.createPage(eventDto.getPage());
+                case OUT_DIARY -> service.outDiary(eventDto.getDiary(), eventDto.getUser());
             }
         } catch (Exception e) {
             Sentry.captureException(e);
