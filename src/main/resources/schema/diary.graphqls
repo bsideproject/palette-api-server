@@ -50,7 +50,7 @@ type CreateHistoryOutput{
 
 input CreatePageInput {
     title: String!
-    body: String!
+    body: String
     historyId: Long!
     imageUrls: [String]
 }
@@ -84,7 +84,7 @@ input DeletePageInput {
 
 input EditPageInput {
     pageId: Long!
-    title: String
+    title: String!
     body: String
     imageUrls: [String]
 }
