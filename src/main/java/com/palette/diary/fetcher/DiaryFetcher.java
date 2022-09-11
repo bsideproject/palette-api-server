@@ -42,6 +42,7 @@ import com.palette.event.EventsKind;
 import com.palette.event.PushAlarmEvent;
 import com.palette.event.PushAlarmEventDto;
 import com.palette.exception.graphql.ColorNotFoundException;
+import com.palette.exception.graphql.DiaryDiscardException;
 import com.palette.exception.graphql.DiaryExistUserException;
 import com.palette.exception.graphql.DiaryNotFoundException;
 import com.palette.exception.graphql.DiaryOutedUserException;
@@ -142,6 +143,11 @@ public class DiaryFetcher {
 
         for (DiaryGroup diaryGroup : diaryGroups) {
             User user = diaryGroup.getUser();
+            Boolean isOuted = diaryGroup.getIsOuted();
+
+            if (isOuted) {
+                throw new DiaryDiscardException();
+            }
 
             if (user.getEmail().equals(loginUser.getEmail()) && diaryGroup.getIsOuted()) {
                 throw new DiaryOutedUserException();
