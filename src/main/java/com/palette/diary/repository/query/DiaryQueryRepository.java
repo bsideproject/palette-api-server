@@ -110,7 +110,7 @@ public class DiaryQueryRepository extends BaseRepository {
 
     public List<Page> findPage(History history, PageRequest pageRequest) {
         return queryFactory.selectFrom(page)
-            .join(page.images, image).fetchJoin()
+            .leftJoin(page.images, image).fetchJoin()
             .where(
                 condition(history, page.history::eq)
             )
@@ -120,19 +120,9 @@ public class DiaryQueryRepository extends BaseRepository {
             .fetch();
     }
 
-//    public List<Page> findPage(List<Long> historyIds) {
-//        return queryFactory.selectFrom(page)
-//            .join(page.images, image).fetchJoin()
-//            .where(
-//                condition(historyIds, page.history.id::in)
-//            )
-//            .orderBy(page.createdAt.desc())
-//            .fetch();
-//    }
-
     public List<Page> findPage(History history) {
         return queryFactory.selectFrom(page)
-            .join(page.images, image).fetchJoin()
+            .leftJoin(page.images, image).fetchJoin()
             .where(
                 condition(history, page.history::eq)
             )
