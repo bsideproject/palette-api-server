@@ -13,7 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
-    @Query(value = "SELECT u FROM User u WHERE u.email = :email")
+    @Query(value = "SELECT * FROM User u WHERE u.email = :email", nativeQuery = true)
     Optional<User> findUsersIncDeletedUserByEmail(@Param("email") String email);
 
     @Query(value = "SELECT u FROM History h " +
