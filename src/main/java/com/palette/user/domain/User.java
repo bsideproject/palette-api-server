@@ -1,27 +1,37 @@
 package com.palette.user.domain;
 
 import com.palette.BaseEntity;
-import com.palette.diary.domain.DiaryGroup;
-import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-
-import javax.persistence.*;
-import java.util.*;
 
 @Getter
 @Setter
 @AttributeOverrides({
-        @AttributeOverride(name = "id", column = @Column(name = "user_id")),
+    @AttributeOverride(name = "id", column = @Column(name = "user_id")),
 })
 @SQLDelete(sql = "UPDATE user SET is_deleted = 1 WHERE user_id = ?")
-@Where(clause = "is_deleted = 0")
+//@Where(clause = "is_deleted = 0")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Entity
 public class User extends BaseEntity {
+
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -71,4 +81,5 @@ public class User extends BaseEntity {
     public Boolean deleteFcmToken(String token) {
         return this.fcmTokens.remove(token);
     }
+
 }
