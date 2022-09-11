@@ -27,7 +27,8 @@ public class PushAlarmEventHandler {
         log.info("Push Event Kind: {}", eventDto);
         try {
             switch (eventDto.getEventsKind()) {
-                case CREATE_DIARY -> service.createDiary(eventDto.getDiary(), eventDto.getUsers());
+                case CREATE_DIARY ->
+                    service.createDiary(eventDto.getDiary(), eventDto.getUserIds());
                 case CREATE_HISTORY -> service.createHistory(eventDto.getHistory());
                 case CREATE_PAGE -> service.createPage(eventDto.getPage());
             }

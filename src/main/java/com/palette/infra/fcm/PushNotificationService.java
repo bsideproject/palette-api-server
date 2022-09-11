@@ -1,5 +1,6 @@
 package com.palette.infra.fcm;
 
+import com.google.firebase.messaging.BatchResponse;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.palette.alarmhistory.domain.AlarmHistory;
 import com.palette.alarmhistory.service.AlarmHistoryService;
@@ -14,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,16 +23,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Component
 @Transactional
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PushNotificationService {
 
-    private UserRepository userRepository;
-    private FcmService fcmService;
-    private AlarmHistoryService alarmHistoryService;
+    private final UserRepository userRepository;
+    private final FcmService fcmService;
+    private final AlarmHistoryService alarmHistoryService;
 
-    public void createDiary(Diary diary, List<User> users) throws FirebaseMessagingException {
+    public void createDiary(Diary diary, List<Long> userIds) throws FirebaseMessagingException {
         log.info("createDiary call");
+        List<User> users = userRepository.findAllById(userIds);
         Map<User, Set<String>> fcmTokens = getFcmTokens(users);
+        log.info("createDiary of fcmTokens: {}", fcmTokens);
 
         for (User user : fcmTokens.keySet()) {
             Set<String> tokens = fcmTokens.get(user);
@@ -55,17 +58,28 @@ public class PushNotificationService {
             );
             noteData.put("alarmHistoryId", alarmHistory.getId().toString());
 
-            String resultMessage = fcmService.sendNotification(createNote(title, body, noteData),
+            BatchResponse batchResponse = fcmService.sendNotification(
+                createNote(title, body, noteData),
                 tokens);
-            log.info("fcm resultMessage: {} ", resultMessage);
+
+            log.info("createDiary push fcm successCount: {}", batchResponse.getSuccessCount());
+            log.info("createDiary push fcm failCount: {}", batchResponse.getFailureCount());
+            log.info("createDiary push fcm messageId {}",
+                batchResponse.getResponses().stream()
+                    .peek(response -> {
+                        log.info("messageId: {}", response.getMessageId());
+                    })
+            );
         }
 
     }
 
+    @Transactional
     public void createHistory(History history) throws FirebaseMessagingException {
         log.info("createHistory call");
         List<User> users = userRepository.findUsers(history);
         Map<User, Set<String>> fcmTokens = getFcmTokens(users);
+        log.info("createHistory of fcmTokens: {}", fcmTokens);
 
         for (User user : fcmTokens.keySet()) {
             Set<String> tokens = fcmTokens.get(user);
@@ -105,10 +119,18 @@ public class PushNotificationService {
 
             noteData.put("alarmHistoryId", alarmHistory.getId().toString());
 
-            String resultMessage = fcmService.sendNotification(
+            BatchResponse batchResponse = fcmService.sendNotification(
                 createNote(noteTitle, noteBody, noteData),
                 tokens);
-            log.info("fcm resultMessage: {} ", resultMessage);
+
+            log.info("createHistory push fcm successCount: {}", batchResponse.getSuccessCount());
+            log.info("createHistory push fcm failCount: {}", batchResponse.getFailureCount());
+            log.info("createHistory push fcm messageId {}",
+                batchResponse.getResponses().stream()
+                    .peek(response -> {
+                        log.info("messageId: {}", response.getMessageId());
+                    })
+            );
         }
 
     }
@@ -126,6 +148,7 @@ public class PushNotificationService {
         users.remove(author);
 
         Set<String> tokens = fcmService.getTokens(users);
+        log.info("createPage of fcmTokens: {}", tokens);
         if (tokens.isEmpty()) {
             return;
         }
@@ -148,9 +171,17 @@ public class PushNotificationService {
 
         noteData.put("alarmHistoryId", alarmHistory.getId().toString());
 
-        String resultMessage = fcmService.sendNotification(
+        BatchResponse batchResponse = fcmService.sendNotification(
             createNote(noteTitle, noteBody, noteData), tokens);
-        log.info("fcm resultMessage: {} ", resultMessage);
+
+        log.info("createPage push fcm successCount: {}", batchResponse.getSuccessCount());
+        log.info("createPage push fcm failCount: {}", batchResponse.getFailureCount());
+        log.info("createPage push fcm messageId {}",
+            batchResponse.getResponses().stream()
+                .peek(response -> {
+                    log.info("messageId: {}", response.getMessageId());
+                })
+        );
     }
 
     public void finishHistory(History history) throws FirebaseMessagingException {
@@ -160,6 +191,7 @@ public class PushNotificationService {
         List<User> users = userRepository.findUsers(history);
 
         Map<User, Set<String>> fcmTokens = getFcmTokens(users);
+        log.info("finishHistory of fcmTokens: {}", fcmTokens);
 
         for (User user : fcmTokens.keySet()) {
             Set<String> tokens = fcmTokens.get(user);
@@ -185,10 +217,18 @@ public class PushNotificationService {
 
             noteData.put("alarmHistoryId", alarmHistory.getId().toString());
 
-            String resultMessage = fcmService.sendNotification(
+            BatchResponse batchResponse = fcmService.sendNotification(
                 createNote(noteTitle, noteBody, noteData),
                 tokens);
-            log.info("fcm resultMessage: {} ", resultMessage);
+
+            log.info("finishHistory push fcm successCount: {}", batchResponse.getSuccessCount());
+            log.info("finishHistory push fcm failCount: {}", batchResponse.getFailureCount());
+            log.info("finishHistory push fcm messageId {}",
+                batchResponse.getResponses().stream()
+                    .peek(response -> {
+                        log.info("messageId: {}", response.getMessageId());
+                    })
+            );
         }
 
     }
