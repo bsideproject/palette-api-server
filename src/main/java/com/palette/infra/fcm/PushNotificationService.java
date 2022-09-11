@@ -17,6 +17,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,7 +82,8 @@ public class PushNotificationService {
 
     public void outDiary(Diary diary, User outUser) throws FirebaseMessagingException {
         log.info("outDiary call");
-        List<DiaryGroup> diaryGroups = diaryGroupRepository.findByDiaryId(diary.getId()).orElseThrow(DiaryNotFoundException::new);
+        List<DiaryGroup> diaryGroups = diaryGroupRepository.findByDiaryId(diary.getId())
+            .orElseThrow(DiaryNotFoundException::new);
         List<User> users = diaryGroups.stream().map(DiaryGroup::getUser).toList();
         Map<User, Set<String>> fcmTokens = getFcmTokens(users);
         log.info("outDiary of fcmTokens: {}", fcmTokens);
@@ -89,7 +91,7 @@ public class PushNotificationService {
         Map<String, String> noteData = new HashMap<>();
         noteData.put("page", "history");
         noteData.put("diaryId", diary.getId().toString());
-        String title = outUser.getNickname()+"님이 일기장을 나갔어요.";
+        String title = outUser.getNickname() + "님이 " + diary.getTitle() + " 일기장을 나갔어요.";
         String body = "";
 
         StringBuilder historyBody = new StringBuilder();
@@ -98,7 +100,7 @@ public class PushNotificationService {
 
         for (User user : fcmTokens.keySet()) {
             AlarmHistory alarmHistory = alarmHistoryService.createAlarmHistory(
-                    toEntity(user, historyBody.toString(), "home", diary.getId(), null)
+                toEntity(user, historyBody.toString(), "home", diary.getId(), null)
             );
             noteData.put("alarmHistoryId", alarmHistory.getId().toString());
 
@@ -108,16 +110,16 @@ public class PushNotificationService {
             }
 
             BatchResponse batchResponse = fcmService.sendNotification(
-                    createNote(title, body, noteData),
-                    tokens);
+                createNote(title, body, noteData),
+                tokens);
 
             log.info("outDiary push fcm successCount: {}", batchResponse.getSuccessCount());
             log.info("outDiary push fcm failCount: {}", batchResponse.getFailureCount());
             log.info("outDiary push fcm messageId {}",
-                    batchResponse.getResponses().stream()
-                            .peek(response -> {
-                                log.info("messageId: {}", response.getMessageId());
-                            })
+                batchResponse.getResponses().stream()
+                    .peek(response -> {
+                        log.info("messageId: {}", response.getMessageId());
+                    })
             );
         }
 
@@ -280,6 +282,72 @@ public class PushNotificationService {
             );
         }
 
+    }
+
+    public void remindHistoryOne(History history) throws FirebaseMessagingException {
+        log.info("remindHistoryOne call");
+        remindHistory(history, "3");
+    }
+
+    public void remindHistoryTwo(History history) throws FirebaseMessagingException {
+        log.info("remindHistoryTwo call");
+        remindHistory(history, "1");
+    }
+
+    private void remindHistory(History history, String remainingDays)
+        throws FirebaseMessagingException {
+        Diary diary = history.getDiary();
+        String title = diary.getTitle();
+        List<User> users = userRepository.findUsers(history);
+        log.info("remainingDays: {}", remainingDays);
+
+        Map<User, Set<String>> fcmTokens = getFcmTokens(users);
+        log.info("remindHistory of fcmTokens: {}", fcmTokens);
+
+        for (User user : fcmTokens.keySet()) {
+            Set<String> tokens = fcmTokens.get(user);
+            if (tokens.isEmpty()) {
+                return;
+            }
+
+            User otherUser = users.stream()
+                .filter(paramUser -> !Objects.equals(paramUser.getId(), user.getId()))
+                .findAny()
+                .orElse(null);
+
+            String noteTitle =
+                remainingDays + "일 후 " + title + " 에서 " + otherUser.getNickname()
+                    + " 님이 작성한 일기가 도착해요 !";
+            String noteBody = "";
+
+            Map<String, String> noteData = new HashMap<>();
+            noteData.put("page", "history");
+            noteData.put("diaryId", diary.getId().toString());
+            noteData.put("historyId", history.getId().toString());
+
+            StringBuilder historyBody = new StringBuilder();
+            historyBody.append(noteTitle);
+
+            AlarmHistory alarmHistory = alarmHistoryService.createAlarmHistory(
+                toEntity(user, historyBody.toString(), "history", diary.getId(),
+                    history.getId())
+            );
+
+            noteData.put("alarmHistoryId", alarmHistory.getId().toString());
+
+            BatchResponse batchResponse = fcmService.sendNotification(
+                createNote(noteTitle, noteBody, noteData),
+                tokens);
+
+            log.info("remindHistory push fcm successCount: {}", batchResponse.getSuccessCount());
+            log.info("remindHistory push fcm failCount: {}", batchResponse.getFailureCount());
+            log.info("remindHistory push fcm messageId {}",
+                batchResponse.getResponses().stream()
+                    .peek(response -> {
+                        log.info("messageId: {}", response.getMessageId());
+                    })
+            );
+        }
     }
 
     private Note createNote(String noteTitle, String noteBody, Map<String, String> noteData) {
