@@ -2,6 +2,7 @@ package com.palette.exception.common;
 
 import com.netflix.graphql.types.errors.ErrorType;
 import com.palette.exception.graphql.*;
+import com.palette.exception.rest.DeletedUserException;
 import com.palette.exception.rest.SocialTypeNotFoundException;
 import com.palette.exception.rest.TokenExpirationException;
 import com.palette.exception.rest.TokenNotValidException;
@@ -15,6 +16,7 @@ public enum GlobalErrorType {
     A002("A002", "만료된 토큰입니다.", null, TokenExpirationException.class),
     A003("A003", "존재하지 않는 소셜 로그인 방식입니다.", null, SocialTypeNotFoundException.class),
     A004("A004", "권한이 없는 사용자입니다.", ErrorType.PERMISSION_DENIED, PermissionDeniedException.class),
+    A005("A005", "이미 탈퇴한 사용자입니다.", ErrorType.UNAVAILABLE, DeletedUserException.class),
 
 
     D001("D001", "초대코드가 존재하지 않습니다.", ErrorType.NOT_FOUND, InviteCodeNotFoundException.class),
