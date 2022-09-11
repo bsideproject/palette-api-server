@@ -146,18 +146,18 @@ public class DiaryFetcher {
             }
         }
 
+        diaryGroupRepository.save(InviteDiaryInput.of(invitedUser, diary));
+
         User adminUser = diaryGroups.stream()
             .filter(DiaryGroup::getIsAdmin)
             .map(DiaryGroup::getUser)
             .findAny()
             .orElse(null);
 
-        diaryGroupRepository.save(InviteDiaryInput.of(invitedUser, diary));
-
         PushAlarmEventDto eventDto = PushAlarmEventDto.builder()
             .eventsKind(EventsKind.CREATE_DIARY)
             .diary(diary)
-            .users(List.of(adminUser, invitedUser))
+            .userIds(List.of(adminUser.getId(), invitedUser.getId()))
             .build();
 
         Events.raise(new PushAlarmEvent(eventDto));

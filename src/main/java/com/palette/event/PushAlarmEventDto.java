@@ -3,7 +3,6 @@ package com.palette.event;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.History;
 import com.palette.diary.domain.Page;
-import com.palette.user.domain.User;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +17,7 @@ public class PushAlarmEventDto {
 
     private EventsKind eventsKind;
     private History history;
-    private List<User> users;
+    private List<Long> userIds;
     private Diary diary;
     private Page page;
 
