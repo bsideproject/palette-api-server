@@ -1,5 +1,5 @@
 extend type Query {
-    alarmHistories: [AlarmHistory]!
+    alarmHistories(alarmHistoryPageInput: AlarmHistoryPageInput): [AlarmHistory]!
 }
 
 extend type Mutation {
@@ -8,4 +8,9 @@ extend type Mutation {
 
 input ReadAlarmHistoriesInput {
     alarmHistoryIds: [Long]!
+}
+
+input AlarmHistoryPageInput {
+    offset: Int
+    size: Int
 }
