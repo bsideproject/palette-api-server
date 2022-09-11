@@ -256,10 +256,12 @@ public class DiaryFetcher {
 
         Integer offset = pageInput.getDiaryOffset();
         Integer size = pageInput.getDiarySize();
+        Integer pageOffset = pageInput.getPageOffset();
+        Integer pageSize = pageInput.getPageSize();
 
         DiaryFetcherDto diaryFetcherDto = DiaryFetcherDto.builder()
-            .pageOffset(offset)
-            .pageSize(size)
+            .pageOffset(pageOffset)
+            .pageSize(pageSize)
             .loginUser(loginUser)
             .build();
 
@@ -291,13 +293,21 @@ public class DiaryFetcher {
 
         Integer offset = pageInput.getHistoryOffset();
         Integer size = pageInput.getHistorySize();
+        Integer pageOffset = pageInput.getPageSize();
+        Integer pageSize = pageInput.getPageOffset();
+
+        DiaryFetcherDto diaryFetcherDto = DiaryFetcherDto.builder()
+            .pageOffset(pageOffset)
+            .pageSize(pageSize)
+            .loginUser(loginUser)
+            .build();
 
         List<History> histories = diaryQueryRepository.findHistories(user, diary,
             PageRequest.of(offset, size));
 
         return DataFetcherResult.<List<History>>newResult()
             .data(histories)
-            .localContext(pageInput)
+            .localContext(diaryFetcherDto)
             .build();
     }
 
@@ -368,7 +378,7 @@ public class DiaryFetcher {
     public List<Page> getPages(DgsDataFetchingEnvironment dfe) {
         History history = dfe.getSource();
         DiaryFetcherDto diaryFetcherDto = dfe.getLocalContext();
-        
+
         if (diaryFetcherDto != null) {
             Integer offset = diaryFetcherDto.getPageOffset();
             Integer size = diaryFetcherDto.getPageSize();
