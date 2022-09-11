@@ -7,9 +7,9 @@
 
 # 📝 Summary
 
-Two developers, two designers, two front developers, and two back-end developers formed a team, aiming to launch a product within 12 weeks, and experienced planning, design, development, and release a product.
+Two developers, two designers, two front developers, and two backend developers formed a team, aiming to launch a product within 12 weeks, and experienced planning, design, development, and release a product.
 
-At the planning stage, opinions were gathered on a journal application, and there were already various journal applications in the market. Our team took the concept in the form of an exchange diary shared by two people to make a difference.
+At the planning stage, we deicided to make a mobile journal application, and there were already various journal applications in the market. Our team took the concept of an exchange diary shared by two people to differentiate.
 
 # 🌟 Key Function
 
