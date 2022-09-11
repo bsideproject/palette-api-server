@@ -26,10 +26,12 @@ public class DiaryQueryRepository extends BaseRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<DiaryGroup> findByUser(User user, PageRequest pageRequest) {
+    public List<DiaryGroup> findByUser(User paramUser, PageRequest pageRequest) {
         return queryFactory.selectFrom(diaryGroup)
+            .join(diaryGroup.user, user).fetchJoin()
+            .join(diaryGroup.diary, diary).fetchJoin()
             .where(
-                condition(user, diaryGroup.user::eq),
+                condition(paramUser, diaryGroup.user::eq),
                 condition(false, diaryGroup.isOuted::eq)
             )
             .orderBy(diaryGroup.createdAt.desc())
@@ -48,6 +50,28 @@ public class DiaryQueryRepository extends BaseRepository {
             .fetch();
     }
 
+    public List<DiaryGroup> findByDiary(List<Long> diaryIds) {
+        return queryFactory.selectFrom(diaryGroup)
+            .join(diaryGroup.user, user).fetchJoin()
+            .join(diaryGroup.diary, diary).fetchJoin()
+            .where(
+                condition(diaryIds, diaryGroup.diary.id::in)
+            )
+            .fetch();
+    }
+
+
+    public List<History> findProgressHistory(List<Diary> diaries) {
+        LocalDateTime now = LocalDateTime.now();
+        return queryFactory.selectFrom(history)
+            .where(
+                condition(diaries, history.diary::in),
+                condition(now, history.startDate::loe),
+                condition(now, history.endDate::goe)
+            )
+            .fetch();
+    }
+
     public History findProgressHistory(Diary diary) {
         LocalDateTime now = LocalDateTime.now();
         return queryFactory.selectFrom(history)
@@ -56,7 +80,6 @@ public class DiaryQueryRepository extends BaseRepository {
                 condition(now, history.startDate::loe),
                 condition(now, history.endDate::goe)
             )
-            .orderBy(history.createdAt.desc())
             .fetchOne();
     }
 
@@ -96,6 +119,16 @@ public class DiaryQueryRepository extends BaseRepository {
             .limit(pageRequest.getPageSize())
             .fetch();
     }
+
+//    public List<Page> findPage(List<Long> historyIds) {
+//        return queryFactory.selectFrom(page)
+//            .join(page.images, image).fetchJoin()
+//            .where(
+//                condition(historyIds, page.history.id::in)
+//            )
+//            .orderBy(page.createdAt.desc())
+//            .fetch();
+//    }
 
     public List<Page> findPage(History history) {
         return queryFactory.selectFrom(page)

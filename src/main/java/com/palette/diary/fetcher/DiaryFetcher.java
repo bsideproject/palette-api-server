@@ -10,6 +10,9 @@ import com.palette.color.domain.Color;
 import com.palette.color.repository.ColorRepository;
 import com.palette.common.PageInput;
 import com.palette.common.S3Properties;
+import com.palette.diary.DiaryFetcherDto;
+import com.palette.diary.dataloader.CurrentHistoryDataLoader;
+import com.palette.diary.dataloader.JoinUserDataLoader;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.DiaryGroup;
 import com.palette.diary.domain.History;
@@ -58,10 +61,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.dataloader.DataLoader;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -252,6 +257,12 @@ public class DiaryFetcher {
         Integer offset = pageInput.getDiaryOffset();
         Integer size = pageInput.getDiarySize();
 
+        DiaryFetcherDto diaryFetcherDto = DiaryFetcherDto.builder()
+            .pageOffset(offset)
+            .pageSize(size)
+            .loginUser(loginUser)
+            .build();
+
         List<Diary> diaries = diaryQueryRepository.findByUser(user, PageRequest.of(offset, size))
             .stream()
             .map(DiaryGroup::getDiary)
@@ -259,7 +270,7 @@ public class DiaryFetcher {
 
         return DataFetcherResult.<List<Diary>>newResult()
             .data(diaries)
-            .localContext(pageInput)
+            .localContext(diaryFetcherDto)
             .build();
     }
 
@@ -270,10 +281,8 @@ public class DiaryFetcher {
      */
     @Authentication
     @DgsQuery(field = "histories")
-    public DataFetcherResult<List<History>> getHistories(
-        @InputArgument Long diaryId,
-        @InputArgument PageInput pageInput,
-        LoginUser loginUser) {
+    public DataFetcherResult<List<History>> getHistories(@InputArgument Long diaryId,
+        @InputArgument PageInput pageInput, LoginUser loginUser) {
         User user = userRepository.findByEmail(loginUser.getEmail())
             .orElseThrow(UserNotFoundExceptionForGraphQL::new);
 
@@ -293,13 +302,21 @@ public class DiaryFetcher {
     }
 
     @DgsData(parentType = "Diary", field = "currentHistory")
-    public History getCurrentHistory(DgsDataFetchingEnvironment dfe) {
+    public CompletableFuture<History> getCurrentHistory(DgsDataFetchingEnvironment dfe) {
         Diary diary = dfe.getSource();
-        History history = diaryQueryRepository.findProgressHistory(diary);
-        if (history == null) {
-            return null;
-        }
-        return history;
+        DataLoader<Diary, History> dataLoader = dfe.getDataLoader(CurrentHistoryDataLoader.class);
+
+//        List<User> users = diaryQueryRepository.findByDiary(diary).stream()
+//            .map(DiaryGroup::getUser)
+//            .collect(Collectors.toList());
+
+        return dataLoader.load(diary);
+
+//        History history = diaryQueryRepository.findProgressHistory(diary);
+//        if (history == null) {
+//            return null;
+//        }
+//        return history;
     }
 
     @DgsData(parentType = "Diary", field = "pastHistories")
@@ -308,12 +325,24 @@ public class DiaryFetcher {
         return diaryQueryRepository.findPastHistories(diary);
     }
 
+//    @DgsData(parentType = "Diary", field = "joinedUsers")
+//    public List<User> getJoinedUsers(DgsDataFetchingEnvironment dfe) {
+//        Diary diary = dfe.getSource();
+//        return diaryQueryRepository.findByDiary(diary).stream()
+//            .map(DiaryGroup::getUser)
+//            .collect(Collectors.toList());
+//    }
+
     @DgsData(parentType = "Diary", field = "joinedUsers")
-    public List<User> getJoinedUsers(DgsDataFetchingEnvironment dfe) {
+    public CompletableFuture<List<User>> getJoinedUsers(DgsDataFetchingEnvironment dfe) {
+        DataLoader<Long, List<User>> dataLoader = dfe.getDataLoader(JoinUserDataLoader.class);
+
         Diary diary = dfe.getSource();
-        return diaryQueryRepository.findByDiary(diary).stream()
-            .map(DiaryGroup::getUser)
-            .collect(Collectors.toList());
+//        List<User> users = diaryQueryRepository.findByDiary(diary).stream()
+//            .map(DiaryGroup::getUser)
+//            .collect(Collectors.toList());
+
+        return dataLoader.load(diary.getId());
     }
 
     @DgsData(parentType = "History", field = "remainingDays")
@@ -331,7 +360,6 @@ public class DiaryFetcher {
         Diary diary = dfe.getSource();
         History history = diaryQueryRepository.findProgressHistory(diary);
         List<DiaryGroup> diaryGroups = diaryQueryRepository.findByDiary(diary);
-
         if (diaryGroups.isEmpty()) {
             return "";
         }
@@ -360,10 +388,13 @@ public class DiaryFetcher {
     @DgsData(parentType = "History", field = "pages")
     public List<Page> getPages(DgsDataFetchingEnvironment dfe) {
         History history = dfe.getSource();
-        PageInput pageInput = dfe.getLocalContext();
-        if (pageInput != null) {
-            Integer offset = pageInput.getPageOffset();
-            Integer size = pageInput.getPageSize();
+//        DataLoader<Long, List<Page>> dataLoader = dfe.getDataLoader(PagesDataLoader.class);
+//
+//        return dataLoader.load(history.getId());
+        DiaryFetcherDto diaryFetcherDto = dfe.getLocalContext();
+        if (diaryFetcherDto != null) {
+            Integer offset = diaryFetcherDto.getPageOffset();
+            Integer size = diaryFetcherDto.getPageSize();
 
             return diaryQueryRepository.findPage(history, PageRequest.of(offset, size));
         } else {
@@ -384,11 +415,13 @@ public class DiaryFetcher {
             .orElseThrow(UserNotFoundExceptionForGraphQL::new);
     }
 
-    @Authentication
     @DgsData(parentType = "Page", field = "isSelf")
-    public Boolean getIsSelf(DgsDataFetchingEnvironment dfe, LoginUser loginUser) {
+    public Boolean getIsSelf(DgsDataFetchingEnvironment dfe) {
         Page page = dfe.getSource();
         Long authorId = page.getUserId();
+        DiaryFetcherDto diaryFetcherDto = dfe.getLocalContext();
+        LoginUser loginUser = diaryFetcherDto.getLoginUser();
+
         log.info("currentUser: {} ", loginUser);
         log.info("page authorId: {} ", authorId);
         if (Objects.equals(loginUser.getUserId(), authorId)) {
