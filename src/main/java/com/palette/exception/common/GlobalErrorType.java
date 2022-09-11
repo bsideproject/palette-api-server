@@ -1,7 +1,18 @@
 package com.palette.exception.common;
 
 import com.netflix.graphql.types.errors.ErrorType;
-import com.palette.exception.graphql.*;
+import com.palette.exception.graphql.ColorNotFoundException;
+import com.palette.exception.graphql.DiaryDiscardException;
+import com.palette.exception.graphql.DiaryExistUserException;
+import com.palette.exception.graphql.DiaryNotFoundException;
+import com.palette.exception.graphql.DiaryOutedUserException;
+import com.palette.exception.graphql.DiaryOverUserException;
+import com.palette.exception.graphql.HistoryNotFoundException;
+import com.palette.exception.graphql.InviteCodeNotFoundException;
+import com.palette.exception.graphql.PageNotFoundException;
+import com.palette.exception.graphql.PermissionDeniedException;
+import com.palette.exception.graphql.ProgressedHistoryException;
+import com.palette.exception.graphql.UserNotFoundExceptionForGraphQL;
 import com.palette.exception.rest.DeletedUserException;
 import com.palette.exception.rest.SocialTypeNotFoundException;
 import com.palette.exception.rest.TokenExpirationException;
@@ -27,6 +38,7 @@ public enum GlobalErrorType {
     D006("D006", "진행중인 히스토리가 있습니다", ErrorType.BAD_REQUEST, ProgressedHistoryException.class),
     D007("D006", "히스토리가 존재하지 않습니다.", ErrorType.BAD_REQUEST, HistoryNotFoundException.class),
     D008("D008", "페이지가 존재하지 않습니다.", ErrorType.BAD_REQUEST, PageNotFoundException.class),
+    D009("D008", "종료된 일기장 입니다.", ErrorType.BAD_REQUEST, DiaryDiscardException.class),
 
     U001("U001", "유저가 존재하지 않습니다.", ErrorType.NOT_FOUND, UserNotFoundExceptionForGraphQL.class),
 
