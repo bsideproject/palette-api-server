@@ -1,6 +1,7 @@
 package com.palette.user;
 
 import com.palette.exception.graphql.UserNotFoundExceptionForGraphQL;
+import com.palette.exception.rest.DeletedUserException;
 import com.palette.exception.rest.UserNotFoundExceptionForRest;
 import com.palette.infra.jwtTokenProvider.JwtRefreshTokenInfo;
 import com.palette.infra.jwtTokenProvider.JwtTokenProvider;
@@ -49,13 +50,16 @@ public class UserController {
             HttpServletResponse response) {
         String email = loginRequest.getEmail();
         SocialType loginSocialType = SocialType.of(loginRequest.getSocialType());
-        Optional<User> optionalUser = userRepository.findByEmail(loginRequest.getEmail());
+        Optional<User> optionalUser = userRepository.findUsersIncDeletedUserByEmail(loginRequest.getEmail());
         User user;
         if (optionalUser.isEmpty()) {
             User userInfo = User.builder().email(email).socialTypes(new HashSet<>(Collections.singletonList(loginSocialType))).build();
             user = userRepository.save(userInfo);
         } else {
             user = optionalUser.get();
+            if(user.getIsDeleted()) {
+                throw new DeletedUserException();
+            }
         }
         String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getEmail());
         ResponseCookie responseCookie = createRefreshTokenCookie(user.getId(), email);

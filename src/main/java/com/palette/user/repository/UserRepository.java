@@ -13,6 +13,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
+    @Query(value = "SELECT u FROM User u WHERE u.email = :email")
+    Optional<User> findUsersIncDeletedUserByEmail(@Param("email") String email);
+
     @Query(value = "SELECT u FROM History h " +
         "RIGHT JOIN Diary d ON h.diary = d AND h = :history " +
         "RIGHT JOIN DiaryGroup g ON g.diary = d AND g.isOuted = false " +
