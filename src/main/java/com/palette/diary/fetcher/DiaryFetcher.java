@@ -306,17 +306,7 @@ public class DiaryFetcher {
         Diary diary = dfe.getSource();
         DataLoader<Diary, History> dataLoader = dfe.getDataLoader(CurrentHistoryDataLoader.class);
 
-//        List<User> users = diaryQueryRepository.findByDiary(diary).stream()
-//            .map(DiaryGroup::getUser)
-//            .collect(Collectors.toList());
-
         return dataLoader.load(diary);
-
-//        History history = diaryQueryRepository.findProgressHistory(diary);
-//        if (history == null) {
-//            return null;
-//        }
-//        return history;
     }
 
     @DgsData(parentType = "Diary", field = "pastHistories")
@@ -325,22 +315,11 @@ public class DiaryFetcher {
         return diaryQueryRepository.findPastHistories(diary);
     }
 
-//    @DgsData(parentType = "Diary", field = "joinedUsers")
-//    public List<User> getJoinedUsers(DgsDataFetchingEnvironment dfe) {
-//        Diary diary = dfe.getSource();
-//        return diaryQueryRepository.findByDiary(diary).stream()
-//            .map(DiaryGroup::getUser)
-//            .collect(Collectors.toList());
-//    }
-
     @DgsData(parentType = "Diary", field = "joinedUsers")
     public CompletableFuture<List<User>> getJoinedUsers(DgsDataFetchingEnvironment dfe) {
         DataLoader<Long, List<User>> dataLoader = dfe.getDataLoader(JoinUserDataLoader.class);
 
         Diary diary = dfe.getSource();
-//        List<User> users = diaryQueryRepository.findByDiary(diary).stream()
-//            .map(DiaryGroup::getUser)
-//            .collect(Collectors.toList());
 
         return dataLoader.load(diary.getId());
     }
@@ -388,10 +367,8 @@ public class DiaryFetcher {
     @DgsData(parentType = "History", field = "pages")
     public List<Page> getPages(DgsDataFetchingEnvironment dfe) {
         History history = dfe.getSource();
-//        DataLoader<Long, List<Page>> dataLoader = dfe.getDataLoader(PagesDataLoader.class);
-//
-//        return dataLoader.load(history.getId());
         DiaryFetcherDto diaryFetcherDto = dfe.getLocalContext();
+        
         if (diaryFetcherDto != null) {
             Integer offset = diaryFetcherDto.getPageOffset();
             Integer size = diaryFetcherDto.getPageSize();

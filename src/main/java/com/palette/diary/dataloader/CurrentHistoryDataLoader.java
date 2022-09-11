@@ -24,8 +24,6 @@ public class CurrentHistoryDataLoader implements BatchLoader<Diary, History> {
     public CompletionStage<List<History>> load(List<Diary> diaries) {
         log.info("CurrentHistoryDataLoader call");
         log.info("diaries size: {}", diaries.size());
-        //List<History> currentHistories = new ArrayList<>();
-        //for (Diary diary : diaries) {
         List<History> currentHistories = diaryQueryRepository.findProgressHistory(diaries);
         log.info("currentHistories size: {}", currentHistories.size());
 
@@ -34,12 +32,7 @@ public class CurrentHistoryDataLoader implements BatchLoader<Diary, History> {
         for (int i = 0; i < count; i++) {
             currentHistories.add(null);
         }
-//        if (history != null) {
-//            currentHistories.add(history);
-//        } else {
-//            currentHistories.add(null);
-//        }
-        //}
+
         return CompletableFuture.supplyAsync(() -> currentHistories);
     }
 

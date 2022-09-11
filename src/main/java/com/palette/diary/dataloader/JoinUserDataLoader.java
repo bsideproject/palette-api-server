@@ -29,11 +29,6 @@ public class JoinUserDataLoader implements MappedBatchLoader<Long, List<User>> {
         log.info("JoinUserDataLoader call");
         Map<Long, List<User>> maps = new HashMap<>();
 
-        //for (Diary diary : diaries) {
-//        List<User> users = diaryQueryRepository.findByDiary(diaryIds.stream().toList()).stream()
-//            .map(DiaryGroup::getUser)
-//            .collect(toList());
-
         List<DiaryGroup> diaryGroups = diaryQueryRepository.findByDiary(diaryIds.stream().toList());
         for (DiaryGroup diaryGroup : diaryGroups) {
             Long diaryId = diaryGroup.getDiary().getId();
