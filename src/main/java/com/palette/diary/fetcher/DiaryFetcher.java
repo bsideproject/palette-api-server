@@ -18,18 +18,7 @@ import com.palette.diary.domain.DiaryGroup;
 import com.palette.diary.domain.History;
 import com.palette.diary.domain.Image;
 import com.palette.diary.domain.Page;
-import com.palette.diary.fetcher.dto.CreateDiaryInput;
-import com.palette.diary.fetcher.dto.CreateDiaryOutput;
-import com.palette.diary.fetcher.dto.CreateHistoryInput;
-import com.palette.diary.fetcher.dto.CreateHistoryOutput;
-import com.palette.diary.fetcher.dto.CreatePageInput;
-import com.palette.diary.fetcher.dto.DeletePageInput;
-import com.palette.diary.fetcher.dto.EditPageInput;
-import com.palette.diary.fetcher.dto.InviteDiaryInput;
-import com.palette.diary.fetcher.dto.InviteDiaryOutput;
-import com.palette.diary.fetcher.dto.OutDiaryInput;
-import com.palette.diary.fetcher.dto.PageQueryInput;
-import com.palette.diary.fetcher.dto.UpdateDiaryInput;
+import com.palette.diary.fetcher.dto.*;
 import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
 import com.palette.diary.repository.HistoryRepository;
@@ -200,6 +189,32 @@ public class DiaryFetcher {
         return CreateHistoryOutput.builder()
             .historyId(history.getId())
             .build();
+    }
+
+    @DgsMutation
+    @Transactional
+    public CreateHistoryOutput testCreateHistory(@InputArgument TestCreateHistoryInput testCreateHistoryInput) {
+        Diary diary = diaryRepository.findById(testCreateHistoryInput.getDiaryId())
+                .orElseThrow(DiaryNotFoundException::new);
+
+        History progressHistory = diaryQueryRepository.findProgressHistory(diary);
+        if (progressHistory != null) {
+            throw new ProgressedHistoryException();
+        }
+
+        History history = historyRepository.save(testCreateHistoryInput.toEntity(diary));
+        diaryService.registerHistoryFinishedJob(history);
+
+        PushAlarmEventDto eventDto = PushAlarmEventDto.builder()
+                .eventsKind(EventsKind.CREATE_HISTORY)
+                .history(history)
+                .build();
+
+        Events.raise(new PushAlarmEvent(eventDto));
+
+        return CreateHistoryOutput.builder()
+                .historyId(history.getId())
+                .build();
     }
 
     @Authentication
