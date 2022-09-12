@@ -13,6 +13,7 @@ import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -21,13 +22,14 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class HistoryRemindTwo implements Job {
 
     @Resource
     private PlatformTransactionManager transactionManager;
-    private final HistoryRepository historyRepository;
-    private final PushNotificationService pushNotificationService;
+    @Autowired
+    private HistoryRepository historyRepository;
+    @Autowired
+    private PushNotificationService pushNotificationService;
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {

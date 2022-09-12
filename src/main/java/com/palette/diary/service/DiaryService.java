@@ -60,7 +60,7 @@ public class DiaryService {
     public void registerHistoryRemindOneJob(History history) {
         try {
             // Creating JobDetail instance
-            String jobDetailId = "History" + history.getId();
+            String jobDetailId = "HistoryRemindOne" + history.getId();
             JobDetail jobDetail = JobBuilder.newJob(HistoryRemindOne.class)
                 .withIdentity(jobDetailId)
                 .build();
@@ -99,7 +99,7 @@ public class DiaryService {
     public void registerHistoryRemindTwoJob(History history) {
         try {
             // Creating JobDetail instance
-            String jobDetailId = "History" + history.getId();
+            String jobDetailId = "HistoryRemindTwo" + history.getId();
             JobDetail jobDetail = JobBuilder.newJob(HistoryRemindTwo.class)
                 .withIdentity(jobDetailId)
                 .build();
