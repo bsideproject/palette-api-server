@@ -6,6 +6,7 @@ import com.netflix.graphql.dgs.DgsDataFetchingEnvironment;
 import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
+import com.palette.BaseEntity;
 import com.palette.color.domain.Color;
 import com.palette.color.repository.ColorRepository;
 import com.palette.common.PageInput;
@@ -423,7 +424,12 @@ public class DiaryFetcher {
             log.info("offset: {}", offset);
             log.info("size: {}", size);
 
-            return diaryQueryRepository.findPage(history, PageRequest.of(offset, size));
+            List<Page> pages = diaryQueryRepository.findPage(history, PageRequest.of(offset, size));
+            List<Long> pageIds = pages.stream()
+                .map(BaseEntity::getId)
+                .collect(Collectors.toList());
+
+            return diaryQueryRepository.findPageByIds(pageIds);
         } else {
             return diaryQueryRepository.findPage(history);
         }
