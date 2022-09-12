@@ -82,7 +82,7 @@ public class PushNotificationService {
 
     public void outDiary(Diary diary, User outUser) throws FirebaseMessagingException {
         log.info("outDiary call");
-        List<DiaryGroup> diaryGroups = diaryGroupRepository.findByDiaryId(diary.getId())
+        List<DiaryGroup> diaryGroups = diaryGroupRepository.findContainsUser(diary)
             .orElseThrow(DiaryNotFoundException::new);
         List<User> users = diaryGroups.stream().map(DiaryGroup::getUser).toList();
         Map<User, Set<String>> fcmTokens = getFcmTokens(users);
@@ -99,6 +99,12 @@ public class PushNotificationService {
         historyBody.append(body);
 
         for (User user : fcmTokens.keySet()) {
+            if (Objects.equals(outUser.getId(), user.getId())) {
+                noteData.put("isOut", "1");
+            } else {
+                noteData.put("isOut", "0");
+            }
+
             AlarmHistory alarmHistory = alarmHistoryService.createAlarmHistory(
                 toEntity(user, historyBody.toString(), "home", diary.getId(), null)
             );
@@ -372,7 +378,7 @@ public class PushNotificationService {
     private Map<User, Set<String>> getFcmTokens(List<User> users) {
         Map<User, Set<String>> fcmTokens = new HashMap<>();
         for (User user : users) {
-            if(user.getPushEnabled()){
+            if (user.getPushEnabled()) {
                 fcmTokens.put(user, user.getFcmTokens());
             }
         }
