@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MultipartException;
 
 @Slf4j
 @RestControllerAdvice
@@ -41,6 +42,18 @@ public class RestExceptionHandler {
         Sentry.captureException(e);
         return this.sendException(HttpStatus.INTERNAL_SERVER_ERROR.value(), "9999",
             HttpStatus.INTERNAL_SERVER_ERROR.name());
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<ExceptionResponse> handleMaxSizeException(
+        MultipartException e) {
+        log.error("{} \n", e.getMessage(), e);
+        GlobalErrorType f001 = GlobalErrorType.F001;
+
+        Sentry.captureMessage(e.getMessage(), SentryLevel.WARNING);
+        Sentry.captureException(e);
+        return this.sendException(HttpStatus.BAD_REQUEST.value(), f001.getCode(),
+            f001.getMessage());
     }
 
     private ResponseEntity<ExceptionResponse> sendException(int statusCode, String code,

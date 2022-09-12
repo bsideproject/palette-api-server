@@ -29,7 +29,6 @@ public enum GlobalErrorType {
     A004("A004", "권한이 없는 사용자입니다.", ErrorType.PERMISSION_DENIED, PermissionDeniedException.class),
     A005("A005", "이미 탈퇴한 사용자입니다.", ErrorType.UNAVAILABLE, DeletedUserException.class),
 
-
     D001("D001", "초대코드가 존재하지 않습니다.", ErrorType.NOT_FOUND, InviteCodeNotFoundException.class),
     D002("D002", "일기가 존재하지 않습니다.", ErrorType.NOT_FOUND, DiaryNotFoundException.class),
     D003("D003", "인원이 초과되었습니다.", ErrorType.BAD_REQUEST, DiaryOverUserException.class),
@@ -44,7 +43,9 @@ public enum GlobalErrorType {
 
     C001("C001", "색깔이 존재하지 않습니다.", ErrorType.NOT_FOUND, ColorNotFoundException.class),
 
-    R001("R001", "알림내역이 존재하지 않습니다.", ErrorType.NOT_FOUND, ColorNotFoundException.class);
+    R001("R001", "알림내역이 존재하지 않습니다.", ErrorType.NOT_FOUND, ColorNotFoundException.class),
+
+    F001("F001", "업로드에 실패하였습니다. 50MB 이하의 파일 사이즈를 등록해주세요.", ErrorType.BAD_REQUEST, null);
 
     private final String code;
     private final String message;
@@ -52,4 +53,3 @@ public enum GlobalErrorType {
     private final Class<? extends BaseException> classType;
 
 }
-
