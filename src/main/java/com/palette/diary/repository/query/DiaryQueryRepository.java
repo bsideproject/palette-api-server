@@ -110,13 +110,21 @@ public class DiaryQueryRepository extends BaseRepository {
 
     public List<Page> findPage(History history, PageRequest pageRequest) {
         return queryFactory.selectFrom(page)
-            .leftJoin(page.images, image)
+//            .leftJoin(page.images, image).fetchJoin()
             .where(
                 condition(history, page.history::eq)
             )
             .orderBy(page.createdAt.desc())
             .offset(pageRequest.getOffset())
             .limit(pageRequest.getPageSize())
+            .fetch();
+    }
+
+    public List<Page> findPageByIds(List<Long> pageIds) {
+        return queryFactory.selectFrom(page)
+            .where(
+                condition(pageIds, page.id::in)
+            )
             .fetch();
     }
 

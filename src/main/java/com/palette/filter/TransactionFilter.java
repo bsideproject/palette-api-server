@@ -23,7 +23,6 @@ public class TransactionFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
-        log.info("dsasadasd");
         HttpServletRequest req = (HttpServletRequest) request;
         String transactionId = Optional.ofNullable(req.getHeader(TRANSACTION_ID))
             .orElse(UUID.randomUUID().toString());
