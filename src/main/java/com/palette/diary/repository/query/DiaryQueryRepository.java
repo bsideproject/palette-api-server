@@ -110,7 +110,7 @@ public class DiaryQueryRepository extends BaseRepository {
 
     public List<Page> findPage(History history, PageRequest pageRequest) {
         return queryFactory.selectFrom(page)
-            .leftJoin(page.images, image).fetchJoin()
+            .leftJoin(page.images, image)
             .where(
                 condition(history, page.history::eq)
             )
