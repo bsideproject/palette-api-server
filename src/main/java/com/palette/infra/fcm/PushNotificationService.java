@@ -372,7 +372,9 @@ public class PushNotificationService {
     private Map<User, Set<String>> getFcmTokens(List<User> users) {
         Map<User, Set<String>> fcmTokens = new HashMap<>();
         for (User user : users) {
-            fcmTokens.put(user, user.getFcmTokens());
+            if(user.getPushEnabled()){
+                fcmTokens.put(user, user.getFcmTokens());
+            }
         }
         return fcmTokens;
     }

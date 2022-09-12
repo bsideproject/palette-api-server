@@ -51,7 +51,9 @@ public class FcmService {
         }
         HashSet<String> tokens = new HashSet<>();
         users.forEach(user -> {
-            tokens.addAll(user.getFcmTokens());
+            if(user.getPushEnabled()){
+                tokens.addAll(user.getFcmTokens());
+            }
         });
         return tokens;
     }
