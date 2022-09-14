@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dataloader.MappedBatchLoader;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @DgsDataLoader(name = "outedUser")
@@ -26,6 +27,7 @@ public class OutedUserDataLoader implements MappedBatchLoader<Long, String> {
     private final DiaryQueryRepository diaryQueryRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public CompletionStage<Map<Long, String>> load(Set<Long> diaryIds) {
         log.info("OutedUserDataLoader call");
         Map<Long, String> maps = new HashMap<>();

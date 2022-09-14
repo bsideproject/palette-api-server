@@ -15,6 +15,7 @@ import com.palette.diary.DiaryFetcherDto;
 import com.palette.diary.dataloader.CurrentHistoryDataLoader;
 import com.palette.diary.dataloader.JoinUserDataLoader;
 import com.palette.diary.dataloader.OutedUserDataLoader;
+import com.palette.diary.dataloader.PastHistoriesDataLoader;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.DiaryGroup;
 import com.palette.diary.domain.History;
@@ -354,9 +355,13 @@ public class DiaryFetcher {
     }
 
     @DgsData(parentType = "Diary", field = "pastHistories")
-    public List<History> getPastHistories(DgsDataFetchingEnvironment dfe) {
+    public CompletableFuture<List<History>> getPastHistories(DgsDataFetchingEnvironment dfe) {
         Diary diary = dfe.getSource();
-        return diaryQueryRepository.findPastHistories(diary);
+
+        DataLoader<Long, List<History>> dataLoader = dfe.getDataLoader(
+            PastHistoriesDataLoader.class);
+
+        return dataLoader.load(diary.getId());
     }
 
     @DgsData(parentType = "Diary", field = "joinedUsers")

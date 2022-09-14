@@ -91,11 +91,11 @@ public class DiaryQueryRepository extends BaseRepository {
             .fetchOne();
     }
 
-    public List<History> findPastHistories(Diary diary) {
+    public List<History> findPastHistories(List<Long> diaryIds) {
         return queryFactory.selectFrom(history)
             .where(
-                condition(diary, history.diary::eq),
-                condition(LocalDateTime.now(), history.endDate::lt)
+                condition(diaryIds, history.diary.id::in),
+                condition(LocalDateTime.now(), history.endDate::loe)
             )
             .orderBy(history.createdAt.desc())
             .fetch();
@@ -118,7 +118,6 @@ public class DiaryQueryRepository extends BaseRepository {
 
     public List<Page> findPage(History history, PageRequest pageRequest) {
         return queryFactory.selectFrom(page)
-//            .leftJoin(page.images, image).fetchJoin()
             .where(
                 condition(history, page.history::eq)
             )
@@ -133,6 +132,7 @@ public class DiaryQueryRepository extends BaseRepository {
             .where(
                 condition(pageIds, page.id::in)
             )
+            .orderBy(page.createdAt.desc())
             .fetch();
     }
 
