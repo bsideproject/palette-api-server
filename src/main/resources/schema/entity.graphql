@@ -23,7 +23,7 @@ type Diary {
     invitationCode: String!
     color: Color
     currentHistory: History
-    pastHistories: [History]!
+    pastHistories: [History]
     joinedUsers: [User]!
     outedUser: String
     diaryStatus: String!
