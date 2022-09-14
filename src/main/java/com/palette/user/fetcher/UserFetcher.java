@@ -7,8 +7,8 @@ import com.netflix.graphql.dgs.DgsDataFetchingEnvironment;
 import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
+import com.palette.common.UserProfileImgProperties;
 import com.palette.diary.domain.Diary;
-import com.palette.diary.repository.DiaryGroupRepository;
 import com.palette.diary.repository.DiaryRepository;
 import com.palette.exception.graphql.UserNotFoundExceptionForGraphQL;
 import com.palette.infra.fcm.FcmService;
@@ -26,9 +26,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @DgsComponent
@@ -36,9 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserFetcher {
 
     private final UserRepository userRepository;
-    private final DiaryGroupRepository diaryGroupRepository;
     private final DiaryRepository diaryRepository;
-    private final EntityManager entityManager;
     private final FcmService fcmService;
 
     @Authentication
@@ -58,7 +56,8 @@ public class UserFetcher {
     @DgsMutation
     public User editMyProfile(@InputArgument EditMyProfileInput editMyProfileInput,
         LoginUser loginUser) {
-        User user = userRepository.findByEmail(loginUser.getEmail()).orElseThrow(UserNotFoundExceptionForGraphQL::new);
+        User user = userRepository.findByEmail(loginUser.getEmail())
+            .orElseThrow(UserNotFoundExceptionForGraphQL::new);
         Boolean agreeWithTerms = editMyProfileInput.getAgreeWithTerms();
         String profileImg = editMyProfileInput.getProfileImg();
         String nickname = editMyProfileInput.getNickname();
@@ -68,9 +67,12 @@ public class UserFetcher {
         if (agreeWithTerms != null) {
             user.setAgreeWithTerms(agreeWithTerms);
         }
-        if (profileImg != null) {
+        if (StringUtils.hasText(profileImg)) {
             user.setProfileImg(profileImg);
+        } else {
+            user.setProfileImg(UserProfileImgProperties.defaultProfileImg);
         }
+
         if (nickname != null) {
             user.setNickname(nickname);
         }
@@ -134,4 +136,5 @@ public class UserFetcher {
         }
         return false;
     }
+
 }
