@@ -14,6 +14,7 @@ import com.palette.common.S3Properties;
 import com.palette.diary.DiaryFetcherDto;
 import com.palette.diary.dataloader.CurrentHistoryDataLoader;
 import com.palette.diary.dataloader.JoinUserDataLoader;
+import com.palette.diary.dataloader.OutedUserDataLoader;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.DiaryGroup;
 import com.palette.diary.domain.History;
@@ -366,6 +367,15 @@ public class DiaryFetcher {
     @DgsData(parentType = "Diary", field = "joinedUsers")
     public CompletableFuture<List<User>> getJoinedUsers(DgsDataFetchingEnvironment dfe) {
         DataLoader<Long, List<User>> dataLoader = dfe.getDataLoader(JoinUserDataLoader.class);
+
+        Diary diary = dfe.getSource();
+
+        return dataLoader.load(diary.getId());
+    }
+
+    @DgsData(parentType = "Diary", field = "outedUser")
+    public CompletableFuture<String> getOutedUser(DgsDataFetchingEnvironment dfe) {
+        DataLoader<Long, String> dataLoader = dfe.getDataLoader(OutedUserDataLoader.class);
 
         Diary diary = dfe.getSource();
 

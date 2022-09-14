@@ -60,6 +60,14 @@ public class DiaryQueryRepository extends BaseRepository {
             .fetch();
     }
 
+    public List<DiaryGroup> findByDiaryGroup(List<Long> diaryIds) {
+        return queryFactory.selectFrom(diaryGroup)
+            .where(
+                condition(diaryIds, diaryGroup.diary.id::in)
+            )
+            .fetch();
+    }
+
 
     public List<History> findProgressHistory(List<Long> diaryIds) {
         LocalDateTime now = LocalDateTime.now();
