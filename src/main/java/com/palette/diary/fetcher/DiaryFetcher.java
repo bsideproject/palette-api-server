@@ -220,11 +220,6 @@ public class DiaryFetcher {
         Diary diary = diaryRepository.findById(testCreateHistoryInput.getDiaryId())
             .orElseThrow(DiaryNotFoundException::new);
 
-        History progressHistory = diaryQueryRepository.findProgressHistory(diary);
-        if (progressHistory != null) {
-            throw new ProgressedHistoryException();
-        }
-
         History history = historyRepository.save(testCreateHistoryInput.toEntity(diary));
         diaryService.registerHistoryFinishedJob(history);
 
