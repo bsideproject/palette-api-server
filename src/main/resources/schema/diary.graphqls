@@ -1,6 +1,6 @@
 extend type Query {
     diaries(pageInput: PageInput): [Diary]!
-    histories(diaryId: Long, pageInput: PageInput): [History]!
+    histories(diaryId: Long, pageInput: PageInput): SelectHistoryOutput
     pages(pageInput: PageInput): Boolean
 }
 
@@ -47,6 +47,11 @@ input CreateHistoryInput {
 
 type CreateHistoryOutput{
     historyId: Long!
+}
+
+type SelectHistoryOutput{
+    diaryTitle: String!
+    histories: [History]
 }
 
 input CreatePageInput {
