@@ -31,7 +31,7 @@ public enum GlobalErrorType {
 
     D001("D001", "초대코드가 존재하지 않습니다.", ErrorType.NOT_FOUND, InviteCodeNotFoundException.class),
     D002("D002", "일기가 존재하지 않습니다.", ErrorType.NOT_FOUND, DiaryNotFoundException.class),
-    D003("D003", "인원이 초과되었습니다.", ErrorType.BAD_REQUEST, DiaryOverUserException.class),
+    D003("D003", "사용할 수 없는 일기장입니다.", ErrorType.BAD_REQUEST, DiaryOverUserException.class),
     D004("D004", "해당 일기에 이미 가입되어 있습니다.", ErrorType.BAD_REQUEST, DiaryExistUserException.class),
     D005("D005", "이전에 나간적이 있는 그룹입니다.", ErrorType.BAD_REQUEST, DiaryOutedUserException.class),
     D006("D006", "진행중인 히스토리가 있습니다", ErrorType.BAD_REQUEST, ProgressedHistoryException.class),
