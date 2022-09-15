@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface DiaryGroupRepository extends JpaRepository<DiaryGroup, Long> {
 
-    Optional<DiaryGroup> findByUserId(String userId);
+    List<DiaryGroup> findByUser(User user);
 
     @Query("select dg from DiaryGroup dg where dg.isOuted = false and dg.diary = :diary")
     Optional<List<DiaryGroup>> findContainsUser(@Param("diary") Diary diary);
