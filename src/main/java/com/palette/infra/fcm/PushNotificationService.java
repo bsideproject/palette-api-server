@@ -14,6 +14,7 @@ import com.palette.exception.graphql.UserNotFoundExceptionForGraphQL;
 import com.palette.user.domain.User;
 import com.palette.user.repository.UserRepository;
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -256,8 +257,19 @@ public class PushNotificationService {
                 return;
             }
 
+            User otherUser = users.stream()
+                .filter(paramUser -> !Objects.equals(paramUser.getId(), user.getId()))
+                .findAny()
+                .orElse(null);
+
+            int period =
+                (int) ChronoUnit.DAYS.between(history.getStartDate(), history.getEndDate()) + 1;
+
             String noteTitle = "일기가 완성됐어요!";
-            String noteBody = diary.getTitle() + " 일기가 완성됐어요.";
+            //String noteBody = diary.getTitle() + " 일기가 완성됐어요.";
+            String noteBody =
+                diary.getTitle() + "일기의 " + period + "일 일기가 완성됐어요! " + otherUser.getNickname()
+                    + "님의 일기를 보러 가볼까요?";
 
             Map<String, String> noteData = new HashMap<>();
             noteData.put("page", "history");
