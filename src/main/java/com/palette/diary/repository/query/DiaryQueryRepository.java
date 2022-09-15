@@ -34,7 +34,7 @@ public class DiaryQueryRepository extends BaseRepository {
                 condition(paramUser, diaryGroup.user::eq),
                 condition(false, diaryGroup.isOuted::eq)
             )
-            .orderBy(diaryGroup.createdAt.desc())
+            .orderBy(diaryGroup.createdAt.asc())
             .offset(pageRequest.getOffset())
             .limit(pageRequest.getPageSize())
             .fetch();
@@ -57,6 +57,7 @@ public class DiaryQueryRepository extends BaseRepository {
             .where(
                 condition(diaryIds, diaryGroup.diary.id::in)
             )
+            .orderBy(diaryGroup.createdAt.asc())
             .fetch();
     }
 
