@@ -66,6 +66,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -305,8 +306,53 @@ public class DiaryFetcher {
             .map(DiaryGroup::getDiary)
             .collect(Collectors.toList());
 
+        List<Diary> list = new ArrayList<>();
+
+        Map<Diary, List<DiaryGroup>> collect = diaryQueryRepository.findByDiary(
+                diaries.stream()
+                    .map(diary -> diary.getId()).collect(Collectors.toList()))
+            .stream()
+            .collect(Collectors.groupingBy(DiaryGroup::getDiary));
+
+        //생성 완료된 일기
+        for (Diary diary : collect.keySet()) {
+            List<DiaryGroup> diaryGroups = collect.get(diary);
+            int diaryGroupSize = diaryGroups.size();
+            if (diaryGroupSize == 2) {
+                List<DiaryGroup> isLiveDiary = diaryGroups.stream()
+                    .filter(diaryGroup -> !diaryGroup.getIsOuted())
+                    .collect(Collectors.toList());
+                if (isLiveDiary.size() == 2) {
+                    list.add(diary);
+                }
+            }
+        }
+
+        //생성된 일기
+        for (Diary diary : collect.keySet()) {
+            List<DiaryGroup> diaryGroups = collect.get(diary);
+            int diaryGroupSize = diaryGroups.size();
+            if (diaryGroupSize == 1) {
+                list.add(diary);
+            }
+        }
+
+        //폐기된 일기
+        for (Diary diary : collect.keySet()) {
+            List<DiaryGroup> diaryGroups = collect.get(diary);
+            int diaryGroupSize = diaryGroups.size();
+            if (diaryGroupSize == 2) {
+                List<DiaryGroup> discardedDiary = diaryGroups.stream()
+                    .filter(DiaryGroup::getIsOuted)
+                    .collect(Collectors.toList());
+                if (discardedDiary.size() > 0) {
+                    list.add(diary);
+                }
+            }
+        }
+
         return DataFetcherResult.<List<Diary>>newResult()
-            .data(diaries)
+            .data(list)
             .localContext(diaryFetcherDto)
             .build();
     }
