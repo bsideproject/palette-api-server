@@ -7,7 +7,6 @@ import com.netflix.graphql.dgs.DgsDataFetchingEnvironment;
 import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
-import com.palette.common.UserProfileImgProperties;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.repository.DiaryRepository;
 import com.palette.exception.graphql.UserNotFoundExceptionForGraphQL;
@@ -28,7 +27,6 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 
 @Slf4j
 @DgsComponent
@@ -67,10 +65,8 @@ public class UserFetcher {
         if (agreeWithTerms != null) {
             user.setAgreeWithTerms(agreeWithTerms);
         }
-        if (StringUtils.hasText(profileImg)) {
+        if (profileImg != null) {
             user.setProfileImg(profileImg);
-        } else {
-            user.setProfileImg(UserProfileImgProperties.defaultProfileImg);
         }
 
         if (nickname != null) {

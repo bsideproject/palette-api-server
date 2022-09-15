@@ -32,6 +32,7 @@ import com.palette.diary.fetcher.dto.InviteDiaryInput;
 import com.palette.diary.fetcher.dto.InviteDiaryOutput;
 import com.palette.diary.fetcher.dto.OutDiaryInput;
 import com.palette.diary.fetcher.dto.PageQueryInput;
+import com.palette.diary.fetcher.dto.SelectHistoryOutput;
 import com.palette.diary.fetcher.dto.TestCreateHistoryInput;
 import com.palette.diary.fetcher.dto.UpdateDiaryInput;
 import com.palette.diary.repository.DiaryGroupRepository;
@@ -317,7 +318,7 @@ public class DiaryFetcher {
      */
     @Authentication
     @DgsQuery(field = "histories")
-    public DataFetcherResult<List<History>> getHistories(@InputArgument Long diaryId,
+    public DataFetcherResult<SelectHistoryOutput> getHistories(@InputArgument Long diaryId,
         @InputArgument PageInput pageInput, LoginUser loginUser) {
         User user = userRepository.findByEmail(loginUser.getEmail())
             .orElseThrow(UserNotFoundExceptionForGraphQL::new);
@@ -339,8 +340,13 @@ public class DiaryFetcher {
         List<History> histories = diaryQueryRepository.findHistories(user, diary,
             PageRequest.of(offset, size));
 
-        return DataFetcherResult.<List<History>>newResult()
-            .data(histories)
+        SelectHistoryOutput selectHistoryOutput = SelectHistoryOutput.builder()
+            .diaryTitle(diary.getTitle())
+            .histories(histories)
+            .build();
+
+        return DataFetcherResult.<SelectHistoryOutput>newResult()
+            .data(selectHistoryOutput)
             .localContext(diaryFetcherDto)
             .build();
     }
