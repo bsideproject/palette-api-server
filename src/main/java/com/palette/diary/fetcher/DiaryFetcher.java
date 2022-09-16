@@ -65,6 +65,7 @@ import graphql.execution.DataFetcherResult;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -315,6 +316,7 @@ public class DiaryFetcher {
             .collect(Collectors.groupingBy(DiaryGroup::getDiary));
 
         //생성 완료된 일기
+        List<Diary> test1 = new ArrayList<>();
         for (Diary diary : collect.keySet()) {
             List<DiaryGroup> diaryGroups = collect.get(diary);
             int diaryGroupSize = diaryGroups.size();
@@ -323,21 +325,35 @@ public class DiaryFetcher {
                     .filter(diaryGroup -> !diaryGroup.getIsOuted())
                     .collect(Collectors.toList());
                 if (isLiveDiary.size() == 2) {
-                    list.add(diary);
+                    test1.add(diary);
                 }
             }
         }
 
+        List<Diary> collect3 = test1.stream()
+            .sorted(Comparator.comparing(Diary::getCreatedAt))
+            .collect(Collectors.toList());
+
+        list.addAll(collect3);
+
         //생성된 일기
+        List<Diary> test2 = new ArrayList<>();
         for (Diary diary : collect.keySet()) {
             List<DiaryGroup> diaryGroups = collect.get(diary);
             int diaryGroupSize = diaryGroups.size();
             if (diaryGroupSize == 1) {
-                list.add(diary);
+                test2.add(diary);
             }
         }
 
+        List<Diary> collect2 = test2.stream()
+            .sorted(Comparator.comparing(Diary::getCreatedAt))
+            .collect(Collectors.toList());
+
+        list.addAll(collect2);
+
         //폐기된 일기
+        List<Diary> test3 = new ArrayList<>();
         for (Diary diary : collect.keySet()) {
             List<DiaryGroup> diaryGroups = collect.get(diary);
             int diaryGroupSize = diaryGroups.size();
@@ -346,10 +362,16 @@ public class DiaryFetcher {
                     .filter(DiaryGroup::getIsOuted)
                     .collect(Collectors.toList());
                 if (discardedDiary.size() > 0) {
-                    list.add(diary);
+                    test3.add(diary);
                 }
             }
         }
+
+        List<Diary> collect1 = test3.stream()
+            .sorted(Comparator.comparing(Diary::getCreatedAt))
+            .collect(Collectors.toList());
+
+        list.addAll(collect1);
 
         return DataFetcherResult.<List<Diary>>newResult()
             .data(list)

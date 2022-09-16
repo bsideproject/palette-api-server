@@ -53,7 +53,7 @@ public class PushNotificationService {
             noteData.put("page", "home");
             noteData.put("diaryId", diary.getId().toString());
 
-            String title = "'" + diary.getTitle() + "'" + " 일기장이 생성되었어요.";
+            String title = "'" + diary.getTitle() + "'" + " 일기장이 생성되었어요. ";
             String body = "첫 교환일기를 시작해보세요!";
 
             StringBuilder historyBody = new StringBuilder();
