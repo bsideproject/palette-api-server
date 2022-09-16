@@ -147,4 +147,14 @@ public class DiaryQueryRepository extends BaseRepository {
             .fetch();
     }
 
+    public List<Page> findPage(List<Long> historyIds) {
+        return queryFactory.selectFrom(page)
+            .leftJoin(page.images, image).fetchJoin()
+            .where(
+                condition(historyIds, page.history.id::in)
+            )
+            .orderBy(page.createdAt.desc())
+            .fetch();
+    }
+
 }

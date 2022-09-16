@@ -1,8 +1,12 @@
 package com.palette.diary.dataloader;
 
 import com.netflix.graphql.dgs.DgsDataLoader;
+import com.palette.BaseEntity;
+import com.palette.diary.dataloader.dto.PastHistoriesDto;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.History;
+import com.palette.diary.domain.Page;
+import com.palette.diary.fetcher.dto.PastHistory;
 import com.palette.diary.repository.query.DiaryQueryRepository;
 import java.util.HashMap;
 import java.util.List;
@@ -21,15 +25,23 @@ import org.springframework.transaction.annotation.Transactional;
 @DgsDataLoader(name = "pastHistories")
 @Component
 @RequiredArgsConstructor
-public class PastHistoriesDataLoader implements MappedBatchLoader<Long, List<History>> {
+public class PastHistoriesDataLoader implements MappedBatchLoader<PastHistoriesDto, PastHistory> {
 
     private final DiaryQueryRepository diaryQueryRepository;
 
     @Override
     @Transactional(readOnly = true)
-    public CompletionStage<Map<Long, List<History>>> load(Set<Long> diaryIds) {
+    public CompletionStage<Map<PastHistoriesDto, PastHistory>> load(
+        Set<PastHistoriesDto> pastHistoriesDtos) {
         log.info("PastHistoriesDataLoader call");
-        Map<Long, List<History>> maps = new HashMap<>();
+        Map<PastHistoriesDto, PastHistory> maps = new HashMap<>();
+
+        List<PastHistoriesDto> collect1 = pastHistoriesDtos.stream().collect(Collectors.toList());
+        Integer pageSize = collect1.get(0).getPageSize();
+
+        List<Long> diaryIds = collect1.stream()
+            .map(collect -> collect.getDiaryId())
+            .collect(Collectors.toList());
 
         Map<Diary, List<History>> collect = diaryQueryRepository.findPastHistories(
                 diaryIds.stream().toList()).stream()
@@ -37,7 +49,24 @@ public class PastHistoriesDataLoader implements MappedBatchLoader<Long, List<His
 
         for (Diary diary : collect.keySet()) {
             List<History> histories = collect.get(diary);
-            maps.put(diary.getId(), histories);
+            List<Long> historyIds = histories.stream()
+                .map(BaseEntity::getId)
+                .collect(Collectors.toList());
+
+            List<Page> pages = diaryQueryRepository.findPage(historyIds).stream()
+                .limit(pageSize)
+                .toList();
+
+            PastHistory pastHistory = PastHistory.builder()
+                .pages(pages)
+                .build();
+
+            PastHistoriesDto pastHistoriesDto = PastHistoriesDto.builder()
+                .diaryId(diary.getId())
+                .pageSize(pageSize)
+                .build();
+
+            maps.put(pastHistoriesDto, pastHistory);
         }
 
         return CompletableFuture.supplyAsync(() -> maps);

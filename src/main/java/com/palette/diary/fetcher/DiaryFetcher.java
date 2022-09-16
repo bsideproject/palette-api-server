@@ -16,6 +16,7 @@ import com.palette.diary.dataloader.CurrentHistoryDataLoader;
 import com.palette.diary.dataloader.JoinUserDataLoader;
 import com.palette.diary.dataloader.OutedUserDataLoader;
 import com.palette.diary.dataloader.PastHistoriesDataLoader;
+import com.palette.diary.dataloader.dto.PastHistoriesDto;
 import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.DiaryGroup;
 import com.palette.diary.domain.History;
@@ -32,6 +33,7 @@ import com.palette.diary.fetcher.dto.InviteDiaryInput;
 import com.palette.diary.fetcher.dto.InviteDiaryOutput;
 import com.palette.diary.fetcher.dto.OutDiaryInput;
 import com.palette.diary.fetcher.dto.PageQueryInput;
+import com.palette.diary.fetcher.dto.PastHistory;
 import com.palette.diary.fetcher.dto.SelectHistoryOutput;
 import com.palette.diary.fetcher.dto.TestCreateHistoryInput;
 import com.palette.diary.fetcher.dto.UpdateDiaryInput;
@@ -429,13 +431,23 @@ public class DiaryFetcher {
     }
 
     @DgsData(parentType = "Diary", field = "pastHistories")
-    public CompletableFuture<List<History>> getPastHistories(DgsDataFetchingEnvironment dfe) {
+    public CompletableFuture<PastHistory> getPastHistories(DgsDataFetchingEnvironment dfe) {
         Diary diary = dfe.getSource();
 
-        DataLoader<Long, List<History>> dataLoader = dfe.getDataLoader(
+        DataLoader<PastHistoriesDto, PastHistory> dataLoader = dfe.getDataLoader(
             PastHistoriesDataLoader.class);
 
-        return dataLoader.load(diary.getId());
+        DiaryFetcherDto diaryFetcherDto = dfe.getLocalContext();
+
+        Integer pageSize = diaryFetcherDto.getPageSize();
+        log.info("pageSize: {}", pageSize);
+
+        PastHistoriesDto pastHistoriesDto = PastHistoriesDto.builder()
+            .diaryId(diary.getId())
+            .pageSize(pageSize)
+            .build();
+
+        return dataLoader.load(pastHistoriesDto);
     }
 
     @DgsData(parentType = "Diary", field = "joinedUsers")
@@ -518,6 +530,7 @@ public class DiaryFetcher {
             return diaryQueryRepository.findPage(history);
         }
     }
+
 
     /**
      * GlobalErrorType 참고
