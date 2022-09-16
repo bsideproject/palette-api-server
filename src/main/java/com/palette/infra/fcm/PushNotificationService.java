@@ -14,6 +14,7 @@ import com.palette.exception.graphql.UserNotFoundExceptionForGraphQL;
 import com.palette.user.domain.User;
 import com.palette.user.repository.UserRepository;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
@@ -308,20 +309,26 @@ public class PushNotificationService {
 
     public void remindHistoryOne(History history) throws FirebaseMessagingException {
         log.info("remindHistoryOne call");
-        remindHistory(history, "3");
+
+        LocalDateTime startDate = history.getStartDate();
+        LocalDateTime endDate = history.getEndDate();
+
+        int period = (int) ChronoUnit.DAYS.between(startDate, endDate);
+
+        remindHistory(history, String.valueOf(12L * period));
     }
 
     public void remindHistoryTwo(History history) throws FirebaseMessagingException {
         log.info("remindHistoryTwo call");
-        remindHistory(history, "1");
+        remindHistory(history, "24"); //정책상 고정
     }
 
-    private void remindHistory(History history, String remainingDays)
+    private void remindHistory(History history, String remainingHours)
         throws FirebaseMessagingException {
         Diary diary = history.getDiary();
         String title = diary.getTitle();
         List<User> users = userRepository.findUsers(history);
-        log.info("remainingDays: {}", remainingDays);
+        log.info("remainingHours: {}", remainingHours);
 
         Map<User, Set<String>> fcmTokens = getFcmTokens(users);
         log.info("remindHistory of fcmTokens: {}", fcmTokens);
@@ -338,7 +345,7 @@ public class PushNotificationService {
                 .orElse(null);
 
             String noteTitle =
-                remainingDays + "일 후 " + title + " 에서 " + otherUser.getNickname()
+                remainingHours + "시간 후 " + title + " 에서 " + otherUser.getNickname()
                     + " 님이 작성한 일기가 도착해요 !";
             String noteBody = "";
 
