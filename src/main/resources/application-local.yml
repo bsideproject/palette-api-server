@@ -23,7 +23,7 @@ spring:
   # ===============================
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/palette
+    url: jdbc:mysql://localhost:3306/palette?serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: dbuser
     password: dbuser1234
   #  sql:

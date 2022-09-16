@@ -22,7 +22,7 @@ spring:
   # ===============================
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://mysql8:3306/palette # 개발서버에 반영시 수정 금지
+    url: jdbc:mysql://mysql8:3306/palette?serverTimezone=UTC&allowPublicKeyRetrieval=true # 개발서버에 반영시 수정 금지
     username: palette # 개발서버에 반영시 수정 금지
     password: 1q2w3e4r1! # 개발서버에 반영시 수정 금지
 

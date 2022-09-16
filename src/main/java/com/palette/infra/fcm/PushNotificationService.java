@@ -270,7 +270,7 @@ public class PushNotificationService {
             int period =
                 (int) ChronoUnit.DAYS.between(history.getStartDate(), history.getEndDate()) + 1;
 
-            String noteTitle = "일기가 완성됐어요!";
+            String noteTitle = "일기가 완성됐어요! ";
             //String noteBody = diary.getTitle() + " 일기가 완성됐어요.";
             String noteBody =
                 diary.getTitle() + "일기의 " + period + "일 일기가 완성됐어요! " + otherUser.getNickname()
@@ -283,6 +283,7 @@ public class PushNotificationService {
 
             StringBuilder historyBody = new StringBuilder();
             historyBody.append(noteTitle);
+            historyBody.append(noteBody);
 
             AlarmHistory alarmHistory = alarmHistoryService.createAlarmHistory(
                 toEntity(user, historyBody.toString(), "history", diary.getId(),
