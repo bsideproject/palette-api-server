@@ -146,9 +146,13 @@ public class PushNotificationService {
             }
 
             StringBuilder sb = new StringBuilder();
+            // 일기 그룹에 2명 제한된 조건전용 로직
             for (int i = 0; i < users.size(); i++) {
+                if (users.size() - 1 == i) {
+                    sb.append(" ");
+                }
                 sb.append(users.get(i).getNickname()).append("님");
-                if (i == users.size()) {
+                if (i == users.size() - 1) {
                     sb.append("의");
                 } else {
                     sb.append("과");
