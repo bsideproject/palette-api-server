@@ -158,7 +158,7 @@ public class PushNotificationService {
                     sb.append("과");
                 }
             }
-            sb.append(" 교환일기가 시작됐어요.");
+            sb.append(" 교환일기가 시작됐어요. ");
 
             String noteTitle = sb.toString();
             String noteBody =
