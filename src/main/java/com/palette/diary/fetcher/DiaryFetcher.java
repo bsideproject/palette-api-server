@@ -228,6 +228,8 @@ public class DiaryFetcher {
 
         History history = historyRepository.save(testCreateHistoryInput.toEntity(diary));
         diaryService.registerHistoryFinishedJob(history);
+        diaryService.registerHistoryRemindOneJobTest(history, testCreateHistoryInput.getSeconds());
+        diaryService.registerHistoryRemindTwoJobTest(history, testCreateHistoryInput.getSeconds());
 
         PushAlarmEventDto eventDto = PushAlarmEventDto.builder()
             .eventsKind(EventsKind.CREATE_HISTORY)

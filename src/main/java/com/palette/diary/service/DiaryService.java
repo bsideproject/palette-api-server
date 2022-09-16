@@ -129,5 +129,82 @@ public class DiaryService {
 
     }
 
+    //테스트 후 삭제예정
+    public void registerHistoryRemindOneJobTest(History history, Long seconds) {
+        try {
+            // Creating JobDetail instance
+            String jobDetailId = "HistoryRemindOne" + history.getId();
+            JobDetail jobDetail = JobBuilder.newJob(HistoryRemindOne.class)
+                .withIdentity(jobDetailId)
+                .build();
+
+            // Adding JobDataMap to JobDetail
+            jobDetail.getJobDataMap().put("historyId", history.getId().toString());
+
+            LocalDateTime startDate = history.getStartDate();
+            LocalDateTime endDate = history.getEndDate();
+
+            int period = (int) ChronoUnit.DAYS.between(startDate, endDate);
+
+            LocalDateTime endDate1 = history.getEndDate();
+
+            // Scheduling time to run job
+            Date triggerJobAt = java.sql.Timestamp.valueOf(
+                endDate1.minusSeconds(seconds / 2));
+
+            //범위
+            SimpleTrigger trigger = TriggerBuilder.newTrigger()
+                .withIdentity(jobDetailId)
+                .startAt(triggerJobAt)
+                .withSchedule(
+                    SimpleScheduleBuilder.simpleSchedule().withMisfireHandlingInstructionFireNow())
+                .build();
+
+            // Getting scheduler instance
+            Scheduler scheduler = schedulerConfig.schedulerFactoryBean().getScheduler();
+            scheduler.scheduleJob(jobDetail, trigger);
+            scheduler.start();
+        } catch (IOException | SchedulerException e) {
+            Sentry.captureException(e);
+        }
+
+    }
+
+    //테스트 후 삭제예정
+    public void registerHistoryRemindTwoJobTest(History history, Long seconds) {
+        try {
+            // Creating JobDetail instance
+            String jobDetailId = "HistoryRemindTwo" + history.getId();
+            JobDetail jobDetail = JobBuilder.newJob(HistoryRemindTwo.class)
+                .withIdentity(jobDetailId)
+                .build();
+
+            // Adding JobDataMap to JobDetail
+            jobDetail.getJobDataMap().put("historyId", history.getId().toString());
+
+            LocalDateTime endDate1 = history.getEndDate();
+
+            // Scheduling time to run job
+            Date triggerJobAt = java.sql.Timestamp.valueOf(
+                endDate1.minusSeconds(seconds / 4));
+
+            //범위
+            SimpleTrigger trigger = TriggerBuilder.newTrigger()
+                .withIdentity(jobDetailId)
+                .startAt(triggerJobAt)
+                .withSchedule(
+                    SimpleScheduleBuilder.simpleSchedule().withMisfireHandlingInstructionFireNow())
+                .build();
+
+            // Getting scheduler instance
+            Scheduler scheduler = schedulerConfig.schedulerFactoryBean().getScheduler();
+            scheduler.scheduleJob(jobDetail, trigger);
+            scheduler.start();
+        } catch (IOException | SchedulerException e) {
+            Sentry.captureException(e);
+        }
+
+    }
+
 
 }
