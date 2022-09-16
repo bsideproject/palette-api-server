@@ -23,7 +23,7 @@ type Diary {
     invitationCode: String!
     color: Color
     currentHistory: History
-    pastHistories: [History]
+    pastHistories: PastHistory
     joinedUsers: [User]!
     outedUser: String
     diaryStatus: String!
@@ -45,6 +45,10 @@ type History {
     leftUsers:[User]!
     createdAt: LocalDateTime!
     updatedAt: LocalDateTime!
+}
+
+type PastHistory {
+    pages: [Page]
 }
 
 type Page {
