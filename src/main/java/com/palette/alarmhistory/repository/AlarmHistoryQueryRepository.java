@@ -24,7 +24,7 @@ public class AlarmHistoryQueryRepository extends BaseRepository {
                 condition(user, alarmHistory.user::eq),
                 condition(LocalDateTime.now().minusDays(60L), alarmHistory.createdAt::goe)
             )
-            .orderBy(alarmHistory.createdAt.desc())
+            .orderBy(alarmHistory.id.desc(), alarmHistory.createdAt.desc())
             .offset(pageRequest.getOffset())
             .limit(pageRequest.getPageSize())
             .fetch();
