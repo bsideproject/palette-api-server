@@ -1,0 +1,16 @@
+extend type Query {
+    alarmHistories(alarmHistoryPageInput: AlarmHistoryPageInput): [AlarmHistory]!
+}
+
+extend type Mutation {
+    readAlarmHistories(readAlarmHistoriesInput: ReadAlarmHistoriesInput): Boolean
+}
+
+input ReadAlarmHistoriesInput {
+    alarmHistoryIds: [Long]!
+}
+
+input AlarmHistoryPageInput {
+    offset: Int
+    size: Int
+}
