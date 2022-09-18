@@ -471,12 +471,21 @@ public class DiaryFetcher {
     }
 
     @DgsData(parentType = "History", field = "remainingDays")
-    public int getPeriodDays(DgsDataFetchingEnvironment dfe) {
+    public int getRemainingDays(DgsDataFetchingEnvironment dfe) {
         History history = dfe.getSource();
         if (!history.getIsDeleted()) {
             return (int) ChronoUnit.DAYS.between(LocalDateTime.now(), history.getEndDate()) + 1;
         }
 
+        return 0;
+    }
+
+    @DgsData(parentType = "History", field = "periodDays")
+    public int getPeriodDays(DgsDataFetchingEnvironment dfe) {
+        History history = dfe.getSource();
+        if (!history.getIsDeleted()) {
+            return (int) ChronoUnit.DAYS.between(history.getStartDate(), history.getEndDate()) + 1;
+        }
         return 0;
     }
 
