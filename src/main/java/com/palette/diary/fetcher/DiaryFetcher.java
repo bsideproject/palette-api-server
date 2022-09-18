@@ -484,7 +484,7 @@ public class DiaryFetcher {
     public int getPeriodDays(DgsDataFetchingEnvironment dfe) {
         History history = dfe.getSource();
         if (!history.getIsDeleted()) {
-            return (int) ChronoUnit.DAYS.between(history.getStartDate(), history.getEndDate()) + 1;
+            return (int) ChronoUnit.DAYS.between(history.getStartDate(), history.getEndDate());
         }
         return 0;
     }
