@@ -1,5 +1,6 @@
 package com.palette.event;
 
+import com.palette.diary.domain.Diary;
 import com.palette.infra.fcm.PushNotificationService;
 import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,11 @@ public class PushAlarmEventHandler {
                     service.createDiary(eventDto.getDiary(), eventDto.getUserIds());
                 case CREATE_HISTORY -> service.createHistory(eventDto.getHistory());
                 case CREATE_PAGE -> service.createPage(eventDto.getPage());
-                case OUT_DIARY -> service.outDiary(eventDto.getDiary(), eventDto.getUser());
+                case OUT_DIARY -> {
+                    for (Diary outDiary : eventDto.getOutDiaries()) {
+                        service.outDiary(outDiary, eventDto.getUser());
+                    }
+                }
             }
         } catch (Exception e) {
             Sentry.captureException(e);

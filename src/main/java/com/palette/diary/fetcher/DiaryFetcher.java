@@ -616,18 +616,18 @@ public class DiaryFetcher {
     @Authentication
     @Transactional
     public Boolean outDiary(@InputArgument OutDiaryInput outDiaryInput, LoginUser loginUser) {
-        Diary diary = diaryRepository.findById(outDiaryInput.getDiaryId())
+        Diary outDiary = diaryRepository.findById(outDiaryInput.getDiaryId())
             .orElseThrow(DiaryNotFoundException::new);
 
         User user = userRepository.findById(loginUser.getUserId())
             .orElseThrow(UserNotFoundExceptionForGraphQL::new);
 
-        DiaryGroup diaryGroup = diaryGroupRepository.findByDiaryAndUser(diary, user)
+        DiaryGroup diaryGroup = diaryGroupRepository.findByDiaryAndUser(outDiary, user)
             .orElseThrow(DiaryNotFoundException::new);
 
         PushAlarmEventDto eventDto = PushAlarmEventDto.builder()
             .eventsKind(EventsKind.OUT_DIARY)
-            .diary(diary)
+            .outDiaries(List.of(outDiary))
             .user(user)
             .build();
 

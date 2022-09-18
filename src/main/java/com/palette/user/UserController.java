@@ -1,7 +1,12 @@
 package com.palette.user;
 
+import com.palette.diary.domain.Diary;
 import com.palette.diary.domain.DiaryGroup;
 import com.palette.diary.repository.DiaryGroupRepository;
+import com.palette.event.Events;
+import com.palette.event.EventsKind;
+import com.palette.event.PushAlarmEvent;
+import com.palette.event.PushAlarmEventDto;
 import com.palette.exception.rest.DeletedUserException;
 import com.palette.exception.rest.UserNotFoundExceptionForRest;
 import com.palette.infra.jwtTokenProvider.JwtRefreshTokenInfo;
@@ -14,10 +19,8 @@ import com.palette.user.fetcher.dto.LoginResponse;
 import com.palette.user.fetcher.dto.TokenResponse;
 import com.palette.user.repository.UserRepository;
 import com.palette.user.service.UserService;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import org.springframework.http.ResponseCookie;
@@ -123,6 +126,20 @@ public class UserController {
         for (DiaryGroup diaryGroup : diaryGroups) {
             diaryGroup.userOut();
         }
+
+        List<Diary> outDiaries = new ArrayList();
+        for (DiaryGroup diaryGroup : diaryGroups) {
+            outDiaries.add(diaryGroup.getDiary());
+        }
+
+        //나간일기에 대한 푸시 알림
+        PushAlarmEventDto eventDto = PushAlarmEventDto.builder()
+                .eventsKind(EventsKind.OUT_DIARY)
+                .outDiaries(outDiaries)
+                .user(user)
+                .build();
+
+        Events.raise(new PushAlarmEvent(eventDto));
 
         userService.removeRefreshToken(refreshToken);
         expireRefreshTokenCookie(response);
