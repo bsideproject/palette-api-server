@@ -68,7 +68,7 @@ jobs:
 
       - name: docker-compose.yml run
         run: |
-          cd /home-server/api-server
+          cd /home/prod-server/api-server
           docker-compose down
           if [ -z $(docker images -qf reference='${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}') ]; then
             echo "not search docker images"
