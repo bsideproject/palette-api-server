@@ -1,0 +1,93 @@
+scalar Long
+scalar LocalDateTime
+
+type Query {}
+type Mutation {}
+
+type User {
+    id: Long!
+    email: String!
+    nickname: String
+    profileImg: String
+    diaries: [Diary]!
+    agreeWithTerms: Boolean!
+    socialTypes: [String]!
+    pushEnabled: Boolean!
+    createdAt: LocalDateTime!
+    updatedAt: LocalDateTime!
+}
+
+type Diary {
+    id: Long!
+    title: String!
+    invitationCode: String!
+    color: Color
+    currentHistory: History
+    pastHistories: PastHistory
+    joinedUsers: [User]!
+    outedUser: String
+    diaryStatus: String!
+    leftUsers:[User]!
+    isDeleted: Boolean!
+    createdAt: LocalDateTime!
+    updatedAt: LocalDateTime!
+}
+
+type History {
+    id: Long!
+    diary: Diary!
+    pages: [Page]
+    startDate: LocalDateTime!
+    endDate: LocalDateTime!
+    remainingDays: Int!
+    periodDays: Int!
+    isFinished: Boolean!
+    joinedUsers: [User]!
+    leftUsers:[User]!
+    createdAt: LocalDateTime!
+    updatedAt: LocalDateTime!
+}
+
+type PastHistory {
+    pages: [Page]
+}
+
+type Page {
+    id: Long!
+    title: String!
+    body: String!
+    author: User!
+    images: [Image]
+    isSelf: Boolean
+    createdAt: LocalDateTime!
+    updatedAt: LocalDateTime!
+}
+
+type Image {
+    id: Long!
+    domain: String!
+    path: String!
+    createdAt: LocalDateTime!
+    updatedAt: LocalDateTime!
+}
+
+type Color {
+    id: Long!
+    order: Int!
+    startCode: String!
+    endCode: String!
+    createdAt: LocalDateTime!
+    updatedAt: LocalDateTime!
+}
+
+type AlarmHistory {
+    id: Long!
+    user: User!
+    body: String!
+    movePage: String!
+    diaryId: Long!
+    historyId: Long!
+    isRead: Boolean!
+    createdAt: LocalDateTime!
+    updatedAt: LocalDateTime!
+}

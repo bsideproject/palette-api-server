@@ -1,0 +1,68 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+    import: 'aws-parameterstore:'
+
+  # ===============================
+  # = jpa
+  # ===============================
+  jpa:
+    defer-datasource-initialization: true
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    properties:
+      hibernate:
+        format_sql: false
+        default_batch_fetch_size: 1000
+
+  # ===============================
+  # = database
+  # ===============================
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/palette?serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: dbuser
+    password: dbuser1234
+  #  sql:
+  #    init:
+  #      mode: always
+
+
+# ==============================
+# = aws
+# ==============================
+aws:
+  paramstore:
+    enabled: true
+    prefix: /config
+    profile-separator: '-'
+    name: app-palette
+    fail-fast: true
+
+# ===============================
+# = p6spy
+# ===============================
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false
+
+# ===============================
+# = sentry
+# ===============================
+sentry:
+  logging:
+    enabled: false # local 비활성화
+
+# ===============================
+# = eureka
+# ===============================
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true

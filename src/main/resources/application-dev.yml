@@ -1,0 +1,76 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+    import: 'aws-parameterstore:'
+
+  # ===============================
+  # = jpa
+  # ===============================
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    properties:
+      hibernate:
+        format_sql: false
+        default_batch_fetch_size: 1000
+
+  # ===============================
+  # = database
+  # ===============================
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mysql8:3306/palette?serverTimezone=UTC&allowPublicKeyRetrieval=true # 개발서버에 반영시 수정 금지
+    username: palette # 개발서버에 반영시 수정 금지
+    password: 1q2w3e4r1! # 개발서버에 반영시 수정 금지
+
+# ===============================
+# = aws
+# ==============================
+aws:
+  paramstore:
+    enabled: true
+    prefix: /config
+    profile-separator: '-'
+    name: app-palette
+    fail-fast: false
+
+# ===============================
+# = p6spy
+# ===============================
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false
+
+# ===============================
+# = sentry
+# ===============================
+sentry:
+  dsn: ${sentry.dns}
+  traces-sample-rate: 1.0 # 성능 모니터링을 위해 100% 트랜잭션을 캡처하려면 trace-sample-rate를 1.0으로 설정합니다.
+  logging:
+    minimum-breadcrumb-level: warn
+    minimum-event-level: warn # info또는 그 이상으로 로그 메시지를 이동 경로로 포함합니다.
+    enabled: true
+  environment: dev
+
+# ===============================
+# = actuator, prometheus
+# ===============================
+management:
+  metrics:
+    tags:
+      application: 'dev-api-server'
+
+# ===============================
+# = eureka
+# ===============================
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-server:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
