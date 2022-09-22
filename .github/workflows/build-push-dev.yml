@@ -1,10 +1,11 @@
-# build-push-master.yml(1)
-name: 'build-push'
-#
+name: 'build-push-dev'
+
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "develop" ]
 #  pull_request:
+#    types:
+#      - closed
 #    branches: [ "develop" ]
 
 jobs:
@@ -57,7 +58,7 @@ jobs:
   deploy:
     needs: build
     name: deploy
-    runs-on: [ self-hosted, eureka-server, dev ]
+    runs-on: [ self-hosted,  api-server, dev ]
     steps:
       - name: Login to DockerHub
         uses: docker/login-action@v1
@@ -67,7 +68,7 @@ jobs:
 
       - name: docker-compose.yml run
         run: |
-          cd /home/server/eureka-server
+          cd /home/server/api-server
           docker-compose down
           if [ -z $(docker images -qf reference='${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}') ]; then
             echo "not search docker images"

@@ -1,11 +1,12 @@
-# build-push.yml(1)
-name: 'build-push'
-# ci / cd test
+name: 'build-push-prod'
+
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "main" ]
 #  pull_request:
-#    branches: [ "develop" ]
+#    types:
+#      - closed
+#    branches: [ "main" ]
 
 jobs:
   build:
@@ -57,7 +58,7 @@ jobs:
   deploy:
     needs: build
     name: deploy
-    runs-on: [ self-hosted,  api-server, dev ]
+    runs-on: [ self-hosted, api-server, prod ]
     steps:
       - name: Login to DockerHub
         uses: docker/login-action@v1
@@ -67,7 +68,7 @@ jobs:
 
       - name: docker-compose.yml run
         run: |
-          cd /home/server/api-server
+          cd /home-server/api-server
           docker-compose down
           if [ -z $(docker images -qf reference='${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}') ]; then
             echo "not search docker images"
@@ -76,7 +77,19 @@ jobs:
             docker rmi -f ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}
             echo "docker images remove success"
             docker-compose up --build -d
-            echo "docker-compose start success"
+            echo "api-server docker-compose start success"
+          fi
+          
+          cd /home/prod-server/api-server2
+          docker-compose down
+          if [ -z $(docker images -qf reference='${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}') ]; then
+            echo "not search docker images"
+            exit 1
+          else
+            docker rmi -f ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKER_REPO}}
+            echo "docker images remove success"
+            docker-compose up --build -d
+            echo "api-server2 docker-compose start success"
           fi
 
       - name: action-slack

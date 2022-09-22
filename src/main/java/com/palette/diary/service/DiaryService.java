@@ -30,7 +30,8 @@ public class DiaryService {
         try {
             // Creating JobDetail instance
             String jobDetailId = "History" + history.getId();
-            JobDetail jobDetail = JobBuilder.newJob(HistoryFinished.class).withIdentity(jobDetailId)
+            JobDetail jobDetail = JobBuilder.newJob(HistoryFinished.class)
+                .withIdentity(jobDetailId)
                 .build();
 
             // Adding JobDataMap to JobDetail
