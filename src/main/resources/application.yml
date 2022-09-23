@@ -8,9 +8,10 @@ spring:
     group:
       local: local
       dev: dev
+      prod: prod
 
 # ===============================
-# = actuator, prometheus
+# = actuator, prometheus+
 # ===============================
 management:
   endpoint:
