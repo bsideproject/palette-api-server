@@ -69,6 +69,8 @@ management:
 # = eureka
 # ===============================
 eureka:
+  instance:
+    hostname: ${HOSTNAME} # 각 서버의 IP
   client:
     serviceUrl:
       defaultZone: ${eureka.url}
