@@ -71,6 +71,6 @@ management:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://eureka-server:8761/eureka/
+      defaultZone: ${eureka.url}
     fetch-registry: true
     register-with-eureka: true
