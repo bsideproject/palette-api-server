@@ -10,7 +10,8 @@
   <property name="MAX_HISTORY" value="30"/>
   <property name="LOG_PATTERN"
     value="[%d{yyyy-MM-dd HH:mm:ss}:%-3relative] [%X{TRANSACTION-ID}] %green([%thread]) %highlight(%-5level) %C.%M :%msg%n"/>
-  <springProfile name="prod">
+
+  <springProfile name="local, dev, prod">
     <appender class="ch.qos.logback.core.ConsoleAppender" name="CONSOLE">
       <encoder>
         <pattern>${LOG_PATTERN}
