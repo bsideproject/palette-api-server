@@ -32,7 +32,6 @@ management:
 # = server config
 # ===============================
 server:
-  port: 8082
   shutdown: graceful
   servlet:
     context-path: /
