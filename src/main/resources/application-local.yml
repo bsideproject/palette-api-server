@@ -61,6 +61,9 @@ sentry:
 # = eureka
 # ===============================
 eureka:
+  instance:
+    #    hostname: 127.0.0.1
+    prefer-ip-address: true
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
