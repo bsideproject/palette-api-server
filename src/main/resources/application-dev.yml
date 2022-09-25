@@ -1,4 +1,10 @@
 spring:
+  quartz:
+    jdbc:
+      #      initialize-schema: never
+      schema: classpath:quartz-create.sql
+    #    overwrite-existing-jobs: true # 생성된 작업 덮어 쓰기
+    job-store-type: jdbc
   config:
     activate:
       on-profile: dev
