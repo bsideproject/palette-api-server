@@ -112,7 +112,16 @@ public class DiaryFetcher {
 
         User user = userRepository.findByEmail(loginUser.getEmail())
             .orElseThrow(UserNotFoundExceptionForGraphQL::new);
-        String invitationCode = RandomStringUtils.randomAlphabetic(8);
+
+        String invitationCode = "";
+        while (true) {
+            invitationCode = RandomStringUtils.randomAlphabetic(8);
+            int count = diaryRepository.countByInvitationCode(invitationCode);
+            if (count < 1) {
+                break;
+            }
+        }
+
         Diary diary = diaryRepository.save(createDiaryInput.toEntity(invitationCode, color));
         diaryGroupRepository.save(createDiaryInput.toEntity(diary, user));
         return CreateDiaryOutput.of(diary.getInvitationCode());

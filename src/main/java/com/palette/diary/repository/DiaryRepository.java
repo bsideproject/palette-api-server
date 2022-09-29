@@ -18,4 +18,6 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
 
     Optional<Diary> findByInvitationCode(String invitationCode);
 
+    int countByInvitationCode(String invitationCode);
+
 }
