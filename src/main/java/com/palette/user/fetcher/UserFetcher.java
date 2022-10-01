@@ -65,17 +65,13 @@ public class UserFetcher {
         if (agreeWithTerms != null) {
             user.setAgreeWithTerms(agreeWithTerms);
         }
-        
+
         if (profileImg != null) {
             user.setProfileImg(profileImg);
-        } else {
-            user.setProfileImg("");
         }
 
         if (nickname != null) {
             user.setNickname(nickname);
-        } else {
-            user.setNickname("");
         }
 
         if (pushEnabled != null) {
