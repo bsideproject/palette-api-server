@@ -216,7 +216,7 @@ public class PushNotificationService {
             return;
         }
 
-        String noteTitle = author.getNickname() + "님이 " + "에 오늘의 일기를 작성했어요.";
+        String noteTitle = author.getNickname() + "님이 " + diary.getTitle() + "에 오늘의 일기를 작성했어요.";
         String noteBody = "";
 
         Map<String, String> noteData = new HashMap<>();
