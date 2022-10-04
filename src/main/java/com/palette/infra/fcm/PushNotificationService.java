@@ -268,7 +268,7 @@ public class PushNotificationService {
                 .orElse(null);
 
             int period =
-                (int) ChronoUnit.DAYS.between(history.getStartDate(), history.getEndDate()) + 1;
+                (int) ChronoUnit.DAYS.between(history.getStartDate(), history.getEndDate());
 
             String noteTitle = "일기가 완성됐어요! ";
             String noteBody =
